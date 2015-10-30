@@ -1,5 +1,6 @@
 package com.blogboard.server.service;
 import com.blogboard.server.data.entity.Account;
+import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.web.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,16 @@ public class AccountManagementService {
     public final String accessDenied = "http://localhost:3000/access-denied";
     public final String accountCreationSucessful = "http://localhost:3000/account-creation-succesful";
 
-    public AccountManagementService() { super(); }
+    //public AccountManagementService() { super(); }
 
     private final Logger logger = Logger.getLogger(AccountManagementService.class.getName());
 
-    @Autowired
     private AccountService accountService;
+
+    @Autowired
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     public LoginResponse validateAccountCreation(String username, String password, String email) {
 

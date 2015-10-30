@@ -1,6 +1,8 @@
 package com.blogboard.server.web;
 
+import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.service.AccountManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -9,7 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AccountController {
 
-    public AccountManagementService accountManagementService = new AccountManagementService();
+    private AccountManagementService accountManagementService;
+    @Autowired
+    public void setAccountRepository(AccountManagementService accountManagementService) {
+        this.accountManagementService = accountManagementService;
+    }
+
 
     @RequestMapping("/create-account")
 
