@@ -43,6 +43,14 @@ public class Account {
         return password;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public java.lang.String getEmail() {
+        return email;
+    }
+
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
     }

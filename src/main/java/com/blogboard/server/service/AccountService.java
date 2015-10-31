@@ -1,12 +1,10 @@
 package com.blogboard.server.service;
 
+import com.blogboard.server.web.CreateAccountResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
 import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.repository.AccountRepository;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AccountService {
@@ -27,14 +25,22 @@ public class AccountService {
         accountRepo.delete(id);
     }
 
-    public Account createAccount(Account newAccount) {
+    public CreateAccountResponse createAccount(String username, String password, String email) {
 
-        if (newAccount.getId() != null) {
-            // Can't create Greeting with specified ID value
-            return null;
+        CreateAccountResponse createAccountResponse = new CreateAccountResponse();
+
+        //check if account already exists
+        if(accountRepo.findByUsername(username) != null) {
+            createAccountResponse.setCreateAccountFailureMessage("username");
+        } else if (accountRepo.findByEmail(email) != null) {
+            createAccountResponse.setCreateAccountFailureMessage("email");
+        } else {
+            Account newAccount = new Account(username, password, email);
+            Account savedAccount = accountRepo.save(newAccount);
+            createAccountResponse.setCreateAccountSuccessMessage();
         }
-        //Account savedAccount = accountRepo.save(newAccount);
-        accountRepo.save(newAccount);
-        return newAccount;
+
+        return createAccountResponse;
     }
+
 }
