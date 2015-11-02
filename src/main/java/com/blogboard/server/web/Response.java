@@ -1,15 +1,14 @@
 package com.blogboard.server.web;
 
 
-public class Response {
+public abstract class Response {
 
     public String httpResponseHeader;
-
-    private String responseText;
+    private String responseMessage;
 
     public Response() {
         this.httpResponseHeader = "";
-        this.responseText = "";
+        this.responseMessage = "";
     }
 
     public String getHttpResponseHeader() {
@@ -20,12 +19,18 @@ public class Response {
         this.httpResponseHeader = newHeader;
     }
 
-    public String getResponseText() {
-        return this.responseText;
+    public String getResponseMessage() {
+        return this.responseMessage;
     }
 
-    public void setResponseText(String newResponseText) {
-        this.responseText = newResponseText;
+    public void setResponseMessage(String newResponseText) {
+        this.responseMessage = newResponseText;
     }
+
+    abstract public void setToSuccess();
+
+    abstract public void setToFailure(String reasonForFailure);
+
+
 
 }
