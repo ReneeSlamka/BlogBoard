@@ -29,12 +29,12 @@ public class AccountController {
 
     }
 
-    /*@RequestMapping("/login")
+    @RequestMapping("/login")
     public @ResponseBody
-    CreateAccountResponse login(
+    LoginResponse login(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password){
 
-        return accountService.createAccount(username, password);
-    }*/
+        return accountService.login(username, password);
+    }
 }
