@@ -21,15 +21,20 @@ public class AccountService {
     public CreateAccountResponse createAccount(String username, String password, String email) {
         CreateAccountResponse createAccountResponse = new CreateAccountResponse();
 
-        if(accountRepo.findByUsername(username) != null) {
-            createAccountResponse.setToFailure("username");
-        } else if (accountRepo.findByEmail(email) != null) {
-            createAccountResponse.setToFailure("email");
-        } else {
+        if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
             Account newAccount = new Account(username, password, email);
             //set try catch here!!
             Account savedAccount = accountRepo.save(newAccount);
             createAccountResponse.setToSuccess();
+        } else {
+            if(accountRepo.findByUsername(username) != null) {
+                createAccountResponse.setToFailure("username");
+            } else if (accountRepo.findByEmail(email) != null) {
+                createAccountResponse.setToFailure("email");
+            } else {
+                //to cover other unknown errors
+                createAccountResponse.setToFailure("WEIRD ERROR"); //TODO replace later
+            }
         }
 
         return createAccountResponse;
@@ -38,12 +43,18 @@ public class AccountService {
     public LoginResponse login(String username, String password) {
         LoginResponse loginResponse = new LoginResponse();
 
-        if (accountRepo.findByUsername(username) == null) {
-            loginResponse.setToFailure("username");
-        } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
-            loginResponse.setToFailure("password");
-        } else {
-            loginResponse.setToSuccess();
+        if (accountRepo.findByUsername(username) != null &&
+            accountRepo.findByUsername(username).getPassword().equals(password)){
+                loginResponse.setToSuccess();
+        }
+        else {
+            if (accountRepo.findByUsername(username) == null) {
+                loginResponse.setToFailure("username");
+            } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
+                loginResponse.setToFailure("password");
+            } else {
+                loginResponse.setToFailure("WEIRD ERROR"); //TODO replace with proper solution later
+            }
         }
 
         return loginResponse;
