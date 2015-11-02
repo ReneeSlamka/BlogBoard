@@ -23,9 +23,12 @@ public class AccountService {
 
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
             Account newAccount = new Account(username, password, email);
-            //set try catch here!!
             Account savedAccount = accountRepo.save(newAccount);
-            createAccountResponse.setToSuccess();
+            if (savedAccount == null) {
+                createAccountResponse.setToFailure("Uknown database error");
+            } else {
+                createAccountResponse.setToSuccess();
+            }
         } else {
             if(accountRepo.findByUsername(username) != null) {
                 createAccountResponse.setToFailure("username");
@@ -33,7 +36,7 @@ public class AccountService {
                 createAccountResponse.setToFailure("email");
             } else {
                 //to cover other unknown errors
-                createAccountResponse.setToFailure("WEIRD ERROR"); //TODO replace later
+                createAccountResponse.setToFailure("UNKNOWN ERROR"); //TODO replace later
             }
         }
 
@@ -53,7 +56,7 @@ public class AccountService {
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
                 loginResponse.setToFailure("password");
             } else {
-                loginResponse.setToFailure("WEIRD ERROR"); //TODO replace with proper solution later
+                loginResponse.setToFailure("UNKNOWN ERROR"); //TODO replace with proper solution later
             }
         }
 
