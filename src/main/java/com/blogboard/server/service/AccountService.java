@@ -65,6 +65,26 @@ public class AccountService {
         return loginResponse;
     }
 
+    public ValidateUserSessionResponse validateUserSession(String sessionId) {
+        ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
+
+        if (sessionId.length() == 0){
+            validationResponse.setToFailure("No session has been initialized");
+            return validationResponse;
+        }
+
+        Account targetAccount = accountRepo.findBySessionId(sessionId);
+
+        //TODO: improve security here after more research
+        if (targetAccount != null){
+            validationResponse.setToSuccess();
+        } else {
+            validationResponse.setToFailure("Not a valid session");
+        }
+
+        return validationResponse;
+    }
+
     public Account findOne(Long id) {
         Account account = accountRepo.findOne(id);
         return account;

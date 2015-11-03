@@ -37,4 +37,11 @@ public class AccountController {
 
         return accountService.login(username, password);
     }
+
+    @RequestMapping("/validate-session")
+    public @ResponseBody
+    ValidateUserSessionResponse validateSession(
+            @RequestParam(value="sessionId", required=true) String sessionId) {
+        return accountService.validateUserSession(sessionId);
+    }
 }
