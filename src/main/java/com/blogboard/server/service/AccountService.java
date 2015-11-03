@@ -2,15 +2,20 @@ package com.blogboard.server.service;
 
 import com.blogboard.server.web.CreateAccountResponse;
 import com.blogboard.server.web.LoginResponse;
+import com.blogboard.server.web.ValidateUserSessionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.repository.AccountRepository;
 
+import java.util.Random;
+
 @Service
 public class AccountService {
 
     private AccountRepository accountRepo;
+
+    //TODO: how to ensure only one return value for queries that require it?
 
     @Autowired
     public void setAccountRepository(AccountRepository accountRepository) {
@@ -48,9 +53,16 @@ public class AccountService {
         Account targetAccount = accountRepo.findByUsername(username);
 
         if (targetAccount != null && targetAccount.getPassword().equals(password)){
-                //generate session id and store it to this account in db
-                targetAccount.setSessionId();
-                loginResponse.setToSuccess();
+            //generate session id and store it to this account in db
+            String newSessionId;
+            //ensure new session id is different from the previous one
+            do {
+                newSessionId = generateSessionID();
+            } while(generateSessionID().equals(targetAccount.getSessionId()));
+
+            targetAccount.setSessionId(newSessionId);
+            Account updatedAccount = accountRepo.save(targetAccount);
+            loginResponse.setToSuccess(newSessionId);
         }
         else {
             if (accountRepo.findByUsername(username) == null) {
@@ -92,6 +104,15 @@ public class AccountService {
 
     public void delete(Long id) {
         accountRepo.delete(id);
+    }
+
+    //TODO: is it safe for this method to be part of the account object?
+    private String generateSessionID() {
+        Random randomNumberGenerator = new Random();
+        int randomInt = randomNumberGenerator.nextInt(100);
+        String sessionId = "ABC" + String.valueOf(randomInt);
+
+        return sessionId;
     }
 
 }

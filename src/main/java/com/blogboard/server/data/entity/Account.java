@@ -1,5 +1,4 @@
 package com.blogboard.server.data.entity;
-import java.util.Random;
 
 import javax.persistence.*;
 
@@ -61,25 +60,13 @@ public class Account {
         return loggedIn;
     }
 
-    public void setSessionId() {
-        this.sessionId = generateSessionID();
+    public void setSessionId(String newSessionId) {
+        this.sessionId = newSessionId;
     }
 
     public String getSessionId() {
         return this.sessionId;
     }
-
-    //TODO: is it safe for this method to be part of the account object?
-    private String generateSessionID() {
-        Random randomNumberGenerator = new Random();
-        int randomInt = randomNumberGenerator.nextInt(100);
-        String sessionId = "ABC" + String.valueOf(randomInt);
-
-        return sessionId;
-    }
-
-
-
 
 
     public void updatePassword(String newPassword) {
