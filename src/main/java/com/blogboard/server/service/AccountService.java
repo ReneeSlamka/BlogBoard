@@ -45,9 +45,11 @@ public class AccountService {
 
     public LoginResponse login(String username, String password) {
         LoginResponse loginResponse = new LoginResponse();
+        Account targetAccount = accountRepo.findByUsername(username);
 
-        if (accountRepo.findByUsername(username) != null &&
-            accountRepo.findByUsername(username).getPassword().equals(password)){
+        if (targetAccount != null && targetAccount.getPassword().equals(password)){
+                //generate session id and store it to this account in db
+                targetAccount.setSessionId();
                 loginResponse.setToSuccess();
         }
         else {
