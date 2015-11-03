@@ -4,7 +4,7 @@ public class CreateAccountResponse extends Response {
 
     //find better place for these strings
     private String getCreateAccountSuccessURL = "http://localhost:3000/account-created";
-    private String createAccountFailureURL = "http://localhost:3000/home";
+    private String createAccountFailureURL = "http://localhost:3000/login";
 
     public CreateAccountResponse() {
         super();
