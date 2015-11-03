@@ -2,8 +2,8 @@ package com.blogboard.server.web;
 
 public class LoginResponse extends Response {
 
-    private String loginSuccessURL = "http://localhost:3000/login";
-    private String loginFailureURL = "http://localhost:3000";
+    private String loginSuccessURL = "http://localhost:3000/home";
+    private String loginFailureURL = "http://localhost:3000/login";
 
     public LoginResponse() {
         super();
