@@ -2,8 +2,9 @@ package com.blogboard.server.web;
 
 public class LoginResponse extends Response {
 
-    private String loginSuccessURL = "http://localhost:3000/home";
-    private String loginFailureURL = "http://localhost:3000/login";
+    private final String loginSuccessURL = "http://localhost:3000/home";
+    private final String loginFailureURL = "http://localhost:3000/login";
+    private String sessionId;
 
     public LoginResponse() {
         super();
@@ -24,11 +25,23 @@ public class LoginResponse extends Response {
 
     }
 
-    @Override
-    public void setToSuccess() {
+    private void setSessionId(String newSessionId) {
+        this.sessionId = newSessionId;
+    }
+
+    public String getSessionId() {
+        return this.sessionId;
+    }
+
+    public void setToSuccess(String sessionId) {
         this.setHttpResponseHeader(loginSuccessURL);
+        this.setSessionId(sessionId);
         this.setLoginSuccessMessage();
     }
+
+    //TODO: refactor
+    @Override
+    public void setToSuccess() {}
 
     @Override
     public void setToFailure(String incorrectLoginParameter) {
