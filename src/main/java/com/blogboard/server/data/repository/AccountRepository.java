@@ -10,4 +10,6 @@ public interface AccountRepository extends CrudRepository<Account, Long> {
     Account findByUsername(String username);
 
     Account findByEmail(String email);
+
+    Account findBySessionId(String sessionId);
 }
