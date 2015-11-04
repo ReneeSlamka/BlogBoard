@@ -12,7 +12,6 @@ public class Account {
     private String password;
     private String email;
     private boolean loggedIn = false;
-    private String sessionId;
 
 
     public Account() {
@@ -59,15 +58,6 @@ public class Account {
     public boolean getLoggedIn(){
         return loggedIn;
     }
-
-    public void setSessionId(String newSessionId) {
-        this.sessionId = newSessionId;
-    }
-
-    public String getSessionId() {
-        return this.sessionId;
-    }
-
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
