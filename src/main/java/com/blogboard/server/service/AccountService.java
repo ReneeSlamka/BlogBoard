@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.repository.AccountRepository;
 import java.security.MessageDigest;
-
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
@@ -28,6 +29,8 @@ public class AccountService {
     public static final String INVALID_PASSWORD = "password";
     public static final String INVALID_EMAIL = "email";
     public static final String UNKNOWN_ERROR = "Unknown error";
+    private static final String LOGIN_SUCCESS_URL = "http://localhost:3000/home";
+    private static final String LOGIN_FAILURE_URL = "http://localhost:3000/login";
 
     //TODO: how to ensure only one return value for queries that require it?
 
@@ -76,9 +79,16 @@ public class AccountService {
         return createAccountResponse;
     }
 
-    public LoginResponse login(String username, String password) {
+
+
+
+
+    public LoginResponse login(String username, String password, HttpServletResponse httpResponse) {
         LoginResponse loginResponse = new LoginResponse();
         Account targetAccount = accountRepo.findByUsername(username);
+        httpResponse.setHeader("Custom-Header", "Own-Data");
+        httpResponse.setHeader("Access-Control-Expose-Headers", "Custom-Header");
+        httpResponse.setHeader("Access-Control-Expose-Headers", "Location");
 
         String hashedPassword = password;
         try {
@@ -93,8 +103,17 @@ public class AccountService {
             if (previousSession == null) {
                 String newSessionId = generateSessionID();
                 Session newSession = new Session(username, newSessionId);
+
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL); //encodeRedirectURL(LOGIN_SUCCESS_URL);
+
+
                 loginResponse.setToSuccess(newSessionId);
             } else {
+
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.setContentType("text/plain");
+                httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
                 loginResponse.setToFailure(INVALID_LOGIN_ATTEMPT);
             }
 
@@ -102,6 +121,10 @@ public class AccountService {
             loginResponse.setToSuccess("");//newSessionId);
         }
         else {
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.setContentType("text/plain");
+            httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
+
             if (accountRepo.findByUsername(username) == null) {
                 loginResponse.setToFailure(INVALID_USERNAME);
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
@@ -113,6 +136,10 @@ public class AccountService {
 
         return loginResponse;
     }
+
+
+
+
 
     public ValidateUserSessionResponse validateUserSession(String sessionId) {
         ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
