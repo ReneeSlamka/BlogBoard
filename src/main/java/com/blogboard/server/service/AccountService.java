@@ -45,33 +45,33 @@ public class AccountService {
     }
 
 
-    public CreateAccountResponse createAccount(String username, String password, String email) {
+    public CreateAccountResponse createAccount(String username, String password, String email,
+       HttpServletResponse httpResponse) {
         CreateAccountResponse createAccountResponse = new CreateAccountResponse();
 
+        //check if account with that username and/or email already exists
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
 
-            String hashedPassword = password;
-            try {
-                hashedPassword = hashPassword(password);
-            } catch (NoSuchAlgorithmException e) {
-                System.out.println("Hashing function failed to hash password");
-            }
-
-            Account newAccount = new Account(username, hashedPassword, email);
+            Account newAccount = new Account(username, hashPassword(password), email);
             Account savedAccount = accountRepo.save(newAccount);
 
             if (savedAccount == null) {
+                httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 createAccountResponse.setToFailure(UNKNOWN_DATABASE_ERROR);
             } else {
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
                 createAccountResponse.setToSuccess();
             }
         } else {
+            //either account with same credential(s) already exists or unknown error occurred
+            httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
             if(accountRepo.findByUsername(username) != null) {
                 createAccountResponse.setToFailure(INVALID_USERNAME);
             } else if (accountRepo.findByEmail(email) != null) {
                 createAccountResponse.setToFailure(INVALID_EMAIL);
             } else {
                 //to cover other unknown errors
+                httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 createAccountResponse.setToFailure(UNKNOWN_DATABASE_ERROR); //TODO replace later
             }
         }
@@ -80,24 +80,12 @@ public class AccountService {
     }
 
 
-
-
-
     public LoginResponse login(String username, String password, HttpServletResponse httpResponse) {
         LoginResponse loginResponse = new LoginResponse();
         Account targetAccount = accountRepo.findByUsername(username);
-        httpResponse.setHeader("Custom-Header", "Own-Data");
-        httpResponse.setHeader("Access-Control-Expose-Headers", "Custom-Header");
-        httpResponse.setHeader("Access-Control-Expose-Headers", "Location");
 
-        String hashedPassword = password;
-        try {
-            hashedPassword = hashPassword(password);
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Hashing function failed to hash password");
-        }
-
-        if (targetAccount != null && targetAccount.getPassword().equals(hashedPassword)){
+        //Check if account exists and whether password is correct
+        if (targetAccount != null && targetAccount.getPassword().equals(hashPassword(password))){
             //generate session id and store it to this account in db
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
@@ -110,9 +98,7 @@ public class AccountService {
 
                 loginResponse.setToSuccess(newSessionId);
             } else {
-
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.setContentType("text/plain");
                 httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
                 loginResponse.setToFailure(INVALID_LOGIN_ATTEMPT);
             }
@@ -121,6 +107,7 @@ public class AccountService {
             loginResponse.setToSuccess("");//newSessionId);
         }
         else {
+            //either credentials were wrong or unknown error occurred
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.setContentType("text/plain");
             httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
@@ -136,9 +123,6 @@ public class AccountService {
 
         return loginResponse;
     }
-
-
-
 
 
     public ValidateUserSessionResponse validateUserSession(String sessionId) {
@@ -179,19 +163,24 @@ public class AccountService {
         return sessionId;
     }
 
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        md.update(password.getBytes());
+    private String hashPassword(String password) {
+        MessageDigest md;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+            md.update(password.getBytes());
 
-        byte byteData[] = md.digest();
+            byte byteData[] = md.digest();
 
-        //convert the byte to hex format method 1
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < byteData.length; i++) {
-            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            //convert the byte to hex format method 1
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < byteData.length; i++) {
+                sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            //TODO: need to somehow return an error to client?
+            System.out.println("Hashing function failed to hash password");
         }
-
-        return sb.toString();
+        return password;
     }
-
 }

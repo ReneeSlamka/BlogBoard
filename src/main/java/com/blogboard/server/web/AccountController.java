@@ -2,10 +2,8 @@ package com.blogboard.server.web;
 
 import com.blogboard.server.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -18,28 +16,19 @@ public class AccountController {
     }
 
 
-    @RequestMapping("/create-account")
-
+    @RequestMapping(value ="/account", method=RequestMethod.POST)
     public @ResponseBody
     CreateAccountResponse createAccount(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
-            @RequestParam(value="email", required=false, defaultValue="") String email){
+            @RequestParam(value="email", required=false, defaultValue="") String email,
+            HttpServletResponse createAccountResponse){
 
-        return accountService.createAccount(username, password, email);
+        return accountService.createAccount(username, password, email, createAccountResponse);
 
     }
 
-    /*@RequestMapping("/login")
-    public @ResponseBody
-    LoginResponse login(
-            @RequestParam(value="username", required=true) String username,
-            @RequestParam(value="password", required=true) String password){
-
-        return accountService.login(username, password);
-    }*/
-
-    @RequestMapping("/login")
+    @RequestMapping(value ="/account", method=RequestMethod.GET)
     public @ResponseBody
     LoginResponse login(
             @RequestParam(value="username", required=true) String username,
