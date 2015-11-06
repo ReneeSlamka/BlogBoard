@@ -21,11 +21,8 @@ public class Account {
     public Account(String username, String password, String email) {
         this.username = username;
         this.password = password;
-
-        this.email = ((email != null && email.length() != 0) ? email : null); //TODO change later
+        this.email = email;
     }
-
-    /*== Getters and Setters ==*/
 
     public Long getId() {
         return id;
@@ -41,6 +38,10 @@ public class Account {
 
     public String getPassword(){
         return password;
+    }
+
+    private void setPassword(String newPassword){
+        this.password = password;
     }
 
     public void setEmail(String email) {

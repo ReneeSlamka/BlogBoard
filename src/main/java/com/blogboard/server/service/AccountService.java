@@ -91,9 +91,19 @@ public class AccountService {
             if (previousSession == null) {
                 String newSessionId = generateSessionID();
                 Session newSession = new Session(username, newSessionId);
+                Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
-                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL); //encodeRedirectURL(LOGIN_SUCCESS_URL);
+                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
+
+                Cookie newSessionCookie = new Cookie("SessionId", newSessionId);
+                //newSessionCookie.setDomain("127.0.0.1");
+                //newSessionCookie.setDomain(".app.localhost");
+                //newSessionCookie.setHttpOnly(false);
+                //newSessionCookie.setSecure(false);
+                newSessionCookie.setMaxAge(60*5);
+                //newSessionCookie.setPath("/");
+                httpResponse.addCookie(newSessionCookie);
 
 
                 loginResponse.setToSuccess(newSessionId);
@@ -104,7 +114,6 @@ public class AccountService {
             }
 
             Account updatedAccount = accountRepo.save(targetAccount);
-            loginResponse.setToSuccess("");//newSessionId);
         }
         else {
             //either credentials were wrong or unknown error occurred
@@ -125,24 +134,29 @@ public class AccountService {
     }
 
 
-    public ValidateUserSessionResponse validateUserSession(String sessionId) {
-        ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
 
-        if (sessionId.length() == 0){
-            validationResponse.setToFailure(NO_SESSION_FOUND);
+    public ValidateUserSessionResponse validateUserSession(String sessionId, HttpServletResponse httpResponse,
+        String cookieValue) {
+            ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
+
+            if (sessionId.length() == 0 || cookieValue.equals("undefined") || cookieValue.length() == 0){
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                validationResponse.setToFailure(NO_SESSION_FOUND);
+                return validationResponse;
+            }
+
+            Session targetAccount = sessionRepo.findBySessionId(sessionId);
+
+            //TODO: improve security here after more research
+            if (targetAccount != null){
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                validationResponse.setToSuccess();
+            } else {
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                validationResponse.setToFailure(INVALID_SESSION);
+            }
+
             return validationResponse;
-        }
-
-        Session targetAccount = sessionRepo.findBySessionId(sessionId);
-
-        //TODO: improve security here after more research
-        if (targetAccount != null){
-            validationResponse.setToSuccess();
-        } else {
-            validationResponse.setToFailure(INVALID_SESSION);
-        }
-
-        return validationResponse;
     }
 
     public Account findOne(Long id) {
@@ -162,6 +176,8 @@ public class AccountService {
 
         return sessionId;
     }
+
+
 
     private String hashPassword(String password) {
         MessageDigest md;
