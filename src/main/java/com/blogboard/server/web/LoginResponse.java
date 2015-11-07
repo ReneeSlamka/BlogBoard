@@ -5,6 +5,7 @@ public class LoginResponse extends Response {
     private final String loginSuccessURL = "http://localhost:3000/home";
     private final String loginFailureURL = "http://localhost:3000/login";
     private String sessionId;
+    private String sessionUsername;
 
     public LoginResponse() {
         super();
@@ -33,9 +34,14 @@ public class LoginResponse extends Response {
         return this.sessionId;
     }
 
-    public void setToSuccess(String sessionId) {
+    private void setSessionUsername(String newSessionUsername) { this.sessionUsername = newSessionUsername; }
+
+    public String getSessionUsername() { return this.sessionUsername; }
+
+    public void setToSuccess(String sessionId, String sessionUsername) {
         this.setHttpResponseHeader(loginSuccessURL);
         this.setSessionId(sessionId);
+        this.setSessionUsername(sessionUsername);
         this.setLoginSuccessMessage();
     }
 

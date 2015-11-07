@@ -41,8 +41,8 @@ public class AccountController {
     public @ResponseBody
     ValidateUserSessionResponse validateSession(
             @RequestParam(value="sessionId", required=true) String sessionId,
-            @CookieValue(value = "sessionIdCookie", defaultValue = "undefined", required = false) String validationCookie,
+            @RequestParam(value="username", required=true) String username,
             HttpServletResponse validationResponse) {
-        return accountService.validateUserSession(sessionId, validationResponse,validationCookie);
+        return accountService.validateUserSession(username, sessionId, validationResponse);
     }
 }

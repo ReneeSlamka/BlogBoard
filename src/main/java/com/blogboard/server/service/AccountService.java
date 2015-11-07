@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.repository.AccountRepository;
 import java.security.MessageDigest;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -52,7 +51,7 @@ public class AccountService {
         //check if account with that username and/or email already exists
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
 
-            Account newAccount = new Account(username, hashPassword(password), email);
+            Account newAccount = new Account(username, hashString(password), email);
             Account savedAccount = accountRepo.save(newAccount);
 
             if (savedAccount == null) {
@@ -85,28 +84,17 @@ public class AccountService {
         Account targetAccount = accountRepo.findByUsername(username);
 
         //Check if account exists and whether password is correct
-        if (targetAccount != null && targetAccount.getPassword().equals(hashPassword(password))){
+        if (targetAccount != null && targetAccount.getPassword().equals(hashString(password))){
             //generate session id and store it to this account in db
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
                 String newSessionId = generateSessionID();
-                Session newSession = new Session(username, newSessionId);
+                Session newSession = new Session(username, hashString(newSessionId));
                 Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
-
-                Cookie newSessionCookie = new Cookie("SessionId", newSessionId);
-                //newSessionCookie.setDomain("127.0.0.1");
-                //newSessionCookie.setDomain(".app.localhost");
-                //newSessionCookie.setHttpOnly(false);
-                //newSessionCookie.setSecure(false);
-                newSessionCookie.setMaxAge(60*5);
-                //newSessionCookie.setPath("/");
-                httpResponse.addCookie(newSessionCookie);
-
-
-                loginResponse.setToSuccess(newSessionId);
+                loginResponse.setToSuccess(newSessionId, username);
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
@@ -135,11 +123,11 @@ public class AccountService {
 
 
 
-    public ValidateUserSessionResponse validateUserSession(String sessionId, HttpServletResponse httpResponse,
-        String cookieValue) {
+    public ValidateUserSessionResponse validateUserSession(String sessionId, String username,
+       HttpServletResponse httpResponse) {
             ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
 
-            if (sessionId.length() == 0 || cookieValue.equals("undefined") || cookieValue.length() == 0){
+            if (sessionId.length() == 0 || username.length() == 0){
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 validationResponse.setToFailure(NO_SESSION_FOUND);
                 return validationResponse;
@@ -148,7 +136,7 @@ public class AccountService {
             Session targetAccount = sessionRepo.findBySessionId(sessionId);
 
             //TODO: improve security here after more research
-            if (targetAccount != null){
+            if (targetAccount != null && targetAccount.getAccountUsername().equals(username)){
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 validationResponse.setToSuccess();
             } else {
@@ -179,7 +167,7 @@ public class AccountService {
 
 
 
-    private String hashPassword(String password) {
+    private String hashString(String password) {
         MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-256");
