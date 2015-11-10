@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hello Spring Boot!</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+          integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
+          crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
+            integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="/css/index.css" />
+    <script src="/js/account-services.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <p class="red">Hello Spring BBotz!</p>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h1>Welcome to Blog Board!</h1>
+            <p>
+                Keeping in touch your friends around the globe just got a whole lot easier.
+                With Blog Board, you can share stories, photos and new experiences. It's easy!
+                Sign up, create a board, invite your friends, and start posting!
+            </p>
+
+            <h4>Create a New Account</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>
+                        Username:
+                    </label>
+                    <input type="text" class="form-control" id="new-username" size="40" />
+                    <label>
+                        Password:
+                    </label>
+                    <input type="text" class="form-control" id="new-password" size="40" />
+                    <label>
+                        Email:
+                    </label>
+                    <input type="email" class="form-control" id="new-email" size="40" />
+                    <button onclick="createAccount()" id="create-account-button" type="submit" class="btn btn-default">
+                        Create Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h3>Already have an account? Sign in below</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>
+                        Username:
+                    </label>
+                    <input type="text" class="form-control" id="login-username" size="40"/>
+                    <label>
+                        Password:
+                    </label>
+                    <input type="text" class="form-control" id="login-password" size="40"/>
+                    <button onclick="login()" id="login-button" type="submit" class="btn btn-default">
+                        Login
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
