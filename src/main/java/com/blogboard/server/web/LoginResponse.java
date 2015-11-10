@@ -2,11 +2,6 @@ package com.blogboard.server.web;
 
 public class LoginResponse extends Response {
 
-    private final String loginSuccessURL = "http://localhost:3000/home";
-    private final String loginFailureURL = "http://localhost:3000/login";
-    private String sessionId;
-    private String sessionUsername;
-
     public LoginResponse() {
         super();
     }
@@ -26,32 +21,13 @@ public class LoginResponse extends Response {
 
     }
 
-    private void setSessionId(String newSessionId) {
-        this.sessionId = newSessionId;
-    }
-
-    public String getSessionId() {
-        return this.sessionId;
-    }
-
-    private void setSessionUsername(String newSessionUsername) { this.sessionUsername = newSessionUsername; }
-
-    public String getSessionUsername() { return this.sessionUsername; }
-
-    public void setToSuccess(String sessionId, String sessionUsername) {
-        this.setHttpResponseHeader(loginSuccessURL);
-        this.setSessionId(sessionId);
-        this.setSessionUsername(sessionUsername);
+    @Override
+    public void setToSuccess() {
         this.setLoginSuccessMessage();
     }
 
-    //TODO: refactor
-    @Override
-    public void setToSuccess() {}
-
     @Override
     public void setToFailure(String incorrectLoginParameter) {
-        this.setHttpResponseHeader(loginFailureURL);
         this.setLoginFailureMessage(incorrectLoginParameter);
     }
 

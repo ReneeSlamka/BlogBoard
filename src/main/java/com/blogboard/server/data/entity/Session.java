@@ -14,6 +14,8 @@ public class Session {
     private String accountUsername;
     private String sessionId;
 
+    private Session() {}
+
     public Session(String accountUsername, String sessionId) {
 
         /*If a user does not already have a session in place

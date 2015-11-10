@@ -2,10 +2,6 @@ package com.blogboard.server.web;
 
 public class CreateAccountResponse extends Response {
 
-    //find better place for these strings
-    private String getCreateAccountSuccessURL = "http://localhost:3000/account-created";
-    private String createAccountFailureURL = "http://localhost:3000/login";
-
     public CreateAccountResponse() {
         super();
     }
@@ -23,13 +19,11 @@ public class CreateAccountResponse extends Response {
 
     @Override
     public void setToSuccess() {
-        this.setHttpResponseHeader(getCreateAccountSuccessURL);
         this.setCreateAccountSuccessMessage();
     }
 
     @Override
     public void setToFailure(String duplicateAccountField) {
-        this.setHttpResponseHeader(createAccountFailureURL);
         this.setCreateAccountFailureMessage(duplicateAccountField);
     }
 }

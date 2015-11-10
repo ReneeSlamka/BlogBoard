@@ -40,9 +40,8 @@ public class AccountController {
     @RequestMapping(value = "/session", method=RequestMethod.GET)
     public @ResponseBody
     ValidateUserSessionResponse validateSession(
-            @RequestParam(value="sessionId", required=true) String sessionId,
-            @RequestParam(value="username", required=true) String username,
+            @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String validationCookie,
             HttpServletResponse validationResponse) {
-        return accountService.validateUserSession(username, sessionId, validationResponse);
+        return accountService.validateUserSession(validationResponse,validationCookie);
     }
 }

@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import javax.servlet.http.Cookie;
 
 @Service
 public class AccountService {
@@ -20,16 +21,18 @@ public class AccountService {
     private AccountRepository accountRepo;
     private SessionRepository sessionRepo;
 
-    public static final String UNKNOWN_DATABASE_ERROR = "Uknown database error";
-    public static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login atttempt";
-    public static final String INVALID_SESSION = "Not a valid session";
-    public static final String NO_SESSION_FOUND = "No session has been initialized";
-    public static final String INVALID_USERNAME = "username";
-    public static final String INVALID_PASSWORD = "password";
-    public static final String INVALID_EMAIL = "email";
-    public static final String UNKNOWN_ERROR = "Unknown error";
-    private static final String LOGIN_SUCCESS_URL = "http://localhost:3000/home";
-    private static final String LOGIN_FAILURE_URL = "http://localhost:3000/login";
+    private static final String UNKNOWN_DATABASE_ERROR = "Unknown database error";
+    private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
+    private static final String INVALID_SESSION = "Not a valid session";
+    private static final String NO_SESSION_FOUND = "No session has been initialized";
+    private static final String INVALID_USERNAME = "username";
+    private static final String INVALID_PASSWORD = "password";
+    private static final String INVALID_EMAIL = "email";
+    private static final String UNKNOWN_ERROR = "Unknown error";
+    private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
+    private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
+    private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
+    private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
 
     //TODO: how to ensure only one return value for queries that require it?
 
@@ -59,11 +62,13 @@ public class AccountService {
                 createAccountResponse.setToFailure(UNKNOWN_DATABASE_ERROR);
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
+                httpResponse.setHeader("Location", CREATE_ACCOUNT_SUCCESS_URL);
                 createAccountResponse.setToSuccess();
             }
         } else {
             //either account with same credential(s) already exists or unknown error occurred
             httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
+            httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
             if(accountRepo.findByUsername(username) != null) {
                 createAccountResponse.setToFailure(INVALID_USERNAME);
             } else if (accountRepo.findByEmail(email) != null) {
@@ -94,7 +99,14 @@ public class AccountService {
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
-                loginResponse.setToSuccess(newSessionId, username);
+
+                Cookie newSessionCookie = new Cookie("sessionID", newSessionId);
+                //newSessionCookie.setHttpOnly(false);
+                //newSessionCookie.setSecure(false);
+                newSessionCookie.setMaxAge(60*5);
+                newSessionCookie.setPath("/");
+                httpResponse.addCookie(newSessionCookie);
+                loginResponse.setToSuccess();
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
@@ -122,35 +134,38 @@ public class AccountService {
     }
 
 
+    public ValidateUserSessionResponse validateUserSession(HttpServletResponse httpResponse, String cookieSessionID) {
+        ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
 
-    public ValidateUserSessionResponse validateUserSession(String sessionId, String username,
-       HttpServletResponse httpResponse) {
-            ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
-
-            if (sessionId.length() == 0 || username.length() == 0){
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                validationResponse.setToFailure(NO_SESSION_FOUND);
-                return validationResponse;
-            }
-
-            Session targetAccount = sessionRepo.findBySessionId(sessionId);
-
-            //TODO: improve security here after more research
-            if (targetAccount != null && targetAccount.getAccountUsername().equals(username)){
-                httpResponse.setStatus(HttpServletResponse.SC_OK);
-                validationResponse.setToSuccess();
-            } else {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                validationResponse.setToFailure(INVALID_SESSION);
-            }
-
+        if (cookieSessionID.equals("undefined") || cookieSessionID.length() == 0){
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
+            validationResponse.setToFailure(NO_SESSION_FOUND);
             return validationResponse;
+        }
+
+        Session targetAccount = sessionRepo.findBySessionId(hashString(cookieSessionID));
+
+        //TODO: improve security here after more research
+        if (targetAccount != null){
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            validationResponse.setToSuccess();
+            httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
+        } else {
+            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            validationResponse.setToFailure(INVALID_SESSION);
+            httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
+        }
+
+        return validationResponse;
     }
+
 
     public Account findOne(Long id) {
         Account account = accountRepo.findOne(id);
         return account;
     }
+
 
     public void delete(Long id) {
         accountRepo.delete(id);
