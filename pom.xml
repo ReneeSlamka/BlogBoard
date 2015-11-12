@@ -46,17 +46,9 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>nz.net.ultraq.thymeleaf</groupId>
-            <artifactId>thymeleaf-layout-dialect</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.lyncode</groupId>
-            <artifactId>jtwig-spring</artifactId>
-            <version>3.1.1</version>
+            <groupId>com.mitchellbosecke</groupId>
+            <artifactId>pebble-spring3</artifactId>
+            <version> 1.6.0 </version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
