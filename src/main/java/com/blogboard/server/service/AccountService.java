@@ -100,12 +100,18 @@ public class AccountService {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
 
-                Cookie newSessionCookie = new Cookie("sessionID", newSessionId);
-                //newSessionCookie.setHttpOnly(false);
-                //newSessionCookie.setSecure(false);
-                newSessionCookie.setMaxAge(60*5);
-                newSessionCookie.setPath("/");
-                httpResponse.addCookie(newSessionCookie);
+                Cookie newSessionIdCookie = new Cookie("sessionID", newSessionId);
+                //newSessionIdCookie.setHttpOnly(false);
+                //newSessionIdCookie.setSecure(false);
+                newSessionIdCookie.setMaxAge(60*10);
+                newSessionIdCookie.setPath("/");
+                httpResponse.addCookie(newSessionIdCookie);
+
+                Cookie newSesssionUsernameCookie = new Cookie("sessionUsername", username);
+                newSesssionUsernameCookie.setMaxAge(60*10);
+                newSessionIdCookie.setPath("/");
+                httpResponse.addCookie(newSesssionUsernameCookie);
+
                 loginResponse.setToSuccess();
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

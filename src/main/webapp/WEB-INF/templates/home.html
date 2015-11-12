@@ -1,18 +1,37 @@
 {% extends "layout" %}
 
-{% block title %}Welcomr to Blog Board{% endblock %}
+{% block title %}Welcome to Blog Board{% endblock %}
 
 {% block css %}
 {% endblock %}
 
 {% block js %}
+<script src="resources/static/js/home-page-services.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <h1 class="red">Welcome to your home page</h1>
+        <div class="col-md-8 col-md-offset-2">
+            <h1 class="red">Welcome to your home page <span id="home-username"></span></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-1">
+            <h3>Your Boards</h3>
+            <ul>
+                <li>Uni Pals</li>
+                <li>The Girl Gang</li>
+                <li>The Fam Jam</li>
+            </ul>
+        </div>
+        <div class="col-md-4 col-md-offset-2">
+            <h3>Notifications</h3>
+            <ul>
+                <li>Jeff posted in Uni Pals</li>
+                <li>Mom added a photo in The Fam Jam</li>
+                <li>Suzie added new member Alexa to The Girl Gang</li>
+            </ul>
         </div>
     </div>
 </div>
