@@ -1,0 +1,43 @@
+.top-navbar {
+    background-color: #eea236;
+    padding-top: 20px;
+    padding-bottom: 15px;
+}
+
+.top-navbar-content-container {
+    display: flex;
+    align-items: baseline;
+}
+
+#top-navbar-logo {
+    font-size: 50px;
+    margin-left: 30px;
+}
+
+#top-navbar-logo * span {
+    font-size: 70px;
+    font-weight: bold;
+}
+
+.top-navbar .text-block {
+    display: inline-block;
+}
+
+#top-navbar-subtitle-container {
+    display: inline-block;
+    text-align: right;
+    margin-left: 200px;
+}
+
+.top-navbar .subtitle {
+    margin-right: 30px;
+    font-size: 25px;
+}
+
+.white-text {
+    color: #FFFFFF;
+}
+
+a#top-navbar-logo:link, a#top-navbar-logohover {
+    text-decoration: none;
+}

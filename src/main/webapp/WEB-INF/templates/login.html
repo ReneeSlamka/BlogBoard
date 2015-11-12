@@ -1,11 +1,16 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Blog Board Login</title>
-    <link rel="stylesheet" type="text/css" href="/css/index.css" />
-    <script src="/js/account-services.js"></script>
-</head>
-<body>
+{% extends "layout" %}
+
+{% block title %}Blog Board Login{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="resources/static/css/login.css"/>
+{% endblock %}
+
+{% block js %}
+<script src="resources/static/js/account-services.js"></script>
+{% endblock %}
+
+{% block content %}
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
@@ -66,5 +71,4 @@
         </div>
     </div>
 </div>
-</body>
-</html>
+{% endblock %}

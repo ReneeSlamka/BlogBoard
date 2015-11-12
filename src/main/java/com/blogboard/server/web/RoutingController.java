@@ -14,22 +14,36 @@ public class RoutingController {
     /*@RequestMapping(value ="/", method= RequestMethod.GET)
     String index() {
         return "index";
+    }*/
+
+    @RequestMapping(value ="/", method= RequestMethod.GET)
+    public ModelAndView getIndexPage() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("index");
+        return mav;
     }
 
-    @RequestMapping(value ="/login", method= RequestMethod.GET)
+    /*@RequestMapping(value ="/login", method= RequestMethod.GET)
     String login() {
         return "login";
     }*/
 
+    @RequestMapping(value ="/login", method= RequestMethod.GET)
+    public ModelAndView getLoginPage() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("login");
+        return mav;
+    }
 
-    /*@RequestMapping(value ="/test", method= RequestMethod.GET)
-    public String test(ModelMap model) {
-        model.addAttribute("name", "JTwig");
-        return "test";
-    }*/
+    @RequestMapping(value ="/home", method= RequestMethod.GET)
+    public ModelAndView getHomePage() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("home");
+        return mav;
+    }
 
     @RequestMapping(value ="/test", method= RequestMethod.GET)
-    public ModelAndView getUserProfile() {
+    public ModelAndView getTest() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("test");
         return mav;
