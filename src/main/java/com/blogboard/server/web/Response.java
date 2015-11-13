@@ -1,6 +1,5 @@
 package com.blogboard.server.web;
 import com.blogboard.server.service.AccountService;
-import com.blogboard.server.service.AccountService.Service;
 
 
 public abstract class Response {

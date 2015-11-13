@@ -18,6 +18,12 @@ public class AccountService {
     private SessionRepository sessionRepo;
     private BoardRepository boardRepo;
 
+    private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
+    private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
+    private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
+    private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
+    private static final String USER_HOME_URL = "http://localhost:8080/home";
+
     public static enum CauseOfFailure {
         USERNAME, PASSWORD, EMAIL, SESSION, DATABASE_ERROR, INVALID_LOGIN, SESSION_DNE,
         INVALID_SESSION, UNKNOWN_ERROR
@@ -27,11 +33,6 @@ public class AccountService {
         ACCOUNT_CREATION, LOGIN, VALIDATION, BOARD_CREATION, ADD_MEMBER, REMOVE_MEMBER
     }
 
-    private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
-    private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
-    private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
-    private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
-    private static final String USER_HOME_URL = "http://localhost:8080/home";
 
     //TODO: how to ensure only one return value for queries that require it?
 
@@ -105,17 +106,14 @@ public class AccountService {
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
 
                 Cookie newSessionIdCookie = new Cookie("sessionID", newSessionId);
-                //newSessionIdCookie.setHttpOnly(false);
-                //newSessionIdCookie.setSecure(false);
-                newSessionIdCookie.setMaxAge(60*10);
-                newSessionIdCookie.setPath("/");
+                configureCookie(newSessionIdCookie, (60*10), "/", false, false);
                 httpResponse.addCookie(newSessionIdCookie);
 
                 Cookie newSesssionUsernameCookie = new Cookie("sessionUsername", username);
-                newSesssionUsernameCookie.setMaxAge(60*10);
-                newSessionIdCookie.setPath("/");
+                configureCookie(newSesssionUsernameCookie, (60*10), "/", false, false);
                 httpResponse.addCookie(newSesssionUsernameCookie);
                 response.setToSuccess();
+
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
@@ -196,8 +194,7 @@ public class AccountService {
             Board savedBoard = boardRepo.save(newBoard);
 
             Cookie userBoardsCookie = new Cookie("userBoards", name);
-            userBoardsCookie.setMaxAge(60*10);
-            userBoardsCookie.setPath("/"); //change to home and other relevant pages later?
+            configureCookie(userBoardsCookie, (60*10), "/", false, false);//change path to home, etc later?
             httpResponse.addCookie(userBoardsCookie);
             httpResponse.setStatus(HttpServletResponse.SC_OK);
 
@@ -248,5 +245,20 @@ public class AccountService {
             System.out.println("Hashing function failed to hash password");
         }
         return password;
+    }
+
+    private void configureCookie(Cookie cookie, int maxAge, String path, boolean httpOnly, boolean isSecure) {
+        cookie.setMaxAge(maxAge);
+        cookie.setPath(path);
+        cookie.setHttpOnly(httpOnly);
+        cookie.setSecure(isSecure);
+    }
+
+    private void configureHttpServlet(HttpServletResponse servletResponse, int status, String locationHeaderURL, Cookie cookie) {
+        servletResponse.setStatus(status);
+        servletResponse.setHeader("Location", locationHeaderURL);
+        if (cookie != null) {
+            servletResponse.addCookie(cookie);
+        }
     }
 }
