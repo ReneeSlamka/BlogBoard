@@ -1,9 +1,6 @@
 package com.blogboard.server.service;
 
-import com.blogboard.server.web.CreateAccountResponse;
-import com.blogboard.server.web.CreateBoardResponse;
-import com.blogboard.server.web.LoginResponse;
-import com.blogboard.server.web.ValidateUserSessionResponse;
+import com.blogboard.server.web.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.*;
@@ -21,14 +18,15 @@ public class AccountService {
     private SessionRepository sessionRepo;
     private BoardRepository boardRepo;
 
-    private static final String UNKNOWN_DATABASE_ERROR = "Unknown database error";
-    private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
-    private static final String INVALID_SESSION = "Not a valid session";
-    private static final String NO_SESSION_FOUND = "No session has been initialized";
-    private static final String INVALID_USERNAME = "username";
-    private static final String INVALID_PASSWORD = "password";
-    private static final String INVALID_EMAIL = "email";
-    private static final String UNKNOWN_ERROR = "Unknown error";
+    public static enum CauseOfFailure {
+        USERNAME, PASSWORD, EMAIL, SESSION, DATABASE_ERROR, INVALID_LOGIN, SESSION_DNE,
+        INVALID_SESSION, UNKNOWN_ERROR
+    }
+
+    public static enum Service {
+        ACCOUNT_CREATION, LOGIN, VALIDATION, BOARD_CREATION, ADD_MEMBER, REMOVE_MEMBER
+    }
+
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
     private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
     private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
@@ -53,9 +51,9 @@ public class AccountService {
     }
 
 
-    public CreateAccountResponse createAccount(String username, String password, String email,
+    public AccountServiceResponse createAccount(String username, String password, String email,
        HttpServletResponse httpResponse) {
-        CreateAccountResponse createAccountResponse = new CreateAccountResponse();
+        AccountServiceResponse response = new AccountServiceResponse(Service.ACCOUNT_CREATION);
 
         //check if account with that username and/or email already exists
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
@@ -65,33 +63,33 @@ public class AccountService {
 
             if (savedAccount == null) {
                 httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                createAccountResponse.setToFailure(UNKNOWN_DATABASE_ERROR);
+                response.setToFailure(CauseOfFailure.DATABASE_ERROR);
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", CREATE_ACCOUNT_SUCCESS_URL);
-                createAccountResponse.setToSuccess();
+                response.setToSuccess();
             }
         } else {
             //either account with same credential(s) already exists or unknown error occurred
             httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
             httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
+
             if(accountRepo.findByUsername(username) != null) {
-                createAccountResponse.setToFailure(INVALID_USERNAME);
+                response.setToFailure(CauseOfFailure.USERNAME);
             } else if (accountRepo.findByEmail(email) != null) {
-                createAccountResponse.setToFailure(INVALID_EMAIL);
+                response.setToFailure(CauseOfFailure.EMAIL);
             } else {
                 //to cover other unknown errors
                 httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                createAccountResponse.setToFailure(UNKNOWN_DATABASE_ERROR); //TODO replace later
+                response.setToFailure(CauseOfFailure.DATABASE_ERROR);
             }
         }
-
-        return createAccountResponse;
+        return response;
     }
 
 
-    public LoginResponse login(String username, String password, HttpServletResponse httpResponse) {
-        LoginResponse loginResponse = new LoginResponse();
+    public AccountServiceResponse login(String username, String password, HttpServletResponse httpResponse) {
+        AccountServiceResponse response = new AccountServiceResponse(Service.LOGIN);
         Account targetAccount = accountRepo.findByUsername(username);
 
         //Check if account exists and whether password is correct
@@ -117,12 +115,11 @@ public class AccountService {
                 newSesssionUsernameCookie.setMaxAge(60*10);
                 newSessionIdCookie.setPath("/");
                 httpResponse.addCookie(newSesssionUsernameCookie);
-
-                loginResponse.setToSuccess();
+                response.setToSuccess();
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
-                loginResponse.setToFailure(INVALID_LOGIN_ATTEMPT);
+                response.setToFailure(CauseOfFailure.INVALID_LOGIN);
             }
 
             Account updatedAccount = accountRepo.save(targetAccount);
@@ -134,26 +131,26 @@ public class AccountService {
             httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
 
             if (accountRepo.findByUsername(username) == null) {
-                loginResponse.setToFailure(INVALID_USERNAME);
+                response.setToFailure(CauseOfFailure.USERNAME);
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
-                loginResponse.setToFailure(INVALID_PASSWORD);
+                response.setToFailure(CauseOfFailure.PASSWORD);
             } else {
-                loginResponse.setToFailure(UNKNOWN_ERROR); //TODO replace with proper solution later
+                response.setToFailure(CauseOfFailure.UNKNOWN_ERROR);//TODO replace with proper solution later
             }
         }
 
-        return loginResponse;
+        return response;
     }
 
 
-    public ValidateUserSessionResponse validateUserSession(HttpServletResponse httpResponse, String cookieSessionID) {
-        ValidateUserSessionResponse validationResponse = new ValidateUserSessionResponse();
+    public AccountServiceResponse validateUserSession(HttpServletResponse httpResponse, String cookieSessionID) {
+        AccountServiceResponse response = new AccountServiceResponse(Service.VALIDATION);
 
         if (cookieSessionID.equals("undefined") || cookieSessionID.length() == 0){
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
-            validationResponse.setToFailure(NO_SESSION_FOUND);
-            return validationResponse;
+            response.setToFailure(CauseOfFailure.SESSION_DNE);
+            return response;
         }
 
         Session targetAccount = sessionRepo.findBySessionId(hashString(cookieSessionID));
@@ -161,15 +158,15 @@ public class AccountService {
         //TODO: improve security here after more research
         if (targetAccount != null){
             httpResponse.setStatus(HttpServletResponse.SC_OK);
-            validationResponse.setToSuccess();
+            response.setToSuccess();
             httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
         } else {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            validationResponse.setToFailure(INVALID_SESSION);
+            response.setToFailure(CauseOfFailure.INVALID_SESSION);
             httpResponse.setHeader("Location", LOGIN_FAILURE_URL);
         }
 
-        return validationResponse;
+        return response;
     }
 
     public Account findOne(Long id) {

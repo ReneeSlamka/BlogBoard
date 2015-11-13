@@ -1,4 +1,6 @@
 package com.blogboard.server.web;
+import com.blogboard.server.service.AccountService;
+import com.blogboard.server.service.AccountService.Service;
 
 
 public abstract class Response {
@@ -19,8 +21,6 @@ public abstract class Response {
 
     abstract public void setToSuccess();
 
-    abstract public void setToFailure(String reasonForFailure);
-
-
+    abstract public void setToFailure(AccountService.CauseOfFailure reasonForFailure);
 
 }

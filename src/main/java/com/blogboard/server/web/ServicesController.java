@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class AccountController {
+public class ServicesController {
 
     private AccountService accountService;
     @Autowired
@@ -18,7 +18,7 @@ public class AccountController {
 
     @RequestMapping(value ="/account", method=RequestMethod.POST)
     public @ResponseBody
-    CreateAccountResponse createAccount(
+    AccountServiceResponse createAccount(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
             @RequestParam(value="email", required=false, defaultValue="") String email,
@@ -29,7 +29,7 @@ public class AccountController {
 
     @RequestMapping(value ="/account", method=RequestMethod.GET)
     public @ResponseBody
-    LoginResponse login(
+    AccountServiceResponse login(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
             HttpServletResponse loginResponse){
@@ -39,7 +39,7 @@ public class AccountController {
 
     @RequestMapping(value = "/session", method=RequestMethod.GET)
     public @ResponseBody
-    ValidateUserSessionResponse validateSession(
+    AccountServiceResponse validateSession(
             @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String validationCookie,
             HttpServletResponse validationResponse) {
         return accountService.validateUserSession(validationResponse,validationCookie);
