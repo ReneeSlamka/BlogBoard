@@ -44,4 +44,15 @@ public class AccountController {
             HttpServletResponse validationResponse) {
         return accountService.validateUserSession(validationResponse,validationCookie);
     }
+
+
+    @RequestMapping(value = "/board", method=RequestMethod.POST)
+    public @ResponseBody
+    CreateBoardResponse createBoard(
+            @RequestParam(value="boardName", required=true) String boardName,
+            @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
+            HttpServletResponse createAccountServletResponse) {
+        return accountService.createBoard(boardName, usernameCookie, createAccountServletResponse);
+    }
+
 }

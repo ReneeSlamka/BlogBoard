@@ -1,14 +1,13 @@
 package com.blogboard.server.service;
 
-import com.blogboard.server.data.entity.Session;
-import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.web.CreateAccountResponse;
+import com.blogboard.server.web.CreateBoardResponse;
 import com.blogboard.server.web.LoginResponse;
 import com.blogboard.server.web.ValidateUserSessionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.blogboard.server.data.entity.Account;
-import com.blogboard.server.data.repository.AccountRepository;
+import com.blogboard.server.data.entity.*;
+import com.blogboard.server.data.repository.*;
 import java.security.MessageDigest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +19,7 @@ public class AccountService {
 
     private AccountRepository accountRepo;
     private SessionRepository sessionRepo;
+    private BoardRepository boardRepo;
 
     private static final String UNKNOWN_DATABASE_ERROR = "Unknown database error";
     private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
@@ -33,6 +33,7 @@ public class AccountService {
     private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
     private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
     private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
+    private static final String USER_HOME_URL = "http://localhost:8080/home";
 
     //TODO: how to ensure only one return value for queries that require it?
 
@@ -44,6 +45,11 @@ public class AccountService {
     @Autowired
     public void setSessionRepository(SessionRepository sessionRepository) {
         this.sessionRepo = sessionRepository;
+    }
+
+    @Autowired
+    public void setSessionRepository(BoardRepository boardRepository) {
+        this.boardRepo = boardRepository;
     }
 
 
@@ -166,7 +172,6 @@ public class AccountService {
         return validationResponse;
     }
 
-
     public Account findOne(Long id) {
         Account account = accountRepo.findOne(id);
         return account;
@@ -176,6 +181,45 @@ public class AccountService {
     public void delete(Long id) {
         accountRepo.delete(id);
     }
+
+
+
+    /*---============== BOARD FUNCTIONS ==============---*/
+    /*===================================================*/
+
+    public CreateBoardResponse createBoard(String name, String ownerUsername,
+       HttpServletResponse httpResponse) {
+
+        CreateBoardResponse createBoardResponse = new CreateBoardResponse();
+
+        //check if board with that owner AND name already exists
+        if (boardRepo.findByNameAndOwnerUsername(name, ownerUsername) == null) {
+            //create board and save in board repo
+            Board newBoard = new Board(name, ownerUsername);
+            Board savedBoard = boardRepo.save(newBoard);
+
+            Cookie userBoardsCookie = new Cookie("userBoards", name);
+            userBoardsCookie.setMaxAge(60*10);
+            userBoardsCookie.setPath("/"); //change to home and other relevant pages later?
+            httpResponse.addCookie(userBoardsCookie);
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+
+            //configure response
+            createBoardResponse.setToSuccess();
+        } else {
+            createBoardResponse.setToFailure("name");
+            //return error messages saying board already exists
+            httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
+        }
+
+        httpResponse.setHeader("Location", USER_HOME_URL);
+        return createBoardResponse;
+    }
+
+
+
+    /*---==============HELPER FUNCTIONS==============---*/
+    /*==================================================*/
 
     //TODO: is it safe for this method to be part of the account object?
     private String generateSessionID() {
