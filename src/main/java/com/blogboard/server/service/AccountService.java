@@ -1,7 +1,6 @@
 package com.blogboard.server.service;
 
 import com.blogboard.server.web.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
@@ -13,10 +12,6 @@ import javax.servlet.http.Cookie;
 
 @Service
 public class AccountService {
-
-    private AccountRepository accountRepo;
-    private SessionRepository sessionRepo;
-    private BoardRepository boardRepo;
 
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
     private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
@@ -34,26 +29,8 @@ public class AccountService {
     }
 
 
-    //TODO: how to ensure only one return value for queries that require it?
-
-    @Autowired
-    public void setAccountRepository(AccountRepository accountRepository) {
-        this.accountRepo = accountRepository;
-    }
-
-    @Autowired
-    public void setSessionRepository(SessionRepository sessionRepository) {
-        this.sessionRepo = sessionRepository;
-    }
-
-    @Autowired
-    public void setSessionRepository(BoardRepository boardRepository) {
-        this.boardRepo = boardRepository;
-    }
-
-
-    public AccountServiceResponse createAccount(String username, String password, String email,
-       HttpServletResponse httpResponse) {
+    public AccountServiceResponse createAccount(AccountRepository accountRepo, String username, String password,
+        String email, HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.ACCOUNT_CREATION);
 
         //check if account with that username and/or email already exists
@@ -89,7 +66,8 @@ public class AccountService {
     }
 
 
-    public AccountServiceResponse login(String username, String password, HttpServletResponse httpResponse) {
+    public AccountServiceResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
+        String password, HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGIN);
         Account targetAccount = accountRepo.findByUsername(username);
 
@@ -141,7 +119,8 @@ public class AccountService {
     }
 
 
-    public AccountServiceResponse validateUserSession(HttpServletResponse httpResponse, String cookieSessionID) {
+    public AccountServiceResponse validateUserSession(SessionRepository sessionRepo, HttpServletResponse httpResponse,
+        String cookieSessionID) {
         AccountServiceResponse response = new AccountServiceResponse(Service.VALIDATION);
 
         if (cookieSessionID.equals("undefined") || cookieSessionID.length() == 0){
@@ -167,22 +146,12 @@ public class AccountService {
         return response;
     }
 
-    public Account findOne(Long id) {
-        Account account = accountRepo.findOne(id);
-        return account;
-    }
-
-
-    public void delete(Long id) {
-        accountRepo.delete(id);
-    }
-
 
 
     /*---============== BOARD FUNCTIONS ==============---*/
     /*===================================================*/
 
-    public CreateBoardResponse createBoard(String name, String ownerUsername,
+    public CreateBoardResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
        HttpServletResponse httpResponse) {
 
         CreateBoardResponse createBoardResponse = new CreateBoardResponse();
