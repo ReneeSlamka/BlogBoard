@@ -20,6 +20,4 @@ public abstract class Response {
 
     abstract public void setToSuccess();
 
-    abstract public void setToFailure(AccountService.CauseOfFailure reasonForFailure);
-
 }

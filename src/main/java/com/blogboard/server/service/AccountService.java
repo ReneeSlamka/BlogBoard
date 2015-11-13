@@ -17,15 +17,15 @@ public class AccountService {
     private static final String LOGIN_FAILURE_URL = "http://localhost:8080/login";
     private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
     private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
-    private static final String USER_HOME_URL = "http://localhost:8080/home";
 
-    public static enum CauseOfFailure {
-        USERNAME, PASSWORD, EMAIL, SESSION, DATABASE_ERROR, INVALID_LOGIN, SESSION_DNE,
+
+    public enum CauseOfFailure {
+        USERNAME, PASSWORD, EMAIL, DATABASE_ERROR, INVALID_LOGIN, SESSION_DNE,
         INVALID_SESSION, UNKNOWN_ERROR
     }
 
-    public static enum Service {
-        ACCOUNT_CREATION, LOGIN, VALIDATION, BOARD_CREATION, ADD_MEMBER, REMOVE_MEMBER
+    public enum Service {
+        ACCOUNT_CREATION, LOGIN, VALIDATION
     }
 
 
@@ -145,41 +145,6 @@ public class AccountService {
 
         return response;
     }
-
-
-
-    /*---============== BOARD FUNCTIONS ==============---*/
-    /*===================================================*/
-
-    public CreateBoardResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
-       HttpServletResponse httpResponse) {
-
-        CreateBoardResponse createBoardResponse = new CreateBoardResponse();
-
-        //check if board with that owner AND name already exists
-        if (boardRepo.findByNameAndOwnerUsername(name, ownerUsername) == null) {
-            //create board and save in board repo
-            Board newBoard = new Board(name, ownerUsername);
-            Board savedBoard = boardRepo.save(newBoard);
-
-            Cookie userBoardsCookie = new Cookie("userBoards", name);
-            configureCookie(userBoardsCookie, (60*10), "/", false, false);//change path to home, etc later?
-            httpResponse.addCookie(userBoardsCookie);
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
-
-            //configure response
-            createBoardResponse.setToSuccess();
-        } else {
-            createBoardResponse.setToFailure("name");
-            //return error messages saying board already exists
-            httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
-        }
-
-        httpResponse.setHeader("Location", USER_HOME_URL);
-        return createBoardResponse;
-    }
-
-
 
     /*---==============HELPER FUNCTIONS==============---*/
     /*==================================================*/

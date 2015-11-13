@@ -51,7 +51,6 @@ public class AccountServiceResponse extends Response {
         }
     }
 
-    @Override
     public void setToFailure(CauseOfFailure causeOfFailure) {
         this.setResponseMessage(UNKNOWN_ERROR);
         switch (serviceType) {

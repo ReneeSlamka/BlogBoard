@@ -23,13 +23,13 @@ public class ServicesController {
     private BoardRepository boardRepo;
 
     @Autowired
-    public void setAccountService(AccountService accountManagementService) {
-        this.accountService = accountManagementService;
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @Autowired
-    public void setBoardService(AccountService accountManagementService) {
-        this.accountService = accountManagementService;
+    public void setBoardService(BoardService boardService) {
+        this.boardService = boardService;
     }
 
     @Autowired
@@ -80,11 +80,11 @@ public class ServicesController {
 
     @RequestMapping(value = "/board", method=RequestMethod.POST)
     public @ResponseBody
-    CreateBoardResponse createBoard(
+    BoardServiceResponse createBoard(
             @RequestParam(value="boardName", required=true) String boardName,
             @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
             HttpServletResponse createAccountServletResponse) {
-        return accountService.createBoard(boardRepo, boardName, usernameCookie, createAccountServletResponse);
+        return boardService.createBoard(boardRepo, boardName, usernameCookie, createAccountServletResponse);
     }
 
 }
