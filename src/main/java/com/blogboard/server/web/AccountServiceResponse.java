@@ -13,9 +13,8 @@ public class AccountServiceResponse extends Response {
             + "credential" + ".";
 
     private static final String LOGIN_SUCCESS = "Login successful!";
-    private String LOGIN_FAILURE_USERNAME = "Sorry, it seems that there is no account with that username.";
-    private String LOGIN_FAILURE_PASSWORD = "Sorry, it seems that password is incorrect.";
-    private static final String LOGIN_INVALID = "Session already in place, invalid login attempt";
+    private static final String LOGIN_FAILURE_USERNAME = "Sorry, it seems that there is no account with that username.";
+    private static final String LOGIN_FAILURE_PASSWORD = "Sorry, it seems that password is incorrect.";
     private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
     private static final String LOGOUT_SUCCESS = "Logout successful";
     private static final String SESSION_VALID = "Valid login session created";

@@ -4,10 +4,7 @@ import com.blogboard.server.web.*;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
-import java.security.MessageDigest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import javax.servlet.http.Cookie;
 
 @Service
@@ -36,7 +33,7 @@ public class AccountService {
         //check if account with that username and/or email already exists
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
 
-            Account newAccount = new Account(username, hashString(password), email);
+            Account newAccount = new Account(username, AppServiceHelper.hashString(password), email);
             Account savedAccount = accountRepo.save(newAccount);
 
             if (savedAccount == null) {
@@ -72,23 +69,23 @@ public class AccountService {
         Account targetAccount = accountRepo.findByUsername(username);
 
         //Check if account exists and whether password is correct
-        if (targetAccount != null && targetAccount.getPassword().equals(hashString(password))){
+        if (targetAccount != null && targetAccount.getPassword().equals(AppServiceHelper.hashString(password))){
             //generate session id and store it to this account in db
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
-                String newSessionId = generateSessionID();
-                Session newSession = new Session(username, hashString(newSessionId));
+                String newSessionId = AppServiceHelper.generateSessionID();
+                Session newSession = new Session(username, AppServiceHelper.hashString(newSessionId));
                 Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
 
                 Cookie newSessionIdCookie = new Cookie("sessionID", newSessionId);
-                configureCookie(newSessionIdCookie, (60*10), "/", false, false);
+                AppServiceHelper.configureCookie(newSessionIdCookie, (60 * 10), "/", false, false);
                 httpResponse.addCookie(newSessionIdCookie);
 
                 Cookie newSesssionUsernameCookie = new Cookie("sessionUsername", username);
-                configureCookie(newSesssionUsernameCookie, (60*10), "/", false, false);
+                AppServiceHelper.configureCookie(newSesssionUsernameCookie, (60 * 10), "/", false, false);
                 httpResponse.addCookie(newSesssionUsernameCookie);
                 response.setToSuccess();
 
@@ -129,7 +126,7 @@ public class AccountService {
             return response;
         }
 
-        Session targetSesssion = sessionRepo.findBySessionId(hashString(cookieSessionID));
+        Session targetSesssion = sessionRepo.findBySessionId(AppServiceHelper.hashString(cookieSessionID));
 
         //if sessionID exists and is valid remove session from DB
         if (targetSesssion != null && targetSesssion.getAccountUsername().equals(username)) {
@@ -158,7 +155,7 @@ public class AccountService {
             return response;
         }
 
-        Session targetAccount = sessionRepo.findBySessionId(hashString(cookieSessionID));
+        Session targetAccount = sessionRepo.findBySessionId(AppServiceHelper.hashString(cookieSessionID));
 
         //TODO: improve security here after more research
         if (targetAccount != null){
@@ -177,50 +174,5 @@ public class AccountService {
     /*---==============HELPER FUNCTIONS==============---*/
     /*==================================================*/
 
-    //TODO: is it safe for this method to be part of the account object?
-    private String generateSessionID() {
-        Random randomNumberGenerator = new Random();
-        int randomInt = randomNumberGenerator.nextInt(100);
-        String sessionId = "ABC" + String.valueOf(randomInt);
 
-        return sessionId;
-    }
-
-
-
-    private String hashString(String password) {
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-            md.update(password.getBytes());
-
-            byte byteData[] = md.digest();
-
-            //convert the byte to hex format method 1
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < byteData.length; i++) {
-                sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            //TODO: need to somehow return an error to client?
-            System.out.println("Hashing function failed to hash password");
-        }
-        return password;
-    }
-
-    private void configureCookie(Cookie cookie, int maxAge, String path, boolean httpOnly, boolean isSecure) {
-        cookie.setMaxAge(maxAge);
-        cookie.setPath(path);
-        cookie.setHttpOnly(httpOnly);
-        cookie.setSecure(isSecure);
-    }
-
-    private void configureHttpServlet(HttpServletResponse servletResponse, int status, String locationHeaderURL, Cookie cookie) {
-        servletResponse.setStatus(status);
-        servletResponse.setHeader("Location", locationHeaderURL);
-        if (cookie != null) {
-            servletResponse.addCookie(cookie);
-        }
-    }
 }
