@@ -69,6 +69,16 @@ public class ServicesController {
         return accountService.login(accountRepo, sessionRepo, username, password, loginResponse);
     }
 
+    @RequestMapping(value ="/session", method=RequestMethod.POST) //better http call option?
+    public @ResponseBody
+    AccountServiceResponse logout(
+            @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
+            @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String sessionIDCookie,
+            HttpServletResponse loginResponse){
+
+        return accountService.logout(sessionRepo, usernameCookie, sessionIDCookie, loginResponse);
+    }
+
     @RequestMapping(value = "/session", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse validateSession(
@@ -76,7 +86,6 @@ public class ServicesController {
             HttpServletResponse validationResponse) {
         return accountService.validateUserSession(sessionRepo, validationResponse,validationCookie);
     }
-
 
     @RequestMapping(value = "/board", method=RequestMethod.POST)
     public @ResponseBody

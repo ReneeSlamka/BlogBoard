@@ -17,8 +17,8 @@ public class AccountServiceResponse extends Response {
     private String LOGIN_FAILURE_PASSWORD = "Sorry, it seems that password is incorrect.";
     private static final String LOGIN_INVALID = "Session already in place, invalid login attempt";
     private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
-    private static final String SESSION_VALID = "";
-    private static final String SESSION_INVALID = "";
+    private static final String LOGOUT_SUCCESS = "Logout successful";
+    private static final String SESSION_VALID = "Valid login session created";
     private static final String NO_SESSION_FOUND = "No session has been initialized";
     private static final String INVALID_SESSION = "Not a valid session";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
@@ -43,6 +43,10 @@ public class AccountServiceResponse extends Response {
 
             case VALIDATION:
                 this.setResponseMessage(SESSION_VALID);
+                break;
+
+            case LOGOUT:
+                this.setResponseMessage(LOGOUT_SUCCESS);
                 break;
 
             default:
@@ -73,6 +77,14 @@ public class AccountServiceResponse extends Response {
                 break;
 
             case VALIDATION:
+                if (causeOfFailure.equals(CauseOfFailure.SESSION_DNE)) {
+                    this.setResponseMessage(NO_SESSION_FOUND);
+                } else if (causeOfFailure.equals(INVALID_SESSION)) {
+                    this.setResponseMessage(INVALID_SESSION);
+                }
+                break;
+
+            case LOGOUT:
                 if (causeOfFailure.equals(CauseOfFailure.SESSION_DNE)) {
                     this.setResponseMessage(NO_SESSION_FOUND);
                 } else if (causeOfFailure.equals(INVALID_SESSION)) {

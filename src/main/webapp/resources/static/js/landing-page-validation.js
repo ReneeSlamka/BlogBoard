@@ -21,6 +21,7 @@ function validateSession() {
     $.ajax({
         cache: false,
         async: false,
+        type: 'GET',
         url: "http://localhost:8080/session",
         data: sessionJSONInfo,
         dataType: 'json',

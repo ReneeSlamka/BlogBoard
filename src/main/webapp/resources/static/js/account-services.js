@@ -1,6 +1,3 @@
-/**
- * Created by renee on 2015-11-10.
- */
 
 //var accountServices = function() {
 
@@ -54,6 +51,31 @@ function login(event) {
             var url = request.getResponseHeader("Location");
             window.location.href = url;
 
+        }
+    });
+}
+
+function logout(event) {
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: 'http://localhost:8080/session',
+        dataType: 'json',
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) { //for additional info
+            alert(request.responseText);
+            if (request.responseJSON.sessionId != null) {
+                createSessionCookie(request.responseJSON.sessionId, request.responseJSON.sessionUsername, 60);
+            }
+            var headers = request.getAllResponseHeaders();
+            var url = request.getResponseHeader("Location");
+            if (url !== null) {
+                window.location.href = url;
+            }
         }
     });
 }
