@@ -4,7 +4,7 @@
 }
 
 .overlay-layer {
-    rgba(160,112,180,0.7);
+    background-color: rgba(160,112,180,0.7);
     padding-top: 50px;
     padding-bottom: 30px;
 }
