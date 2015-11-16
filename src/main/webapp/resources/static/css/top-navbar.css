@@ -1,17 +1,34 @@
 .top-navbar {
-    background-color: #eea236;
-    padding-top: 20px;
-    padding-bottom: 15px;
+    background-image: url("https://static.pexels.com/photos/2752/city-sunny-people-street.jpg");
+    background-position: 36% 62%;
+}
+
+.overlay-layer {
+    padding-top: 50px;
+    padding-bottom: 30px;
+}
+
+.overlay-layer:after {
+    /*background-color: #eea236;*/
+    rgba(160,112,180,0.7);
+}
+
+.logo {
+    display: inline-block;
+    width: 180px;
 }
 
 .top-navbar-content-container {
     display: flex;
-    align-items: baseline;
+    flex-direction: row;
+    align-items: flex-end;
+    padding-bottom: 15px;
 }
 
-#top-navbar-logo {
+#top-navbar-text-logo {
     font-size: 50px;
     margin-left: 30px;
+    line-height: 1.07;
 }
 
 #top-navbar-logo * span {
@@ -23,10 +40,12 @@
     display: inline-block;
 }
 
-#top-navbar-subtitle-container {
+#logout-button {
     display: inline-block;
-    text-align: right;
-    margin-left: 200px;
+}
+
+#top-navbar-subtitle-container {
+    margin-left: 150px;
 }
 
 .top-navbar .subtitle {
