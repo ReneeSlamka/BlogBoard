@@ -18,6 +18,7 @@ function createBoard() {
             var headers = request.getAllResponseHeaders();
             var url = request.getResponseHeader("Location");
             if(textStatus === "success") {
+                $("#create-board-form").modal("hide");
                 var boardName = getCookie("userBoards");
                 addBoardName(boardName);
             }

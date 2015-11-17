@@ -26,5 +26,9 @@ function getCookie(field) {
     return "";
 }
 
+function displayModal() {
+    var modal = document.getElementById("create-board-form");
+    modal.style.display = "block";
+}
 
 setUsername();
