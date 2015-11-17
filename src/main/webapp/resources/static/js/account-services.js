@@ -1,6 +1,4 @@
 
-//var accountServices = function() {
-
 function createAccount() {
     var $newUsername = $("#new-username").val();
     var $newPassword = $("#new-password").val();
@@ -18,13 +16,18 @@ function createAccount() {
             alert(textStatus);
         },
         complete: function (request, textStatus) { //for additional info
-            alert(request.responseText);
-            var headers = request.getAllResponseHeaders();
-            var url = request.getResponseHeader("Location");
-            window.location.href = url;
-
+            showResponseMessage("create-account-response-text", request.responseJSON.responseMessage);
+            document.getElementById("new-username").value = "";
+            document.getElementById("new-password").value = "";
+            document.getElementById("new-email").value = "";
         }
     });
+}
+
+function showResponseMessage(elementId, text) {
+    var display = document.getElementById(elementId);
+    display.innerHTML = text;
+    display.style.display="block";
 }
 
 function login(event) {
@@ -44,13 +47,9 @@ function login(event) {
         },
         complete: function (request, textStatus) { //for additional info
             alert(request.responseText);
-            if (request.responseJSON.sessionId != null) {
-                createSessionCookie(request.responseJSON.sessionId, request.responseJSON.sessionUsername, 60);
-            }
             var headers = request.getAllResponseHeaders();
             var url = request.getResponseHeader("Location");
             window.location.href = url;
-
         }
     });
 }
@@ -79,14 +78,12 @@ function logout(event) {
         }
     });
 }
-//};
 
 function createSessionCookie(sessionId, username, maxAge) {
     var sessionInfo = {
         sessionId: sessionId,
         username: username
     };
-
     var sessionInfoJSON = JSON.stringify(sessionInfo);
     document.cookie = "sessionIdCookie=" + sessionInfoJSON + ";max-age=" + maxAge;
 }
