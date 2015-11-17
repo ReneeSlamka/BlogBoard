@@ -1,17 +1,18 @@
 {% extends "layout" %}
+{% set activePage = 'login' %}
 
-{% block title %}Blog Board Login{% endblock %}
+{% block title %}Blog Board Login{% endblock title %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="resources/static/css/login.css"/>
-{% endblock %}
+<link rel="stylesheet" type="text/css" href="resources/static/css/login.css" />
+{% endblock css %}
 
 {%block headerJs %}
 <script src="resources/static/js/landing-page-validation.js"></script>
-{% endblock %}
+{% endblock headerJs %}
 
 {% block js %}
-{% endblock %}
+{% endblock js %}
 
 {% block content %}
 <div class="container">
@@ -23,7 +24,10 @@
                 With Blog Board, you can share stories, photos and new experiences. It's easy!
                 Sign up, create a board, invite your friends, and start posting!
             </p>
-
+        </div>
+    </div>
+    <div class="row account-section">
+        <div class="col-md-8 col-md-offset-2">
             <h4>Create a New Account</h4>
             <div class="row">
                 <div class="col-md-6">
@@ -39,14 +43,16 @@
                         Email:
                     </label>
                     <input type="email" class="form-control" id="new-email" size="40" />
-                    <button onclick="createAccount()" id="create-account-button" type="submit" class="btn btn-default">
+                    <button onclick="createAccount()" id="create-account-button" type="submit" class="btn btn-default login-page-button">
                         Create Account
                     </button>
+                    <div id="create-account-response-text" class="well">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row account-section">
         <div class="col-md-8 col-md-offset-2">
             <h3>Already have an account? Sign in below</h3>
             <div class="row">
@@ -59,7 +65,7 @@
                         Password:
                     </label>
                     <input type="text" class="form-control" id="login-password" size="40"/>
-                    <button onclick="login()" id="login-button" type="submit" class="btn btn-default">
+                    <button onclick="login()" id="login-button" type="submit" class="btn btn-default login-page-button">
                         Login
                     </button>
                 </div>
@@ -67,4 +73,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock content %}

@@ -1,6 +1,6 @@
 .top-navbar {
     background-image: url("https://static.pexels.com/photos/2752/city-sunny-people-street.jpg");
-    background-position: 36% 62%;
+    background-position: 24% 62%;
 }
 
 .overlay-layer {
@@ -38,6 +38,10 @@
 
 #logout-button {
     display: inline-block;
+    background-color: rgba(0,0,0,0);
+    border-color: #FFFFFF;
+    border-width: 2px;
+    color: #FFFFFF;
 }
 
 #top-navbar-subtitle-container {

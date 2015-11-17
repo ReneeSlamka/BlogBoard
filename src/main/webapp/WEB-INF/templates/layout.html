@@ -2,27 +2,30 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
     <head>
         <meta charset="UTF-8"/>
-        <title>{% block title %}{% endblock %}</title>
+        <title>{% block title %}{% endblock title %}</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
               integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
               crossorigin="anonymous" />
-        <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
                 integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
                 crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         <link rel="stylesheet" type="text/css" href="resources/static/css/top-navbar.css" />
+
         {% block css %}
-        {% endblock %}
+        {% endblock css %}
         {% block headerJs %}
-        {% endblock %}
+        {% endblock headerJs%}
     </head>
     <body>
+        {% set activePage = active_page|default('login') %}
         {% include '/fragments/top-navbar' %}
 
         {% block content %}
-        {% endblock %}
+        {% endblock content %}
         {% block js %}
-        {% endblock %}
+        {% endblock js %}
         <script src="resources/static/js/account-services.js"></script>
     </body>
 </html>

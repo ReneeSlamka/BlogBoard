@@ -11,7 +11,6 @@ import javax.servlet.http.Cookie;
 public class AccountService {
 
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
-    private static final String CREATE_ACCOUNT_SUCCESS_URL = "http://localhost:8080/account-created";
     private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
 
@@ -41,7 +40,7 @@ public class AccountService {
                 response.setToFailure(CauseOfFailure.DATABASE_ERROR);
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
-                httpResponse.setHeader("Location", CREATE_ACCOUNT_SUCCESS_URL);
+                httpResponse.setHeader("Location", LOGIN_PAGE);
                 response.setToSuccess();
             }
         } else {

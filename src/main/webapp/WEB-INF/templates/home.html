@@ -1,8 +1,10 @@
 {% extends "layout" %}
+{% set activePage = 'home' %}
 
 {% block title %}Welcome to Blog Board{% endblock %}
 
 {% block css %}
+<link rel="stylesheet" type="text/css" href="resources/static/css/home.css" />
 {% endblock %}
 
 {% block js %}
@@ -12,14 +14,17 @@
 
 {% block content %}
 <div class="container">
-    <div class="row">
+    <div class="row" id="home-greeting">
         <div class="col-md-8 col-md-offset-2">
             <h1 class="red">Welcome to your home page <span id="home-username"></span></h1>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-4 col-md-offset-1">
-            <h3>Your Boards</h3>
+    <div class="row" id="home-page-boards-container">
+        <div class="col-md-5" id="user-boards-section">
+            <div class="row section-header">
+                <i class="fa fa-pencil-square fa-2x"></i>
+                <h3 class="header-text">Your Boards</h3>
+            </div>
             <ul id="user-boards-list">
                 <li>Uni Pals</li>
                 <li>The Girl Gang</li>
@@ -30,8 +35,11 @@
                 Create Board
             </button>
         </div>
-        <div class="col-md-4 col-md-offset-2">
-            <h3>Notifications</h3>
+        <div class="col-md-6 col-md-offset-1" id="board-notifications">
+            <div class="row section-header">
+                <i class="fa fa-flag fa-2x"></i>
+                <h3 class="header-text">Notifications</h3>
+            </div>
             <ul>
                 <li>Jeff posted in Uni Pals</li>
                 <li>Mom added a photo in The Fam Jam</li>
