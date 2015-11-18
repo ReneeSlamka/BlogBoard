@@ -48,7 +48,7 @@ public class Board {
         this.name = newName;
     }
 
-    public String getownerUsername() {
+    public String getOwnerUsername() {
         return ownerUsername;
     }
 

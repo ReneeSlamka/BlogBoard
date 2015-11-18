@@ -7,6 +7,7 @@ import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -84,7 +85,7 @@ public class ServicesController {
     AccountServiceResponse validateSession(
             @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String validationCookie,
             HttpServletResponse validationResponse) {
-        return accountService.validateUserSession(sessionRepo, validationResponse,validationCookie);
+        return accountService.validateUserSession(sessionRepo, validationResponse, validationCookie);
     }
 
     @RequestMapping(value = "/board", method=RequestMethod.POST)
@@ -94,6 +95,27 @@ public class ServicesController {
             @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
             HttpServletResponse createAccountServletResponse) {
         return boardService.createBoard(boardRepo, boardName, usernameCookie, createAccountServletResponse);
+    }
+
+    @RequestMapping(value ="/board/{boardName}", method=RequestMethod.GET)
+    public ModelAndView getBoardPage(@PathVariable String boardName,
+        @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String sessionUsername,
+        @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String sessionId) {
+        ModelAndView mav = new ModelAndView();
+
+        //add info from repo
+        //1. check sessionId for validity (do later)
+        BoardServiceResponse getBoardResponse = boardService.getBoard(boardRepo, boardName, sessionUsername);
+
+        //create object to add to pebble board template
+        //need board name, owner, members and posts, date created??
+        mav.addObject("boardName", getBoardResponse.getBoard().getName());
+        mav.addObject("boardOwner", getBoardResponse.getBoard().getOwnerUsername());
+        mav.addObject("boardMembers", getBoardResponse.getBoard().getMembers());
+
+        ///
+        mav.setViewName("board");
+        return mav;
     }
 
 }

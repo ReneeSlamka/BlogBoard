@@ -1,6 +1,7 @@
 package com.blogboard.server.web;
 
 import com.blogboard.server.service.BoardService;
+import com.blogboard.server.data.entity.Board;
 
 
 public class BoardServiceResponse extends Response {
@@ -8,6 +9,11 @@ public class BoardServiceResponse extends Response {
     private static final String BOARD_CREATION_SUCCESS = "Your board has been successfully created!";
     private  String BOARD_CREATION_FAILURE = "Sorry, it seems there is already a board with that name. Please try making" +
             " another board with a different name.";
+
+    private static final String GET_BOARD_SUCCESS = "Board successfully retrieved";
+    private static final String GET_BOARD_FAILURE_NAME = "Error, board with that name doesn't exist";
+    private static final String GET_BOARD_FAILURE_USERNAME = "Error, user does not have permission to access this board";
+
     private static final String ADD_MEMBER_SUCCESS = "New member successfully added";
     private static final String ADD_MEMBER_FAILURE = "Failed to add new member, account with given username doesn't exist";
 
@@ -20,11 +26,20 @@ public class BoardServiceResponse extends Response {
 
     private BoardService.Service serviceType;
 
+    private Board board;
+
     public BoardServiceResponse(BoardService.Service serviceType) {
         super();
         this.serviceType = serviceType;
     }
 
+    public void setBoard(Board board) {
+        this.board = board;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
 
     @Override
     public void setToSuccess() {
@@ -32,6 +47,10 @@ public class BoardServiceResponse extends Response {
 
             case BOARD_CREATION:
                 this.setResponseMessage(BOARD_CREATION_SUCCESS);
+                break;
+
+            case GET_BOARD:
+                this.setResponseMessage(GET_BOARD_SUCCESS);
                 break;
 
             case ADD_MEMBER:
@@ -64,6 +83,14 @@ public class BoardServiceResponse extends Response {
             case BOARD_CREATION:
                 if (causeOfFailure.equals(BoardService.CauseOfFailure.NAME)) {
                     this.setResponseMessage(BOARD_CREATION_FAILURE);
+                }
+                break;
+
+            case GET_BOARD:
+                if (causeOfFailure.equals(BoardService.CauseOfFailure.NAME)) {
+                    this.setResponseMessage(GET_BOARD_FAILURE_NAME);
+                } else if (causeOfFailure.equals(BoardService.CauseOfFailure.USERNAME)) {
+                    this.setResponseMessage(GET_BOARD_FAILURE_USERNAME);
                 }
                 break;
 

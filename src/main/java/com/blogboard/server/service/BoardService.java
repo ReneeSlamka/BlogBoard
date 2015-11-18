@@ -15,10 +15,10 @@ public class BoardService {
     private static final String USER_HOME_URL = "http://localhost:8080/home";
 
     public enum CauseOfFailure {
-        NAME, USERNAME
+        NAME, USERNAME, UNKNOWN
     }
     public enum Service {
-        BOARD_CREATION, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
+        BOARD_CREATION, GET_BOARD, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
     }
 
     public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
@@ -48,5 +48,25 @@ public class BoardService {
 
         httpResponse.setHeader("Location", USER_HOME_URL);
         return createBoardResponse;
+    }
+
+    public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username) {
+        BoardServiceResponse getBoardResponse = new BoardServiceResponse(Service.GET_BOARD);
+        Board targetBoard = boardRepo.findByName(name);
+
+        //check that board exists and is accsesible by user
+        //Todo: check if username is in list of members
+        if (targetBoard != null && (targetBoard.getOwnerUsername().equals(username))) {
+            getBoardResponse.setBoard(targetBoard);
+            getBoardResponse.setToSuccess();
+        } else if (!targetBoard.getOwnerUsername().equals(username)) {
+            getBoardResponse.setToFailure(CauseOfFailure.USERNAME);
+        } else if (targetBoard == null) {
+            getBoardResponse.setToFailure(CauseOfFailure.NAME);
+        } else {
+            getBoardResponse.setToFailure(CauseOfFailure.UNKNOWN);
+        }
+
+        return getBoardResponse;
     }
 }

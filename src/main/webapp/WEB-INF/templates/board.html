@@ -1,0 +1,31 @@
+{% extends "layout" %}
+{% set activePage = 'board' %}
+
+{% block title %}{{boardName}}{% endblock title %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="resources/static/css/board.css" />
+{% endblock css %}
+
+{%block headerJs %}
+{% endblock headerJs %}
+
+{% block js %}
+{% endblock js %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <h3>Board name is: {{boardName}}</h3>
+        </div>
+    </div>
+    <div class="row content-section">
+        <div class="col-md-10 col-md-offset-1">
+            {% for member in boardMembers %}
+                <h5>member</h5>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
