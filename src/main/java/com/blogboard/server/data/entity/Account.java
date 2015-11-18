@@ -1,18 +1,17 @@
 package com.blogboard.server.data.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 
 @Entity
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id = null; //change later
+    private Long id;
     private String username;
     private String password;
     private String email;
-    private boolean loggedIn = false;
-
 
     public Account() {
         super();
@@ -50,14 +49,6 @@ public class Account {
 
     public java.lang.String getEmail() {
         return email;
-    }
-
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
-    public boolean getLoggedIn(){
-        return loggedIn;
     }
 
     public void updatePassword(String newPassword) {
