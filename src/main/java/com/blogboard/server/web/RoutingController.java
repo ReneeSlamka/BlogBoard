@@ -30,10 +30,5 @@ public class RoutingController {
         return mav;
     }
 
-    @RequestMapping(value ="/test", method= RequestMethod.GET)
-    public ModelAndView getTest() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("test");
-        return mav;
-    }
+
 }
