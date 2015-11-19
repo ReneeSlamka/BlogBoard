@@ -16,15 +16,17 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <h3>Board name is: {{boardName}}</h3>
-        </div>
-    </div>
-    <div class="row content-section">
-        <div class="col-md-10 col-md-offset-1">
+        <div class="col-md-4">
+            <h3>{{boardName}}</h3>
+            <h6>Created {{dateCreated}}</h6>
             {% for member in boardMembers %}
-                <h5>member</h5>
+                <h6>member</h6>
             {% endfor %}
+        </div>
+        <div class="col-md-8">
+            <section>
+                <h3>This is a post</h3>
+            </section>
         </div>
     </div>
 </div>
