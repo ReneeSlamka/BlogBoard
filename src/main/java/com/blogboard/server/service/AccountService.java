@@ -80,11 +80,11 @@ public class AccountService {
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
 
                 Cookie newSessionIdCookie = new Cookie("sessionID", newSessionId);
-                AppServiceHelper.configureCookie(newSessionIdCookie, (60 * 10), "/", false, false);
+                AppServiceHelper.configureCookie(newSessionIdCookie, (60 * 15), "/", false, false);
                 httpResponse.addCookie(newSessionIdCookie);
 
                 Cookie newSesssionUsernameCookie = new Cookie("sessionUsername", username);
-                AppServiceHelper.configureCookie(newSesssionUsernameCookie, (60 * 10), "/", false, false);
+                AppServiceHelper.configureCookie(newSesssionUsernameCookie, (60 * 15), "/", false, false);
                 httpResponse.addCookie(newSesssionUsernameCookie);
                 response.setToSuccess();
 
