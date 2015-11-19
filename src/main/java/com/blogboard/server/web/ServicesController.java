@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.stereotype.Controller;
+import com.blogboard.server.data.entity.Board;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -87,6 +89,17 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String validationCookie,
             HttpServletResponse validationResponse) {
         return accountService.validateUserSession(sessionRepo, validationResponse, validationCookie);
+    }
+
+    @RequestMapping(value ="/home", method=RequestMethod.GET)
+    public ModelAndView getHomePage(
+            @CookieValue(value = "sessionUsername", required = true) String sessionUsername) {
+        ModelAndView mav = new ModelAndView();
+
+        ArrayList<Board> userBoards = boardService.getListBoards(boardRepo, sessionUsername);
+        mav.addObject("userBoards", userBoards);
+        mav.setViewName("home");
+        return mav;
     }
 
     @RequestMapping(value = "/board", method=RequestMethod.POST)

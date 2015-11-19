@@ -43,7 +43,9 @@ public class BoardService {
             Calendar calendar = Calendar.getInstance();
 
             Board newBoard = new Board(name, ownerUsername, dateFormat.format(calendar.getTime()), BASE_URL);
+            createBoardResponse.setBoard(newBoard);
             Board savedBoard = boardRepo.save(newBoard);
+
 
             //configure response
             //store list of ALL users boards with urls into cookie
@@ -73,6 +75,12 @@ public class BoardService {
 
         httpResponse.setHeader("Location", USER_HOME_URL);
         return createBoardResponse;
+    }
+
+    public ArrayList<Board> getListBoards(BoardRepository boardRepo, String username) {
+
+        ArrayList<Board> userBoards =  boardRepo.findByOwnerUsername(username);
+        return userBoards;
     }
 
     public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username) {

@@ -29,6 +29,11 @@
                 <li>Uni Pals</li>
                 <li>The Girl Gang</li>
                 <li>The Fam Jam</li>
+                {% for board in userBoards %}
+                    <a href="{{ board.url }}">
+                        <li>{{ board.name }}</li>
+                    </a>
+                {% endfor %}
             </ul>
             <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
                 data-target="#create-board-form" onclick="displayModal()">

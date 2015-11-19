@@ -23,12 +23,7 @@ public class RoutingController {
         return mav;
     }
 
-    @RequestMapping(value ="/home", method= RequestMethod.GET)
-    public ModelAndView getHomePage() {
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("home");
-        return mav;
-    }
+
 
 
 }
