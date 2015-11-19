@@ -55,11 +55,6 @@ public class BoardService {
                 boardCookieTuple.put("url", board.getUrl());
                 boardCookies.add(boardCookieTuple);
             }
-            /*ArrayList<String[]> boardCookies = new ArrayList<String[]>();
-            for(Board board : boards) {
-                String[] nameUrlTuple = {board.getName(),board.getUrl()};
-                boardCookies.add(nameUrlTuple);
-            }*/
 
             //TODO: will have to also get boards that are a member but not owner of (later)
 
