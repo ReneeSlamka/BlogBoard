@@ -24,8 +24,14 @@ function createBoard() {
                 boardName = boardName.substring(1, boardName.length-1);
                 boardName = boardName.split(/[\[\]']+/g);
                 boardName = boardName[1].replace(/\\/g, "");
-                var cookieJSON = JSON.parse(boardName);
-                addBoardName(cookieJSON.name, cookieJSON.url);
+                
+                var arrayCookieJson = boardName.split(",");
+
+                for (var i = 0; i < arrayCookieJson.length; i=i+2) {
+                    arrayCookieJson[i/2] = arrayCookieJson[i] + "," + arrayCookieJson[i+1];
+                    var cookieJSON = JSON.parse(arrayCookieJson[i/2]);
+                    addBoardName(cookieJSON.name, cookieJSON.url);
+                }
             }
             document.getElementById("new-board-name").value = "";
             if (window.location.href !== url) {
