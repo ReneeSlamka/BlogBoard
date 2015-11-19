@@ -46,7 +46,3 @@ function addBoardName(newBoardName, url) {
     var $listBoards = $("#user-boards-list");
     $listBoards.append("<a href=" + url + "><li>" + newBoardName+ "</li></a>");
 }
-
-function replaceCharacter(string, index, character) {
-    return string.substr(0, index) + character + this.substr(index+character.length);
-}
