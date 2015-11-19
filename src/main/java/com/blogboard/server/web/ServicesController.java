@@ -8,10 +8,11 @@ import com.blogboard.server.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletResponse;
 
-@RestController
+@Controller
 public class ServicesController {
 
     private AccountService accountService;
@@ -23,31 +24,31 @@ public class ServicesController {
     private SessionRepository sessionRepo;
     private BoardRepository boardRepo;
 
-    @Autowired
-    public void setAccountService(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    @Autowired
-    public void setBoardService(BoardService boardService) {
-        this.boardService = boardService;
-    }
-
-    @Autowired
-    public void setAccountRepository(AccountRepository accountRepository) {
-        this.accountRepo = accountRepository;
-    }
-
-    @Autowired
-    public void setSessionRepository(SessionRepository sessionRepository) {
-        this.sessionRepo = sessionRepository;
-    }
-
-    @Autowired
+    @Autowired (required = true)
     public void setSessionRepository(BoardRepository boardRepository) {
         this.boardRepo = boardRepository;
     }
 
+    @Autowired (required = true)
+    public void setBoardService(BoardService boardService) {
+        this.boardService = boardService;
+    }
+
+
+    @Autowired (required = true)
+    public void setAccountService(AccountService accountService) {
+        this.accountService = accountService;
+    }
+
+    @Autowired (required = true)
+    public void setAccountRepository(AccountRepository accountRepository) {
+        this.accountRepo = accountRepository;
+    }
+
+    @Autowired (required = true)
+    public void setSessionRepository(SessionRepository sessionRepository) {
+        this.sessionRepo = sessionRepository;
+    }
 
     @RequestMapping(value ="/account", method=RequestMethod.POST)
     public @ResponseBody
@@ -97,7 +98,7 @@ public class ServicesController {
         return boardService.createBoard(boardRepo, boardName, usernameCookie, createAccountServletResponse);
     }
 
-    @RequestMapping(value ="/board/{boardName}", method=RequestMethod.GET)
+    @RequestMapping(value ="/board={boardName}", method=RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable String boardName,
         @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String sessionUsername,
         @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String sessionId) {
@@ -108,12 +109,10 @@ public class ServicesController {
         BoardServiceResponse getBoardResponse = boardService.getBoard(boardRepo, boardName, sessionUsername);
 
         //create object to add to pebble board template
-        //need board name, owner, members and posts, date created??
         mav.addObject("boardName", getBoardResponse.getBoard().getName());
         mav.addObject("boardOwner", getBoardResponse.getBoard().getOwnerUsername());
+        mav.addObject("dateCreated", getBoardResponse.getBoard().getDateCreated());
         mav.addObject("boardMembers", getBoardResponse.getBoard().getMembers());
-
-        ///
         mav.setViewName("board");
         return mav;
     }

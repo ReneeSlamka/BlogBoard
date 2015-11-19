@@ -28,6 +28,8 @@ public class BoardServiceResponse extends Response {
 
     private Board board;
 
+    public BoardServiceResponse() {};
+
     public BoardServiceResponse(BoardService.Service serviceType) {
         super();
         this.serviceType = serviceType;

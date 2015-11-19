@@ -20,7 +20,12 @@ function createBoard() {
             if(textStatus === "success") {
                 $("#create-board-form").modal("hide");
                 var boardName = getCookie("userBoards");
-                addBoardName(boardName);
+                //remove extra quotation marks
+                boardName = boardName.substring(1, boardName.length-1);
+                boardName = boardName.split(/[\[\]']+/g);
+                boardName = boardName[1].replace(/\\/g, "");
+                var cookieJSON = JSON.parse(boardName);
+                addBoardName(cookieJSON.name, cookieJSON.url);
             }
             document.getElementById("new-board-name").value = "";
             if (window.location.href !== url) {
@@ -31,8 +36,11 @@ function createBoard() {
     });
 }
 
-function addBoardName(newBoardName) {
+function addBoardName(newBoardName, url) {
     var $listBoards = $("#user-boards-list");
-    $listBoards.append("<li>" + newBoardName+ "</li>");
+    $listBoards.append("<a href=" + url + "><li>" + newBoardName+ "</li></a>");
 }
 
+function replaceCharacter(string, index, character) {
+    return string.substr(0, index) + character + this.substr(index+character.length);
+}
