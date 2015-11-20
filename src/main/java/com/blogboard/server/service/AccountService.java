@@ -1,6 +1,8 @@
 package com.blogboard.server.service;
 
 import com.blogboard.server.web.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
@@ -16,6 +18,20 @@ public class AccountService {
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
     private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
+
+    private static final String ACCOUNT_CREATION_SUCCESS = "Congrats, your account has successfully been " +
+            "created! You can now login and start blogging.";
+    private static final String ACCOUNT_CREATION_FAILURE_USERNAME = "Sorry, it seems there is already an account with that username";
+    private static final String ACCOUNT_CREATION_FAILURE_EMAIL = "Sorry, it seems there is already an account with that email";
+    private static final String LOGIN_SUCCESS = "Login successful!";
+    private static final String LOGIN_FAILURE_USERNAME = "Sorry, it seems that there is no account with that username.";
+    private static final String LOGIN_FAILURE_PASSWORD = "Sorry, it seems that password is incorrect.";
+    private static final String INVALID_LOGIN_ATTEMPT = "Session already in place, invalid login attempt";
+    private static final String LOGOUT_SUCCESS = "Logout successful";
+    private static final String SESSION_VALID = "Valid login session created";
+    private static final String NO_SESSION_FOUND = "No session has been initialized";
+    private static final String INVALID_SESSION = "Not a valid session";
+    private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
 
     public enum CauseOfFailure {
@@ -43,25 +59,27 @@ public class AccountService {
             Account newAccount = new Account(username, AppServiceHelper.hashString(password), email);
             Account savedAccount = accountRepo.save(newAccount);
             if (savedAccount == null) {
-                httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setToFailure(CauseOfFailure.DATABASE_ERROR);
+                AppServiceHelper
+                    .configureHttpError(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
+
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_PAGE);
-                response.setToSuccess();
             }
         //either account with same credential(s) already exists or unknown error occurred
         } else {
-            httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
             httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
             if(accountRepo.findByUsername(username) != null) {
-                response.setToFailure(CauseOfFailure.USERNAME);
+                AppServiceHelper
+                    .configureHttpError(httpResponse, HttpServletResponse.SC_CONFLICT, ACCOUNT_CREATION_FAILURE_USERNAME);
             } else if (accountRepo.findByEmail(email) != null) {
-                response.setToFailure(CauseOfFailure.EMAIL);
+                AppServiceHelper
+                    .configureHttpError(httpResponse, HttpServletResponse.SC_CONFLICT, ACCOUNT_CREATION_FAILURE_EMAIL);
+
             } else {
                 //to cover other unknown errors
-                httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setToFailure(CauseOfFailure.UNKNOWN_ERROR);
+                AppServiceHelper
+                    .configureHttpError(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
             }
         }
 
