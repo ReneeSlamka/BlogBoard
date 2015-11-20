@@ -6,6 +6,9 @@ import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 @Service
 public class AccountService {
@@ -24,6 +27,12 @@ public class AccountService {
         ACCOUNT_CREATION, LOGIN, LOGOUT, VALIDATION
     }
 
+    /*
+    * Method Name: Create Account
+    * Inputs: Account Repository, username, password, email, httpResponse
+    * Return Value: Account Services Response w/ HTTP Servlet Response
+    * Purpose: create new account, store in database and return the a success or failure message
+     */
 
     public AccountServiceResponse createAccount(AccountRepository accountRepo, String username, String password,
         String email, HttpServletResponse httpResponse) {
@@ -61,9 +70,21 @@ public class AccountService {
         return response;
     }
 
-
+    /*
+    * Method Name: Login
+    * Inputs: Account Repository, Session Repository, username, password, HTTP Servlet Response
+    * Return Value: Account Services Response
+    * Purpose: logs user in by creating a session object, storing it the database and returning its values
+    * in a cookie to be stored on the client side for persistent authentication
+     */
     public AccountServiceResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
         String password, HttpServletResponse httpResponse) {
+
+        //create new session and save in board repo
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        String timeStamp = dateFormat.format(calendar.getTime());
+
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGIN);
         Account targetAccount = accountRepo.findByUsername(username);
 
@@ -73,7 +94,7 @@ public class AccountService {
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
                 String newSessionId = AppServiceHelper.generateSessionID();
-                Session newSession = new Session(username, AppServiceHelper.hashString(newSessionId));
+                Session newSession = new Session(username, AppServiceHelper.hashString(newSessionId), timeStamp);
                 Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
@@ -114,18 +135,26 @@ public class AccountService {
         return response;
     }
 
-    public AccountServiceResponse logout(SessionRepository sessionRepo, String username, String cookieSessionID,
+
+    /*
+    * Method Name: Logout
+    * Inputs: Session Repository, username, sessionId, HTTP Servlet Response
+    * Return Value: Account Services Response
+    * Purpose: logs user out of their current session, deletes their session from the database and returns the url
+    * to the login page to redirect the client
+     */
+    public AccountServiceResponse logout(SessionRepository sessionRepo, String username, String sessionID,
         HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGOUT);
 
-        if (cookieSessionID.equals("undefined") || cookieSessionID.length() == 0){
+        if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setToFailure(CauseOfFailure.SESSION_DNE);
             return response;
         }
 
-        Session targetSesssion = sessionRepo.findBySessionId(AppServiceHelper.hashString(cookieSessionID));
+        Session targetSesssion = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionID));
 
         //if sessionID exists and is valid remove session from DB
         if (targetSesssion != null && targetSesssion.getAccountUsername().equals(username)) {
@@ -143,18 +172,26 @@ public class AccountService {
         return response;
     }
 
+
+    /*
+    * Method Name: Validate User Session
+    * Inputs: Session Repository, HTTP Servlet Response, sessionId
+    * Return Value: Account Services Response
+    * Purpose: checks if sessionId provided by client's cookie matches with one stored in database and returns
+     * success message with user home page url to redirect client to if it does
+     */
     public AccountServiceResponse validateUserSession(SessionRepository sessionRepo, HttpServletResponse httpResponse,
-        String cookieSessionID) {
+        String sessionID) {
         AccountServiceResponse response = new AccountServiceResponse(Service.VALIDATION);
 
-        if (cookieSessionID.equals("undefined") || cookieSessionID.length() == 0){
+        if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setToFailure(CauseOfFailure.SESSION_DNE);
             return response;
         }
 
-        Session targetAccount = sessionRepo.findBySessionId(AppServiceHelper.hashString(cookieSessionID));
+        Session targetAccount = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionID));
 
         //TODO: improve security here after more research
         if (targetAccount != null){
