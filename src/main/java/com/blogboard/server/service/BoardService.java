@@ -28,6 +28,14 @@ public class BoardService {
         BOARD_CREATION, GET_BOARD, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
     }
 
+
+    /*
+    * Method Name: Create Board
+    * Inputs: Board Repository, name (of board), ownerUsername
+    * Return Value: BoardServiceResponse containing newly created board object and  configured httpServerletResponse
+    * Purpose: create new board, store in database and return the necessary info to add it to
+    * the DOM on the client side
+    */
     public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
         HttpServletResponse httpResponse) {
 
@@ -35,18 +43,15 @@ public class BoardService {
 
         //check if board with that owner AND name already exists
         if (boardRepo.findByNameAndOwnerUsername(name, ownerUsername) == null) {
-            //create board and save in board repo
 
+            //create board and save in board repo
             DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Calendar calendar = Calendar.getInstance();
-
             Board newBoard = new Board(name, ownerUsername, dateFormat.format(calendar.getTime()), BASE_URL);
             createBoardResponse.setBoard(newBoard);
             Board savedBoard = boardRepo.save(newBoard);
 
-
-            //configure response
-            //store list of ALL users boards with urls into cookie
+            //update list of boards to store in cookie on client side (use this later)
             ArrayList<Board> boards = boardRepo.findByOwnerUsername(ownerUsername);
             JSONArray boardCookies = new JSONArray();
             for (Board board: boards) {
@@ -58,6 +63,7 @@ public class BoardService {
 
             //TODO: will have to also get boards that are a member but not owner of (later)
 
+            //configure cookie and api response
             Cookie userBoardsCookie = new Cookie("userBoards", boardCookies.toJSONString());
             userBoardsCookie.setMaxAge(60*15);
             userBoardsCookie.setPath("/");
@@ -71,21 +77,36 @@ public class BoardService {
             httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
         }
 
+        //include URL for client to redirect to
         httpResponse.setHeader("Location", USER_HOME_URL);
         return createBoardResponse;
     }
 
+
+    /*
+    * Method Name: Get List Boards
+    * Inputs: Board Repository, username(board ownerUsername)
+    * Return: ArrayList<Board>
+    * Purpose: to retrieve all boards that belong to that user
+    */
     public ArrayList<Board> getListBoards(BoardRepository boardRepo, String username) {
 
         ArrayList<Board> userBoards =  boardRepo.findByOwnerUsername(username);
         return userBoards;
     }
 
+
+    /*
+    * Method Name: Get Board
+    * Inputs: Board Repository, name (of board), ownerUsername
+    * Return: ArrayList<Board>
+    * Purpose:
+    */
     public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username) {
         BoardServiceResponse getBoardResponse = new BoardServiceResponse(Service.GET_BOARD);
         Board targetBoard = boardRepo.findByName(name);
 
-        //check that board exists and is accsesible by user
+        //check that board exists and is accessible by user
         //Todo: check if username is in list of members
         if (targetBoard != null && (targetBoard.getOwnerUsername().equals(username))) {
             getBoardResponse.setBoard(targetBoard);
