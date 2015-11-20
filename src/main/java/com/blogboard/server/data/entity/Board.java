@@ -30,6 +30,7 @@ public class Board {
     @Column(name="members")
     private ArrayList<String> members;
 
+    //keep like this for now, in future might have different types if posts and want loose coupling
     private ArrayList<String> posts;
 
     public Board() {

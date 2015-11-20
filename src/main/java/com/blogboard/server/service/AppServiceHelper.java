@@ -1,6 +1,4 @@
 package com.blogboard.server.service;
-
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
@@ -45,13 +43,4 @@ public class AppServiceHelper {
         cookie.setHttpOnly(httpOnly);
         cookie.setSecure(isSecure);
     }
-
-    public static void configureHttpServlet(HttpServletResponse servletResponse, int status, String locationHeaderURL, Cookie cookie) {
-        servletResponse.setStatus(status);
-        servletResponse.setHeader("Location", locationHeaderURL);
-        if (cookie != null) {
-            servletResponse.addCookie(cookie);
-        }
-    }
-
 }

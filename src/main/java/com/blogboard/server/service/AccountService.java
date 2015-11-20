@@ -38,12 +38,10 @@ public class AccountService {
         String email, HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.ACCOUNT_CREATION);
 
-        //check if account with that username and/or email already exists
+        //account with provided credentials doesn't already exist
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
-
             Account newAccount = new Account(username, AppServiceHelper.hashString(password), email);
             Account savedAccount = accountRepo.save(newAccount);
-
             if (savedAccount == null) {
                 httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setToFailure(CauseOfFailure.DATABASE_ERROR);
@@ -52,11 +50,10 @@ public class AccountService {
                 httpResponse.setHeader("Location", LOGIN_PAGE);
                 response.setToSuccess();
             }
+        //either account with same credential(s) already exists or unknown error occurred
         } else {
-            //either account with same credential(s) already exists or unknown error occurred
             httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
             httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
-
             if(accountRepo.findByUsername(username) != null) {
                 response.setToFailure(CauseOfFailure.USERNAME);
             } else if (accountRepo.findByEmail(email) != null) {
@@ -64,9 +61,10 @@ public class AccountService {
             } else {
                 //to cover other unknown errors
                 httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setToFailure(CauseOfFailure.DATABASE_ERROR);
+                response.setToFailure(CauseOfFailure.UNKNOWN_ERROR);
             }
         }
+
         return response;
     }
 
@@ -100,13 +98,12 @@ public class AccountService {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
 
-                Cookie newSessionIdCookie = new Cookie("sessionID", newSessionId);
-                AppServiceHelper.configureCookie(newSessionIdCookie, (60 * 15), "/", false, false);
-                httpResponse.addCookie(newSessionIdCookie);
-
-                Cookie newSesssionUsernameCookie = new Cookie("sessionUsername", username);
-                AppServiceHelper.configureCookie(newSesssionUsernameCookie, (60 * 15), "/", false, false);
-                httpResponse.addCookie(newSesssionUsernameCookie);
+                Cookie sessionId = new Cookie("sessionID", newSessionId);
+                AppServiceHelper.configureCookie(sessionId, (60 * 15), "/", false, false);
+                httpResponse.addCookie(sessionId);
+                Cookie sesssionUsername = new Cookie("sessionUsername", username);
+                AppServiceHelper.configureCookie(sesssionUsername, (60 * 15), "/", false, false);
+                httpResponse.addCookie(sesssionUsername);
                 response.setToSuccess();
 
             } else {
