@@ -2,6 +2,7 @@ package com.blogboard.server.service;
 
 
 import com.blogboard.server.data.entity.Board;
+import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.web.BoardServiceResponse;
 import org.springframework.stereotype.Service;
@@ -120,5 +121,36 @@ public class BoardService {
         }
 
         return getBoardResponse;
+    }
+
+
+    /*
+    * Method Name: Add Member
+    * Inputs:
+    * Return:
+    * Purpose:
+    */
+    public BoardServiceResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
+        String username, HttpServletResponse httpResponse, String boardName) {
+        BoardServiceResponse addMemberResponse = new BoardServiceResponse(Service.ADD_MEMBER);
+
+        //1. Check if user exists
+        /*if (accountRepo.findByUsername(username) != null) {
+            Board targetBoard = boardRepo.findByName(boardName);
+            targetBoard.addMember(username);
+            JS
+        } else {
+
+        }*/
+
+        //2. When confirmed, add user's name to list of boards members
+
+        //3. Create json object with user's name, and link to their home page
+
+        //4. Configure httpRespnse and BoardServiceResponse
+
+        //5. Send response to client so can add user to DOM
+
+        return addMemberResponse;
     }
 }
