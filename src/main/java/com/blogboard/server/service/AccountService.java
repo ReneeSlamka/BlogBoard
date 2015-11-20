@@ -33,12 +33,6 @@ public class AccountService {
     private static final String INVALID_SESSION = "Not a valid session";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
-
-    public enum CauseOfFailure {
-        USERNAME, PASSWORD, EMAIL, DATABASE_ERROR, INVALID_LOGIN, SESSION_DNE,
-        INVALID_SESSION, UNKNOWN_ERROR
-    }
-
     public enum Service {
         ACCOUNT_CREATION, LOGIN, LOGOUT, VALIDATION
     }
@@ -58,9 +52,13 @@ public class AccountService {
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
             Account newAccount = new Account(username, AppServiceHelper.hashString(password), email);
             Account savedAccount = accountRepo.save(newAccount);
+            response.setToSuccess();
             if (savedAccount == null) {
-                AppServiceHelper
-                    .configureHttpError(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        UNKNOWN_ERROR
+                );
 
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
@@ -70,16 +68,24 @@ public class AccountService {
         } else {
             httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
             if(accountRepo.findByUsername(username) != null) {
-                AppServiceHelper
-                    .configureHttpError(httpResponse, HttpServletResponse.SC_CONFLICT, ACCOUNT_CREATION_FAILURE_USERNAME);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_CONFLICT,
+                        ACCOUNT_CREATION_FAILURE_USERNAME
+                );
             } else if (accountRepo.findByEmail(email) != null) {
-                AppServiceHelper
-                    .configureHttpError(httpResponse, HttpServletResponse.SC_CONFLICT, ACCOUNT_CREATION_FAILURE_EMAIL);
-
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_CONFLICT,
+                        ACCOUNT_CREATION_FAILURE_EMAIL
+                );
             } else {
                 //to cover other unknown errors
-                AppServiceHelper
-                    .configureHttpError(httpResponse, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        UNKNOWN_ERROR
+                );
             }
         }
 
@@ -124,26 +130,40 @@ public class AccountService {
                 httpResponse.addCookie(sesssionUsername);
                 response.setToSuccess();
 
+                //session cookie expired before user logged out
             } else {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setHeader("Location", LOGIN_PAGE);
-                response.setToFailure(CauseOfFailure.INVALID_LOGIN);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        INVALID_LOGIN_ATTEMPT
+                );
             }
 
             Account updatedAccount = accountRepo.save(targetAccount);
         }
         else {
             //either credentials were wrong or unknown error occurred
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.setContentType("text/plain");
             httpResponse.setHeader("Location", LOGIN_PAGE);
 
             if (accountRepo.findByUsername(username) == null) {
-                response.setToFailure(CauseOfFailure.USERNAME);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        LOGIN_FAILURE_USERNAME
+                );
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
-                response.setToFailure(CauseOfFailure.PASSWORD);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        LOGIN_FAILURE_PASSWORD
+                );
             } else {
-                response.setToFailure(CauseOfFailure.UNKNOWN_ERROR);//TODO replace with proper solution later
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        UNKNOWN_ERROR
+                );
             }
         }
 
@@ -164,8 +184,11 @@ public class AccountService {
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setToFailure(CauseOfFailure.SESSION_DNE);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    NO_SESSION_FOUND
+            );
             return response;
         }
 
@@ -177,11 +200,23 @@ public class AccountService {
             httpResponse.setHeader("Location", LOGIN_PAGE);
             response.setToSuccess();
         } else if (targetSesssion == null) {
-            response.setToFailure(CauseOfFailure.SESSION_DNE);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    NO_SESSION_FOUND
+            );
         } else if (!targetSesssion.getAccountUsername().equals(username)) {
-            response.setToFailure(CauseOfFailure.INVALID_SESSION);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    INVALID_SESSION
+            );
         } else {
-            response.setToFailure(CauseOfFailure.UNKNOWN_ERROR);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    UNKNOWN_ERROR
+            );
         }
 
         return response;
@@ -201,8 +236,11 @@ public class AccountService {
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setToFailure(CauseOfFailure.SESSION_DNE);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    NO_SESSION_FOUND
+            );
             return response;
         }
 
@@ -210,20 +248,18 @@ public class AccountService {
 
         //TODO: improve security here after more research
         if (targetAccount != null){
+            httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
             httpResponse.setStatus(HttpServletResponse.SC_OK);
             response.setToSuccess();
-            httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
         } else {
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setToFailure(CauseOfFailure.INVALID_SESSION);
             httpResponse.setHeader("Location", LOGIN_PAGE);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    INVALID_SESSION
+            );
         }
 
         return response;
     }
-
-    /*---==============HELPER FUNCTIONS==============---*/
-    /*==================================================*/
-
-
 }

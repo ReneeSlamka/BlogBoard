@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
+import java.io.IOException;
 
 public class AppServiceHelper {
 
@@ -42,5 +43,14 @@ public class AppServiceHelper {
         cookie.setPath(path);
         cookie.setHttpOnly(httpOnly);
         cookie.setSecure(isSecure);
+    }
+
+    public static void configureHttpError(HttpServletResponse httpResponse,  int status, String message) {
+        try {
+            httpResponse.sendError(status, message);
+        } catch (IOException ex) {
+            System.out.println (ex.toString());
+            System.out.println("Internet connection was closed before error message could be sent");
+        }
     }
 }

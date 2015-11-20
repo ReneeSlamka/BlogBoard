@@ -4,18 +4,18 @@ import com.blogboard.server.service.AccountService;
 
 public abstract class Response {
 
-    private String responseMessage;
+    private String message;
 
     public Response() {
-        this.responseMessage = "";
+        this.message = "";
     }
 
-    public String getResponseMessage() {
-        return this.responseMessage;
+    public String getMessage() {
+        return this.message;
     }
 
-    public void setResponseMessage(String newResponseText) {
-        this.responseMessage = newResponseText;
+    public void setMessage(String newResponseText) {
+        this.message = newResponseText;
     }
 
     abstract public void setToSuccess();

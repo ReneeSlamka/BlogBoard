@@ -16,7 +16,7 @@ function createAccount() {
             alert(textStatus);
         },
         complete: function (request, textStatus) { //for additional info
-            showResponseMessage("create-account-response-text", request.responseJSON.responseMessage);
+            showResponseMessage("create-account-response-text", request.responseJSON.message);
             document.getElementById("new-username").value = "";
             document.getElementById("new-password").value = "";
             document.getElementById("new-email").value = "";

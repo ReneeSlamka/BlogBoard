@@ -2,6 +2,7 @@ package com.blogboard.server.web;
 
 import com.blogboard.server.service.BoardService;
 import com.blogboard.server.data.entity.Board;
+import org.json.simple.JSONObject;
 
 
 public class BoardServiceResponse extends Response {
@@ -28,6 +29,8 @@ public class BoardServiceResponse extends Response {
 
     private Board board;
 
+    private JSONObject jsonReponseObject;
+
     public BoardServiceResponse() {};
 
     public BoardServiceResponse(BoardService.Service serviceType) {
@@ -43,68 +46,72 @@ public class BoardServiceResponse extends Response {
         return board;
     }
 
+    public void setJsonReponseObject(JSONObject jsonObject) { this.jsonReponseObject = jsonObject; }
+
+    public JSONObject getJsonReponseObject() { return jsonReponseObject; }
+
     @Override
     public void setToSuccess() {
         switch(serviceType) {
 
             case BOARD_CREATION:
-                this.setResponseMessage(BOARD_CREATION_SUCCESS);
+                this.setMessage(BOARD_CREATION_SUCCESS);
                 break;
 
             case GET_BOARD:
-                this.setResponseMessage(GET_BOARD_SUCCESS);
+                this.setMessage(GET_BOARD_SUCCESS);
                 break;
 
             case ADD_MEMBER:
-                this.setResponseMessage(ADD_MEMBER_SUCCESS);
+                this.setMessage(ADD_MEMBER_SUCCESS);
                 break;
 
             case REMOVE_MEMBER:
-                this.setResponseMessage(REMOVE_MEMBER_SUCCESS);
+                this.setMessage(REMOVE_MEMBER_SUCCESS);
                 break;
 
             case ADD_POST:
-                this.setResponseMessage(POST_SUCCESSFULLY_ADDED);
+                this.setMessage(POST_SUCCESSFULLY_ADDED);
                 break;
 
             case DELETE_POST:
-                this.setResponseMessage(POST_SUCCESSFULLY_DELETED);
+                this.setMessage(POST_SUCCESSFULLY_DELETED);
                 break;
 
             default:
-                this.setResponseMessage("Undefined success");
+                this.setMessage("Undefined success");
                 break;
         }
     }
 
 
     public void setToFailure(BoardService.CauseOfFailure causeOfFailure) {
-        this.setResponseMessage(UNKNOWN_ERROR);
+        this.setMessage(UNKNOWN_ERROR);
         switch(serviceType) {
 
             case BOARD_CREATION:
                 if (causeOfFailure.equals(BoardService.CauseOfFailure.NAME)) {
-                    this.setResponseMessage(BOARD_CREATION_FAILURE);
+                    this.setMessage(BOARD_CREATION_FAILURE);
                 }
                 break;
 
             case GET_BOARD:
                 if (causeOfFailure.equals(BoardService.CauseOfFailure.NAME)) {
-                    this.setResponseMessage(GET_BOARD_FAILURE_NAME);
+                    this.setMessage(GET_BOARD_FAILURE_NAME);
                 } else if (causeOfFailure.equals(BoardService.CauseOfFailure.USERNAME)) {
-                    this.setResponseMessage(GET_BOARD_FAILURE_USERNAME);
+                    this.setMessage(GET_BOARD_FAILURE_USERNAME);
                 }
                 break;
 
             case ADD_MEMBER:
                 if (causeOfFailure.equals(BoardService.CauseOfFailure.USERNAME)) {
-                    this.setResponseMessage(ADD_MEMBER_FAILURE);
+                    this.setMessage(ADD_MEMBER_FAILURE);
                 }
                 break;
 
             case REMOVE_MEMBER:
                 if (causeOfFailure.equals(BoardService.CauseOfFailure.USERNAME)) {
-                    this.setResponseMessage(REMOVE_MEMBER_FAILURE);
+                    this.setMessage(REMOVE_MEMBER_FAILURE);
                 }
                 break;
         }
