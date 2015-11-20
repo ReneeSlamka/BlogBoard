@@ -10,13 +10,14 @@ public class Session {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id = null;
+    private Long id;
     private String accountUsername;
     private String sessionId;
+    private String timeStamp;
 
     private Session() {}
 
-    public Session(String accountUsername, String sessionId) {
+    public Session(String accountUsername, String sessionId, String timeStamp) {
 
         /*If a user does not already have a session in place
         then their account username should not be listed in the
@@ -25,6 +26,7 @@ public class Session {
         */
         this.accountUsername = accountUsername;
         this.sessionId = sessionId;
+        this.timeStamp = timeStamp;
     }
 
     public Long getId() {
@@ -50,5 +52,9 @@ public class Session {
     public void setSessionId(String newSessionId) {
         this.sessionId = newSessionId;
     }
+
+    public String getTimeStamp() { return timeStamp; }
+
+    private void setTimeStamp(String timeStamp) { this.timeStamp = timeStamp; }
 
 }
