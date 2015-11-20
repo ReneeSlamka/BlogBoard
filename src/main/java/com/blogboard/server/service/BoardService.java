@@ -5,8 +5,6 @@ import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.web.BoardServiceResponse;
 import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

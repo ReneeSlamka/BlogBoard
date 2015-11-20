@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import javax.persistence.Column;
 import java.io.File;
@@ -35,10 +37,17 @@ public class Board {
     }
 
     public Board(String name, String owner, String dateCreated, String baseUrl) {
+        String urlEncodedName = name;
+        try {
+            name = URLDecoder.decode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError("UTF-8 is unknown");
+        }
+
         this.name = name;
         this.ownerUsername = owner;
         this.dateCreated = dateCreated;
-        this.url = baseUrl + File.separator + "board=" +  name;
+        this.url = baseUrl + File.separator + "board=" +  urlEncodedName;
     }
 
     public Long getId() {
