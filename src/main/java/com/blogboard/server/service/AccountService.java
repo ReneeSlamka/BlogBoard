@@ -183,7 +183,6 @@ public class AccountService {
     public AccountServiceResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
         HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGOUT);
-        boolean sessionValid = validateSession(sessionRepo, httpResponse, sessionID, sessionUsername);
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);

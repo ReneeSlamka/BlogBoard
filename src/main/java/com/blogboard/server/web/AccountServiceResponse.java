@@ -1,7 +1,6 @@
 package com.blogboard.server.web;
 
 import com.blogboard.server.service.AccountService.Service;
-import com.blogboard.server.service.AccountService.CauseOfFailure;
 
 
 public class AccountServiceResponse extends Response {
