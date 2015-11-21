@@ -46,9 +46,7 @@ public class BoardService {
         if (boardRepo.findByNameAndOwnerUsername(name, ownerUsername) == null) {
 
             //create board and save in board repo
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            Calendar calendar = Calendar.getInstance();
-            Board newBoard = new Board(name, ownerUsername, dateFormat.format(calendar.getTime()), BASE_URL);
+            Board newBoard = new Board(name, ownerUsername, AppServiceHelper.createTimeStamp(), BASE_URL);
             createBoardResponse.setBoard(newBoard);
             Board savedBoard = boardRepo.save(newBoard);
 

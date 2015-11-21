@@ -101,11 +101,6 @@ public class AccountService {
     public AccountServiceResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
         String password, HttpServletResponse httpResponse) {
 
-        //create new session and save in board repo
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Calendar calendar = Calendar.getInstance();
-        String timeStamp = dateFormat.format(calendar.getTime());
-
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGIN);
         Account targetAccount = accountRepo.findByUsername(username);
 
@@ -115,7 +110,10 @@ public class AccountService {
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
                 String newSessionId = AppServiceHelper.generateSessionID();
-                Session newSession = new Session(username, AppServiceHelper.hashString(newSessionId), timeStamp);
+                Session newSession = new Session(
+                        username,
+                        AppServiceHelper.hashString(newSessionId),
+                        AppServiceHelper.createTimeStamp());
                 Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);

@@ -3,6 +3,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Random;
 import java.io.IOException;
 
@@ -52,5 +55,12 @@ public class AppServiceHelper {
             System.out.println (ex.toString());
             System.out.println("Internet connection was closed before error message could be sent");
         }
+    }
+
+    public static String createTimeStamp() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        String timeStamp = dateFormat.format(calendar.getTime());
+        return timeStamp;
     }
 }
