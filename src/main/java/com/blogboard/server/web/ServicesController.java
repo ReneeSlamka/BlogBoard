@@ -6,6 +6,7 @@ import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.stereotype.Controller;
@@ -76,24 +77,26 @@ public class ServicesController {
     @RequestMapping(value ="/session", method=RequestMethod.POST) //better http call option?
     public @ResponseBody
     AccountServiceResponse logout(
-            @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
-            @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String sessionIDCookie,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse loginResponse){
 
-        return accountService.logout(sessionRepo, usernameCookie, sessionIDCookie, loginResponse);
+        return accountService.logout(sessionRepo, sessionUsername, sessionId, loginResponse);
     }
 
     @RequestMapping(value = "/session", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse validateSession(
-            @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String validationCookie,
-            HttpServletResponse validationResponse) {
-        return accountService.validateUserSession(sessionRepo, validationResponse, validationCookie);
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) {
+        return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername );
     }
 
     @RequestMapping(value ="/home", method=RequestMethod.GET)
     public ModelAndView getHomePage(
-            @CookieValue(value = "sessionUsername", required = true) String sessionUsername) {
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId) {
         ModelAndView mav = new ModelAndView();
 
         ArrayList<Board> userBoards = boardService.getListBoards(boardRepo, sessionUsername);
@@ -106,15 +109,16 @@ public class ServicesController {
     public @ResponseBody
     BoardServiceResponse createBoard(
             @RequestParam(value="boardName", required=true) String boardName,
-            @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String usernameCookie,
-            HttpServletResponse createAccountServletResponse) {
-        return boardService.createBoard(boardRepo, boardName, usernameCookie, createAccountServletResponse);
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) {
+        return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
     }
 
     @RequestMapping(value ="/board={boardName}", method=RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable String boardName,
-        @CookieValue(value = "sessionUsername", defaultValue = "undefined", required = false) String sessionUsername,
-        @CookieValue(value = "sessionID", defaultValue = "undefined", required = false) String sessionId) {
+        @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+        @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername) {
         ModelAndView mav = new ModelAndView();
 
         //add info from repo
@@ -129,5 +133,4 @@ public class ServicesController {
         mav.setViewName("board");
         return mav;
     }
-
 }
