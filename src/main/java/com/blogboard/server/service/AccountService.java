@@ -103,9 +103,11 @@ public class AccountService {
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGIN);
         Account targetAccount = accountRepo.findByUsername(username);
 
+
         //Check if account exists and whether password is correct
         if (targetAccount != null && targetAccount.getPassword().equals(AppServiceHelper.hashString(password))){
-            //generate session id and store it to this account in db
+
+            //check for previous session
             Session previousSession = sessionRepo.findByAccountUsername(username);
             if (previousSession == null) {
                 String newSessionId = AppServiceHelper.generateSessionID();
@@ -128,6 +130,10 @@ public class AccountService {
 
                 //session cookie expired before user logged out
             } else {
+                String timeStamp = AppServiceHelper.createTimeStamp();
+                //substract current time against time is previous session
+                //if is greater than 30 minutes can still allow user to login again
+
                 httpResponse.setHeader("Location", LOGIN_PAGE);
                 AppServiceHelper.configureHttpError(
                         httpResponse,
@@ -174,9 +180,10 @@ public class AccountService {
     * Purpose: logs user out of their current session, deletes their session from the database and returns the url
     * to the login page to redirect the client
      */
-    public AccountServiceResponse logout(SessionRepository sessionRepo, String username, String sessionID,
+    public AccountServiceResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
         HttpServletResponse httpResponse) {
         AccountServiceResponse response = new AccountServiceResponse(Service.LOGOUT);
+        boolean sessionValid = validateSession(sessionRepo, httpResponse, sessionID, sessionUsername);
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
@@ -191,7 +198,7 @@ public class AccountService {
         Session targetSesssion = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionID));
 
         //if sessionID exists and is valid remove session from DB
-        if (targetSesssion != null && targetSesssion.getAccountUsername().equals(username)) {
+        if (targetSesssion != null && targetSesssion.getAccountUsername().equals(sessionUsername)) {
             sessionRepo.delete(targetSesssion.getId());
             httpResponse.setHeader("Location", LOGIN_PAGE);
             response.setToSuccess();
@@ -201,7 +208,7 @@ public class AccountService {
                     HttpServletResponse.SC_UNAUTHORIZED,
                     NO_SESSION_FOUND
             );
-        } else if (!targetSesssion.getAccountUsername().equals(username)) {
+        } else if (!targetSesssion.getAccountUsername().equals(sessionUsername)) {
             AppServiceHelper.configureHttpError(
                     httpResponse,
                     HttpServletResponse.SC_UNAUTHORIZED,
@@ -226,33 +233,32 @@ public class AccountService {
     * Purpose: checks if sessionId provided by client's cookie matches with one stored in database and returns
      * success message with user home page url to redirect client to if it does
      */
-    public AccountServiceResponse validateUserSession(SessionRepository sessionRepo, HttpServletResponse httpResponse,
-        String sessionID) {
+    public AccountServiceResponse validateUserSession(SessionRepository sessionRepo,
+        HttpServletResponse httpResponse, String sessionId, String sessionUsername) {
+
         AccountServiceResponse response = new AccountServiceResponse(Service.VALIDATION);
-
-        if (sessionID.equals("undefined") || sessionID.length() == 0){
-            httpResponse.setHeader("Location", LOGIN_PAGE);
-            AppServiceHelper.configureHttpError(
-                    httpResponse,
-                    HttpServletResponse.SC_UNAUTHORIZED,
-                    NO_SESSION_FOUND
-            );
-            return response;
-        }
-
-        Session targetAccount = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionID));
+        Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
 
         //TODO: improve security here after more research
-        if (targetAccount != null){
-            httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
-            response.setToSuccess();
+        if ((!sessionId.isEmpty()) && (targetSession != null)) {
+            if (targetSession.getAccountUsername().equals(sessionUsername)) {
+                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                response.setToSuccess();
+            } else {
+                httpResponse.setHeader("Location", LOGIN_PAGE);
+                AppServiceHelper.configureHttpError(
+                        httpResponse,
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        INVALID_SESSION
+                );
+            }
         } else {
             httpResponse.setHeader("Location", LOGIN_PAGE);
             AppServiceHelper.configureHttpError(
                     httpResponse,
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    INVALID_SESSION
+                    NO_SESSION_FOUND
             );
         }
 

@@ -63,4 +63,13 @@ public class AppServiceHelper {
         String timeStamp = dateFormat.format(calendar.getTime());
         return timeStamp;
     }
+
+    public static void parseTimeStamp(String timeStamp) {
+        String[] timeValues = timeStamp.split("/");
+        int numMinutes;
+        if (timeValues[5] != null) {
+            numMinutes = Integer.parseInt(timeValues[5]);
+        }
+
+    }
 }
