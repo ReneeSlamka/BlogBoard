@@ -16,7 +16,6 @@ import java.util.Calendar;
 public class AccountService {
 
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
-    private static final String CREATE_ACCOUNT_FAILURE_URL = "http://localhost:8080/login";
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
 
     private static final String ACCOUNT_CREATION_SUCCESS = "Congrats, your account has successfully been " +
@@ -66,7 +65,7 @@ public class AccountService {
             }
         //either account with same credential(s) already exists or unknown error occurred
         } else {
-            httpResponse.setHeader("Location", CREATE_ACCOUNT_FAILURE_URL);
+            httpResponse.setHeader("Location", LOGIN_PAGE);
             if(accountRepo.findByUsername(username) != null) {
                 AppServiceHelper.configureHttpError(
                         httpResponse,
