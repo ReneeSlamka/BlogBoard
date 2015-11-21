@@ -19,7 +19,7 @@ public class AccountService {
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
 
     private static final String ACCOUNT_CREATION_SUCCESS = "Congrats, your account has successfully been " +
-            "created! You can now login and start blogging.";
+                                                                "created! You can now login and start blogging.";
     private static final String ACCOUNT_CREATION_FAILURE_USERNAME = "Sorry, it seems there is already an account with that username";
     private static final String ACCOUNT_CREATION_FAILURE_EMAIL = "Sorry, it seems there is already an account with that email";
     private static final String LOGIN_SUCCESS = "Login successful!";
@@ -58,7 +58,6 @@ public class AccountService {
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                         UNKNOWN_ERROR
                 );
-
             } else {
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 httpResponse.setHeader("Location", LOGIN_PAGE);
