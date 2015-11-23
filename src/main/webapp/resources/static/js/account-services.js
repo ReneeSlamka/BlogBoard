@@ -12,9 +12,6 @@ function createAccount() {
         data: {"username": $newUsername, "password": $newPassword, "email": $newEmail},
         dataType: 'json',
         crossDomain: true,
-        error: function (request, textStatus, errorThrown) {
-            alert(textStatus);
-        },
         complete: function (request, textStatus) { //for additional info
             showResponseMessage("create-account-response-text", request.responseJSON.message);
             document.getElementById("new-username").value = "";
@@ -42,9 +39,6 @@ function login(event) {
         data: {"username": $name, "password": $password},
         dataType: 'json',
         crossDomain: true,
-        error: function (request, textStatus, errorThrown) {
-            alert(textStatus);
-        },
         complete: function (request, textStatus) { //for additional info
             alert(request.responseText);
             var headers = request.getAllResponseHeaders();
@@ -62,9 +56,6 @@ function logout(event) {
         url: 'http://localhost:8080/session',
         dataType: 'json',
         crossDomain: true,
-        error: function (request, textStatus, errorThrown) {
-            alert(textStatus);
-        },
         complete: function (request, textStatus) { //for additional info
             alert(request.responseText);
             if (request.responseJSON.sessionId != null) {
@@ -89,8 +80,8 @@ function createSessionCookie(sessionId, username, maxAge) {
 }
 
 
-function getCookieField(field) {
-    var field = field + "=";
+function getCookieField(fieldName) {
+    var field = fieldName + "=";
     var cookieFields = document.cookie.split(';');
 
     for (var i = 0; i < cookieFields.length; i++) {

@@ -16,8 +16,6 @@ function createBoard() {
         },
         complete: function (request, textStatus) { //for additional info
             alert(request.responseText);
-            var headers = request.getAllResponseHeaders();
-            var url = request.getResponseHeader("Location");
             if(textStatus === "success") {
                 $("#create-board-form").modal("hide");
                 //var boardName = getCookie("userBoards");
@@ -26,9 +24,6 @@ function createBoard() {
                 addBoardName(newBoard.name, newBoard.url);
             }
             document.getElementById("new-board-name").value = "";
-            if (window.location.href !== url) {
-                window.location.href = url;
-            }
         }
     });
 }
