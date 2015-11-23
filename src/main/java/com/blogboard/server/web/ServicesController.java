@@ -59,9 +59,9 @@ public class ServicesController {
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
             @RequestParam(value="email", required=false, defaultValue="") String email,
-            HttpServletResponse createAccountResponse){
+            HttpServletResponse httpResponse){
 
-        return accountService.createAccount(accountRepo, username, password, email, createAccountResponse);
+        return accountService.createAccount(accountRepo, username, password, email, httpResponse);
     }
 
     @RequestMapping(value ="/account", method=RequestMethod.GET)
@@ -69,9 +69,9 @@ public class ServicesController {
     AccountServiceResponse login(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
-            HttpServletResponse loginResponse){
+            HttpServletResponse httpResponse){
 
-        return accountService.login(accountRepo, sessionRepo, username, password, loginResponse);
+        return accountService.login(accountRepo, sessionRepo, username, password, httpResponse);
     }
 
     @RequestMapping(value ="/session", method=RequestMethod.POST) //better http call option?
@@ -79,9 +79,9 @@ public class ServicesController {
     AccountServiceResponse logout(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            HttpServletResponse loginResponse){
+            HttpServletResponse httpResponse){
 
-        return accountService.logout(sessionRepo, sessionUsername, sessionId, loginResponse);
+        return accountService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
     }
 
     @RequestMapping(value = "/session", method=RequestMethod.GET)
@@ -90,7 +90,7 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) {
-        return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername );
+        return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
     }
 
     @RequestMapping(value ="/home", method=RequestMethod.GET)
@@ -118,12 +118,13 @@ public class ServicesController {
     @RequestMapping(value ="/board={boardName}", method=RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable String boardName,
         @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
-        @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername) {
+        @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+                                     HttpServletResponse httpResponse) {
         ModelAndView mav = new ModelAndView();
 
         //add info from repo
         //1. check sessionId for validity (do later)
-        BoardServiceResponse getBoardResponse = boardService.getBoard(boardRepo, boardName, sessionUsername);
+        BoardServiceResponse getBoardResponse = boardService.getBoard(boardRepo, boardName, sessionUsername, httpResponse);
 
         //create object to add to pebble board template
         mav.addObject("boardName", getBoardResponse.getBoard().getName());
