@@ -22,13 +22,18 @@ public class BoardService {
     private static final String BASE_URL = "http://localhost:8080";
     private static final String USER_HOME_URL = "http://localhost:8080/home";
 
-    public enum CauseOfFailure {
-        NAME, USERNAME, UNKNOWN
-    }
     public enum Service {
         BOARD_CREATION, GET_BOARD, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
     }
 
+    //Custom Failure Message
+    private  String BOARD_CREATION_FAILURE = "Sorry, it seems there is already a board with that name";
+    private static final String GET_BOARD_FAILURE_NAME = "Error, board with that name doesn't exist";
+    private static final String GET_BOARD_FAILURE_USERNAME = "Error, you do not have permission to access this board";
+    private static final String ADD_MEMBER_FAILURE = "Failed to add new member, account with given username doesn't exist";
+    private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
+                                                        "either doesn't exist or isn't a member of this board";
+    private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
     /*
     * Method Name: Create Board
@@ -38,7 +43,7 @@ public class BoardService {
     * the DOM on the client side
     */
     public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
-        HttpServletResponse httpResponse) {
+                                            HttpServletResponse httpResponse) {
 
         BoardServiceResponse createBoardResponse = new BoardServiceResponse(Service.BOARD_CREATION);
 
@@ -64,16 +69,18 @@ public class BoardService {
 
             //configure cookie and api response
             Cookie userBoardsCookie = new Cookie("userBoards", boardCookies.toJSONString());
-            userBoardsCookie.setMaxAge(60*15);
-            userBoardsCookie.setPath("/");
+            AppServiceHelper.configureCookie(userBoardsCookie, 60*15, "/", false, false);
             httpResponse.addCookie(userBoardsCookie);
             httpResponse.setStatus(HttpServletResponse.SC_OK);
             createBoardResponse.setToSuccess();
 
         } else {
             //return error messages saying board already exists
-            createBoardResponse.setToFailure(CauseOfFailure.NAME);
-            httpResponse.setStatus(HttpServletResponse.SC_CONFLICT);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_OK,
+                    BOARD_CREATION_FAILURE
+            );
         }
 
         //include URL for client to redirect to
@@ -101,7 +108,9 @@ public class BoardService {
     * Return: ArrayList<Board>
     * Purpose:
     */
-    public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username) {
+    public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username,
+                                         HttpServletResponse httpResponse) {
+
         BoardServiceResponse getBoardResponse = new BoardServiceResponse(Service.GET_BOARD);
         Board targetBoard = boardRepo.findByName(name);
 
@@ -111,11 +120,23 @@ public class BoardService {
             getBoardResponse.setBoard(targetBoard);
             getBoardResponse.setToSuccess();
         } else if (!targetBoard.getOwnerUsername().equals(username)) {
-            getBoardResponse.setToFailure(CauseOfFailure.USERNAME);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    GET_BOARD_FAILURE_USERNAME
+            );
         } else if (targetBoard == null) {
-            getBoardResponse.setToFailure(CauseOfFailure.NAME);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_NOT_FOUND,
+                    GET_BOARD_FAILURE_NAME
+            );
         } else {
-            getBoardResponse.setToFailure(CauseOfFailure.UNKNOWN);
+            AppServiceHelper.configureHttpError(
+                    httpResponse,
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    UNKNOWN_ERROR
+            );
         }
 
         return getBoardResponse;
