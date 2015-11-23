@@ -2,11 +2,11 @@ package com.blogboard.server.web;
 import com.blogboard.server.service.AccountService;
 
 
-public abstract class Response {
+public abstract class BasicAPIResponse {
 
     private String message;
 
-    public Response() {
+    public BasicAPIResponse() {
         this.message = "";
     }
 
@@ -17,7 +17,5 @@ public abstract class Response {
     public void setMessage(String newResponseText) {
         this.message = newResponseText;
     }
-
-    abstract public void setToSuccess();
 
 }

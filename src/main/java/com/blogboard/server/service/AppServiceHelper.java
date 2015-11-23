@@ -48,15 +48,6 @@ public class AppServiceHelper {
         cookie.setSecure(isSecure);
     }
 
-    public static void configureHttpError(HttpServletResponse httpResponse,  int status, String message) {
-        try {
-            httpResponse.sendError(status, message);
-        } catch (IOException ex) {
-            System.out.println (ex.toString());
-            System.out.println("Internet connection was closed before error message could be sent");
-        }
-    }
-
     public static String createTimeStamp() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Calendar calendar = Calendar.getInstance();

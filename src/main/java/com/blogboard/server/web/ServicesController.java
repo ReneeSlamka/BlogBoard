@@ -6,12 +6,17 @@ import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.stereotype.Controller;
 import com.blogboard.server.data.entity.Board;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,7 +42,6 @@ public class ServicesController {
         this.boardService = boardService;
     }
 
-
     @Autowired (required = true)
     public void setAccountService(AccountService accountService) {
         this.accountService = accountService;
@@ -53,13 +57,18 @@ public class ServicesController {
         this.sessionRepo = sessionRepository;
     }
 
+
+    private static final Logger logger = Logger.getLogger(ServicesController.class.getName());
+
+
+
     @RequestMapping(value ="/account", method=RequestMethod.POST)
     public @ResponseBody
     AccountServiceResponse createAccount(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
             @RequestParam(value="email", required=false, defaultValue="") String email,
-            HttpServletResponse httpResponse){
+            HttpServletResponse httpResponse) throws IOException {
 
         return accountService.createAccount(accountRepo, username, password, email, httpResponse);
     }
@@ -69,7 +78,7 @@ public class ServicesController {
     AccountServiceResponse login(
             @RequestParam(value="username", required=true) String username,
             @RequestParam(value="password", required=true) String password,
-            HttpServletResponse httpResponse){
+            HttpServletResponse httpResponse) throws IOException {
 
         return accountService.login(accountRepo, sessionRepo, username, password, httpResponse);
     }
@@ -79,7 +88,7 @@ public class ServicesController {
     AccountServiceResponse logout(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            HttpServletResponse httpResponse){
+            HttpServletResponse httpResponse) throws IOException {
 
         return accountService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
     }
@@ -89,7 +98,7 @@ public class ServicesController {
     AccountServiceResponse validateSession(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            HttpServletResponse httpResponse) {
+            HttpServletResponse httpResponse) throws IOException {
         return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
     }
 
@@ -111,7 +120,7 @@ public class ServicesController {
             @RequestParam(value="boardName", required=true) String boardName,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            HttpServletResponse httpResponse) {
+            HttpServletResponse httpResponse) throws IOException {
         return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
     }
 
@@ -119,7 +128,7 @@ public class ServicesController {
     public ModelAndView getBoardPage(@PathVariable String boardName,
         @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
         @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-                                     HttpServletResponse httpResponse) {
+                                     HttpServletResponse httpResponse) throws IOException {
         ModelAndView mav = new ModelAndView();
 
         //add info from repo
@@ -133,5 +142,13 @@ public class ServicesController {
         mav.addObject("boardMembers", getBoardResponse.getBoard().getMembers());
         mav.setViewName("board");
         return mav;
+    }
+
+
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason = "An IO exception occurred")
+    @ExceptionHandler(IOException.class)
+    public void exceptionHandler(IOException ex)
+    {
+        logger.log(Level.SEVERE, "An IO exception has occurred, most likely due to a close internet connection", ex);
     }
 }

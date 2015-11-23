@@ -6,6 +6,8 @@ import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.web.BoardServiceResponse;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,14 +28,23 @@ public class BoardService {
         BOARD_CREATION, GET_BOARD, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
     }
 
-    //Custom Failure Message
-    private  String BOARD_CREATION_FAILURE = "Sorry, it seems there is already a board with that name";
-    private static final String GET_BOARD_FAILURE_NAME = "Error, board with that name doesn't exist";
-    private static final String GET_BOARD_FAILURE_USERNAME = "Error, you do not have permission to access this board";
+    //Custom Success/Error Messages
+
+    private static final String BOARD_CREATED = "Your board has been successfully created!";
+    private static final String BOARD_FOUND = "Board successfully retrieved";
+    private static final String MEMBER_ADDED = "New member successfully added";
+    private static final String MEMBER_REMOVED = "Member successfully removed";
+    private static final String POST_ADDED = "Post successfully added";
+    private static final String POST_DELETED = "Post successfully deleted";
+
+    private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
+    private static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
+    private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
     private static final String ADD_MEMBER_FAILURE = "Failed to add new member, account with given username doesn't exist";
     private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
+
 
     /*
     * Method Name: Create Board
@@ -43,7 +54,7 @@ public class BoardService {
     * the DOM on the client side
     */
     public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
-                                            HttpServletResponse httpResponse) {
+                                            HttpServletResponse httpResponse) throws IOException {
 
         BoardServiceResponse createBoardResponse = new BoardServiceResponse(Service.BOARD_CREATION);
 
@@ -72,15 +83,11 @@ public class BoardService {
             AppServiceHelper.configureCookie(userBoardsCookie, 60*15, "/", false, false);
             httpResponse.addCookie(userBoardsCookie);
             httpResponse.setStatus(HttpServletResponse.SC_OK);
-            createBoardResponse.setToSuccess();
+            createBoardResponse.setMessage(BOARD_CREATED);
 
         } else {
             //return error messages saying board already exists
-            AppServiceHelper.configureHttpError(
-                    httpResponse,
-                    HttpServletResponse.SC_OK,
-                    BOARD_CREATION_FAILURE
-            );
+            httpResponse.sendError(HttpServletResponse.SC_OK, NAME_IN_USE);
         }
 
         //include URL for client to redirect to
@@ -96,7 +103,6 @@ public class BoardService {
     * Purpose: to retrieve all boards that belong to that user
     */
     public ArrayList<Board> getListBoards(BoardRepository boardRepo, String username) {
-
         ArrayList<Board> userBoards =  boardRepo.findByOwnerUsername(username);
         return userBoards;
     }
@@ -109,7 +115,7 @@ public class BoardService {
     * Purpose:
     */
     public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username,
-                                         HttpServletResponse httpResponse) {
+                                         HttpServletResponse httpResponse) throws IOException {
 
         BoardServiceResponse getBoardResponse = new BoardServiceResponse(Service.GET_BOARD);
         Board targetBoard = boardRepo.findByName(name);
@@ -118,25 +124,13 @@ public class BoardService {
         //Todo: check if username is in list of members
         if (targetBoard != null && (targetBoard.getOwnerUsername().equals(username))) {
             getBoardResponse.setBoard(targetBoard);
-            getBoardResponse.setToSuccess();
+            getBoardResponse.setMessage(BOARD_FOUND);
         } else if (!targetBoard.getOwnerUsername().equals(username)) {
-            AppServiceHelper.configureHttpError(
-                    httpResponse,
-                    HttpServletResponse.SC_UNAUTHORIZED,
-                    GET_BOARD_FAILURE_USERNAME
-            );
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, BOARD_ACCESS_DENIED);
         } else if (targetBoard == null) {
-            AppServiceHelper.configureHttpError(
-                    httpResponse,
-                    HttpServletResponse.SC_NOT_FOUND,
-                    GET_BOARD_FAILURE_NAME
-            );
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
         } else {
-            AppServiceHelper.configureHttpError(
-                    httpResponse,
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    UNKNOWN_ERROR
-            );
+            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
         }
 
         return getBoardResponse;
