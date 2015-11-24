@@ -8,6 +8,8 @@ import com.blogboard.server.web.BoardServiceResponse;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,10 +58,17 @@ public class BoardService {
     public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
                                             HttpServletResponse httpResponse) throws IOException {
 
-        BoardServiceResponse createBoardResponse = new BoardServiceResponse(Service.BOARD_CREATION);
+        BoardServiceResponse createBoardResponse = new BoardServiceResponse();
+        String decodedName;
+        try {
+            decodedName = URLDecoder.decode(name, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError("UTF-8 is unknown");
+        }
+        Board targetBoard = boardRepo.findByNameAndOwnerUsername(decodedName, ownerUsername);
 
         //check if board with that owner AND name already exists
-        if (boardRepo.findByNameAndOwnerUsername(name, ownerUsername) == null) {
+        if (targetBoard == null) {
 
             //create board and save in board repo
             Board newBoard = new Board(name, ownerUsername, AppServiceHelper.createTimeStamp(), BASE_URL);
@@ -117,7 +126,7 @@ public class BoardService {
     public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username,
                                          HttpServletResponse httpResponse) throws IOException {
 
-        BoardServiceResponse getBoardResponse = new BoardServiceResponse(Service.GET_BOARD);
+        BoardServiceResponse getBoardResponse = new BoardServiceResponse();
         Board targetBoard = boardRepo.findByName(name);
 
         //check that board exists and is accessible by user
@@ -145,7 +154,7 @@ public class BoardService {
     */
     public BoardServiceResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
         String username, HttpServletResponse httpResponse, String boardName) {
-        BoardServiceResponse addMemberResponse = new BoardServiceResponse(Service.ADD_MEMBER);
+        BoardServiceResponse addMemberResponse = new BoardServiceResponse();
 
         //1. Check if user exists
         /*if (accountRepo.findByUsername(username) != null) {
