@@ -36,9 +36,6 @@ public class AccountService {
     private static final String INVALID_SESSION = "Not a valid session";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
-    public enum Service {
-        ACCOUNT_CREATION, LOGIN, LOGOUT, VALIDATION
-    }
 
     /*
     * Method Name: Create Account

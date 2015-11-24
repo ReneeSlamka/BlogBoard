@@ -11,9 +11,7 @@ public class BoardServiceResponse extends BasicAPIResponse {
 
     private JSONObject jsonReponseObject;
 
-    public BoardServiceResponse() {};
-
-    public BoardServiceResponse(BoardService.Service serviceType) {
+    public BoardServiceResponse() {
         super();
     }
 
