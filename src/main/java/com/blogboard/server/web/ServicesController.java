@@ -104,9 +104,10 @@ public class ServicesController {
         return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
     }
 
-    @RequestMapping(value = "/boards", method=RequestMethod.POST)
+    @RequestMapping(value = "/{username}/boards", method=RequestMethod.POST)
     public @ResponseBody
     BoardServiceResponse createBoard(
+            @PathVariable String username,
             @RequestParam(value="boardName", required=true) String boardName,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,

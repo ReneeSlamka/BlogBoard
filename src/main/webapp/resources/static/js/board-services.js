@@ -1,12 +1,13 @@
 
 function createBoard() {
     var $newBoardname = encodeURI($("#new-board-name").val());
+    var apiUrl = window.location.href + "/boards";
 
     $.ajax({
         type: 'POST',
         cache: false,
         async: false,
-        url: 'http://localhost:8080/boards',
+        url: apiUrl,
         data: {"boardName": $newBoardname},
         dataType: 'json',
         crossDomain: true,
@@ -29,13 +30,13 @@ function createBoard() {
 
 function addMember() {
     var $memberUsername = $("#member-username").val();
-    var apiUrl = window.location.href;
+    var apiUrl = window.location.href + '/members';
 
     $.ajax({
         type: 'POST',
         cache: false,
         async: false,
-        url: apiUrl + '/members',
+        url: apiUrl,
         data: {"memberUsername": $memberUsername},
         dataType: 'json',
         crossDomain: true,
