@@ -114,11 +114,18 @@ public class ServicesController {
         return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
     }
 
-    @RequestMapping(value ="/home", method=RequestMethod.GET)
-    public ModelAndView getHomePage(
+    @RequestMapping(value ="/{username}", method=RequestMethod.GET)
+    public ModelAndView getHomePage(@PathVariable String username,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId) {
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            HttpServletResponse httpResponse) throws IOException{
         ModelAndView mav = new ModelAndView();
+
+        if (accountRepo.findByUsername(username) == null) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Account not found");
+        } else {
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+        }
 
         ArrayList<Board> userBoards = boardService.getListBoards(boardRepo, sessionUsername);
         mav.addObject("userBoards", userBoards);

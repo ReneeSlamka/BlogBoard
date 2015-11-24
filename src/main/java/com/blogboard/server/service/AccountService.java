@@ -8,6 +8,7 @@ import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Cookie;
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 @Service
 public class AccountService {
 
+    private static final String BASE_URL = "http://localhost:8080";
     private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
 
@@ -103,7 +105,8 @@ public class AccountService {
                 Session savedSession = sessionRepo.save(newSession);
 
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
-                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
+                //return getHomePage url --> /{username}
+                httpResponse.setHeader("Location", BASE_URL + File.separator + username);
 
                 Cookie sessionId = new Cookie("sessionID", newSessionId);
                 AppServiceHelper.configureCookie(sessionId, (60 * 15), "/", false, false);
@@ -123,7 +126,7 @@ public class AccountService {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_LOGIN_ATTEMPT);
             }
 
-            Account updatedAccount = accountRepo.save(targetAccount);
+            Account updatedAccount = accountRepo.save(targetAccount);//Todo: remove this?
         } else {
             //FAILURE CASE(S): either credentials were wrong or unknown error occurred
             httpResponse.setHeader("Location", LOGIN_PAGE);
@@ -193,7 +196,7 @@ public class AccountService {
         //TODO: improve security here after more research
         if ((!sessionId.isEmpty()) && (targetSession != null)) {
             if (targetSession.getAccountUsername().equals(sessionUsername)) {
-                httpResponse.setHeader("Location", LOGIN_SUCCESS_URL);
+                httpResponse.setHeader("Location", BASE_URL + File.separator + sessionUsername);
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
                 response.setMessage(SESSION_VALID);
             } else {
