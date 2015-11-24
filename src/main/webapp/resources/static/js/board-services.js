@@ -27,6 +27,34 @@ function createBoard() {
     });
 }
 
+function addMember() {
+    var $memberUsername = $("#member-username");
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: 'http://localhost:8080/boards',
+        data: {"memberUsername": $memberUsername},
+        dataType: 'json',
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) { //for additional info
+            alert(request.responseText);
+            if(textStatus === "success") {
+                $("#create-board-form").modal("hide");
+                //var boardName = getCookie("userBoards");
+                //parseJSONBoardCookies(boardName)
+                var newBoard = request.responseJSON.board;
+                addBoardName(newBoard.name, newBoard.url);
+            }
+            document.getElementById("new-board-name").value = "";
+        }
+    });
+}
+
 function addBoardName(newBoardName, url) {
     var $listBoards = $("#user-boards-list");
     $listBoards.append("<a href=" + url + "><li>" + newBoardName+ "</li></a>");

@@ -1,12 +1,14 @@
 package com.blogboard.server.service;
 
 
+import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.web.BoardServiceResponse;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -148,22 +150,28 @@ public class BoardService {
 
     /*
     * Method Name: Add Member
-    * Inputs:
-    * Return:
-    * Purpose:
+    * Inputs: Account Repository, Board Repository, sessionUsername, sessionID, memberUsername, HTTPServlet Response
+    * Return: Object containing the username of the new member, its url (add later), and an http response
+    * Purpose: To add the username of the new member to a board's members list
     */
-    public BoardServiceResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
-        String username, HttpServletResponse httpResponse, String boardName) {
+    public JSONObject addMember(AccountRepository accountRepo, BoardRepository boardRepo,
+        String username, String boardName, HttpServletResponse httpResponse) throws IOException {
         BoardServiceResponse addMemberResponse = new BoardServiceResponse();
 
+        JSONObject response = new JSONObject();
         //1. Check if user exists
-        /*if (accountRepo.findByUsername(username) != null) {
-            Board targetBoard = boardRepo.findByName(boardName);
+        Account targetAccount = accountRepo.findByUsername(username);
+        if (accountRepo.findByUsername(username) != null) {
+            Board targetBoard = boardRepo.findByName(boardName); //shouldn't ever be null
             targetBoard.addMember(username);
-            JS
-        } else {
+            response.put("username", username);
+            response.put("url", BASE_URL + File.separator + "board=" + boardName + File.separator + username);
+            response.put("message", MEMBER_ADDED);
+            httpResponse.setStatus(HttpServletResponse.SC_CREATED);
 
-        }*/
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
+        }
 
         //2. When confirmed, add user's name to list of boards members
 
@@ -173,6 +181,6 @@ public class BoardService {
 
         //5. Send response to client so can add user to DOM
 
-        return addMemberResponse;
+        return response;
     }
 }

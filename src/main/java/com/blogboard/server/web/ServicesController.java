@@ -5,6 +5,7 @@ import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.BoardService;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.stereotype.Controller;
 import com.blogboard.server.data.entity.Board;
+import com.blogboard.server.data.entity.Account;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,17 +126,7 @@ public class ServicesController {
         return mav;
     }
 
-    @RequestMapping(value = "/board", method=RequestMethod.POST)
-    public @ResponseBody
-    BoardServiceResponse createBoard(
-            @RequestParam(value="boardName", required=true) String boardName,
-            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
-            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            HttpServletResponse httpResponse) throws IOException {
-        return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
-    }
-
-    @RequestMapping(value ="/board={boardName}", method=RequestMethod.GET)
+    @RequestMapping(value ="/boards={boardName}", method=RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable String boardName,
         @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
         @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
@@ -152,6 +144,17 @@ public class ServicesController {
         mav.addObject("boardMembers", getBoardResponse.getBoard().getMembers());
         mav.setViewName("board");
         return mav;
+    }
+
+    @RequestMapping(value = "/board={boardName}/members", method=RequestMethod.POST)
+    public @ResponseBody
+    JSONObject addMember(
+            @PathVariable String boardName,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @RequestParam(value="memberUsername", required=true) String memberUsername) {
+
+        return boardService.addMember(accountRepo, boardRepo, sessionUsername, sessionId, memberUsername);
     }
 
 
