@@ -1,13 +1,12 @@
 
 function createBoard() {
-    var test = $("#new-board-name").val();
     var $newBoardname = encodeURI($("#new-board-name").val());
 
     $.ajax({
         type: 'POST',
         cache: false,
         async: false,
-        url: 'http://localhost:8080/board',
+        url: 'http://localhost:8080/boards',
         data: {"boardName": $newBoardname},
         dataType: 'json',
         crossDomain: true,

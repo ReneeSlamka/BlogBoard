@@ -42,7 +42,7 @@ public class BoardService {
     private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
     private static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
     private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
-    private static final String ADD_MEMBER_FAILURE = "Failed to add new member, account with given username doesn't exist";
+    private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
     private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
@@ -67,7 +67,7 @@ public class BoardService {
         }
         Board targetBoard = boardRepo.findByNameAndOwnerUsername(decodedName, ownerUsername);
 
-        //check if board with that owner AND name already exists
+        //SUCCESS CASE: board with that name does not already exist (for this user)
         if (targetBoard == null) {
 
             //create board and save in board repo
@@ -91,11 +91,11 @@ public class BoardService {
             Cookie userBoardsCookie = new Cookie("userBoards", boardCookies.toJSONString());
             AppServiceHelper.configureCookie(userBoardsCookie, 60*15, "/", false, false);
             httpResponse.addCookie(userBoardsCookie);
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
+            httpResponse.setStatus(HttpServletResponse.SC_CREATED);
             createBoardResponse.setMessage(BOARD_CREATED);
 
         } else {
-            //return error messages saying board already exists
+            //FAILURE CASE: board with given name already exists (for this user)
             httpResponse.sendError(HttpServletResponse.SC_OK, NAME_IN_USE);
         }
 

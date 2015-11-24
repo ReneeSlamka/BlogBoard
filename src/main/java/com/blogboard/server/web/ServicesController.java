@@ -62,7 +62,7 @@ public class ServicesController {
 
 
 
-    @RequestMapping(value ="/account", method=RequestMethod.POST)
+    @RequestMapping(value ="/accounts", method=RequestMethod.POST)
     public @ResponseBody
     AccountServiceResponse createAccount(
             @RequestParam(value="username", required=true) String username,
@@ -73,7 +73,7 @@ public class ServicesController {
         return accountService.createAccount(accountRepo, username, password, email, httpResponse);
     }
 
-    @RequestMapping(value ="/account", method=RequestMethod.GET)
+    @RequestMapping(value ="/accounts", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse login(
             @RequestParam(value="username", required=true) String username,
@@ -83,7 +83,7 @@ public class ServicesController {
         return accountService.login(accountRepo, sessionRepo, username, password, httpResponse);
     }
 
-    @RequestMapping(value ="/session", method=RequestMethod.POST) //better http call option?
+    @RequestMapping(value ="/sessions", method=RequestMethod.POST) //better http call option?
     public @ResponseBody
     AccountServiceResponse logout(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
@@ -93,13 +93,23 @@ public class ServicesController {
         return accountService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
     }
 
-    @RequestMapping(value = "/session", method=RequestMethod.GET)
+    @RequestMapping(value = "/sessions", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse validateSession(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
         return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
+    }
+
+    @RequestMapping(value = "/boards", method=RequestMethod.POST)
+    public @ResponseBody
+    BoardServiceResponse createBoard(
+            @RequestParam(value="boardName", required=true) String boardName,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+        return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
     }
 
     @RequestMapping(value ="/home", method=RequestMethod.GET)

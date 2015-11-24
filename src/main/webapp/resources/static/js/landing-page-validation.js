@@ -7,7 +7,7 @@ function validateSession() {
         cache: false,
         async: false,
         type: 'GET',
-        url: "http://localhost:8080/session",
+        url: "http://localhost:8080/sessions",
         crossDomain: true,
         xhrFields: {
             withCredentials: true
