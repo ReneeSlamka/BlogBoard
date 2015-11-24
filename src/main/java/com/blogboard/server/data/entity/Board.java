@@ -28,7 +28,7 @@ public class Board {
     private String url;
 
     @Column(name="members")
-    private ArrayList<String> members;
+    private ArrayList<String> members = new ArrayList<String>();;
 
     //keep like this for now, in future might have different types if posts and want loose coupling
     private ArrayList<String> posts;
@@ -48,7 +48,9 @@ public class Board {
         this.name = name;
         this.ownerUsername = owner;
         this.dateCreated = dateCreated;
-        this.url = baseUrl + File.separator + "board=" +  urlEncodedName;
+        this.url = baseUrl + File.separator + "boards=" +  urlEncodedName;
+        members.add(owner);
+
     }
 
     public Long getId() {
@@ -87,8 +89,12 @@ public class Board {
         return members;
     }
 
-    public void addMember(String newMember) {
-        members.add(newMember);
+    public boolean addMember(String newMember) {
+        if (!members.contains(newMember)) {
+            members.add(newMember);
+            return true;
+        }
+        return false;
     }
 
     public void removeMember(Account memberToDelete) {
