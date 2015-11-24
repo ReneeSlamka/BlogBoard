@@ -45,6 +45,7 @@ public class BoardService {
     private static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
     private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
     private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
+    private static final String USER_ALREADY_MEMBER = "This user is already a member of this board";
     private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
@@ -150,7 +151,8 @@ public class BoardService {
 
     /*
     * Method Name: Add Member
-    * Inputs: Account Repository, Board Repository, sessionUsername, sessionID, memberUsername, HTTPServlet Response
+    * Inputs: Account Repository, Board Repository, (sessionUsername & sessionID later), memberUsername,
+    * HTTPServlet Response
     * Return: Object containing the username of the new member, its url (add later), and an http response
     * Purpose: To add the username of the new member to a board's members list
     */
@@ -163,23 +165,18 @@ public class BoardService {
         Account targetAccount = accountRepo.findByUsername(username);
         if (accountRepo.findByUsername(username) != null) {
             Board targetBoard = boardRepo.findByName(boardName); //shouldn't ever be null
-            targetBoard.addMember(username);
-            response.put("username", username);
-            response.put("url", BASE_URL + File.separator + "board=" + boardName + File.separator + username);
-            response.put("message", MEMBER_ADDED);
-            httpResponse.setStatus(HttpServletResponse.SC_CREATED);
-
+            if(targetBoard.addMember(username)) {
+                boardRepo.save(targetBoard);
+                response.put("username", username);
+                response.put("url", BASE_URL + File.separator + "board=" + boardName + File.separator + username);
+                response.put("message", MEMBER_ADDED);
+                httpResponse.setStatus(HttpServletResponse.SC_CREATED);
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_CONFLICT, USER_ALREADY_MEMBER);
+            }
         } else {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
         }
-
-        //2. When confirmed, add user's name to list of boards members
-
-        //3. Create json object with user's name, and link to their home page
-
-        //4. Configure httpRespnse and BoardServiceResponse
-
-        //5. Send response to client so can add user to DOM
 
         return response;
     }

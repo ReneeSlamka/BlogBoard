@@ -146,15 +146,16 @@ public class ServicesController {
         return mav;
     }
 
-    @RequestMapping(value = "/board={boardName}/members", method=RequestMethod.POST)
+    @RequestMapping(value = "/boards={boardName}/members", method=RequestMethod.POST)
     public @ResponseBody
     JSONObject addMember(
             @PathVariable String boardName,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
-            @RequestParam(value="memberUsername", required=true) String memberUsername) {
+            @RequestParam(value="memberUsername", required=true) String memberUsername,
+            HttpServletResponse httpresponse) throws IOException {
 
-        return boardService.addMember(accountRepo, boardRepo, sessionUsername, sessionId, memberUsername);
+        return boardService.addMember(accountRepo, boardRepo, memberUsername, boardName, httpresponse);
     }
 
 

@@ -11,6 +11,7 @@
 {% endblock headerJs %}
 
 {% block js %}
+<script src="resources/static/js/board-services.js"></script>
 {% endblock js %}
 
 {% block content %}
@@ -19,11 +20,14 @@
         <div class="col-md-4">
             <h3>{{boardName}}</h3>
             <h6>Created {{dateCreated}}</h6>
+            <section id="list-board-members">
             {% for member in boardMembers %}
-                <h6>member</h6>
+                <h5>member</h5>
             {% endfor %}
+                <h5>Tester Jenny</h5>
+            </section>
             <input type="text" class="form-control" id="member-username" size="40" />
-            <button onclick="createAccount()" id="add-member-button" type="submit" class="btn btn-default">
+            <button onclick="addMember()" id="add-member-button" type="submit" class="btn btn-default">
                 Add New Member
             </button>
 

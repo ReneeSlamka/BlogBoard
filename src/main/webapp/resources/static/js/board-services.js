@@ -13,7 +13,7 @@ function createBoard() {
         error: function (request, textStatus, errorThrown) {
             alert(textStatus);
         },
-        complete: function (request, textStatus) { //for additional info
+        complete: function (request, textStatus) {
             alert(request.responseText);
             if(textStatus === "success") {
                 $("#create-board-form").modal("hide");
@@ -28,29 +28,26 @@ function createBoard() {
 }
 
 function addMember() {
-    var $memberUsername = $("#member-username");
+    var $memberUsername = $("#member-username").val();
+    var apiUrl = window.location.href;
 
     $.ajax({
         type: 'POST',
         cache: false,
         async: false,
-        url: 'http://localhost:8080/boards',
+        url: apiUrl + '/members',
         data: {"memberUsername": $memberUsername},
         dataType: 'json',
         crossDomain: true,
         error: function (request, textStatus, errorThrown) {
             alert(textStatus);
         },
-        complete: function (request, textStatus) { //for additional info
+        complete: function (request, textStatus) {
             alert(request.responseText);
+            var newMember = request.responseJSON;
             if(textStatus === "success") {
-                $("#create-board-form").modal("hide");
-                //var boardName = getCookie("userBoards");
-                //parseJSONBoardCookies(boardName)
-                var newBoard = request.responseJSON.board;
-                addBoardName(newBoard.name, newBoard.url);
+                addMemberName(newMember.username, newMember.url);
             }
-            document.getElementById("new-board-name").value = "";
         }
     });
 }
@@ -60,6 +57,12 @@ function addBoardName(newBoardName, url) {
     $listBoards.append("<a href=" + url + "><li>" + newBoardName+ "</li></a>");
 }
 
+
+function addMemberName(newMemberName, url) {
+    var $listMembers = $("#list-board-members");
+    $listMembers.append("<a href=" + url + "><h5>" + newMemberName + "</h5></a>");
+
+}
 //function to parse board cookie from server to list names on home page
 function parseJSONBoardCookies(jsonArray) {
     //remove extra quotation marks
