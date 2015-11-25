@@ -7,6 +7,8 @@ import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.AuthenticationService;
 import com.blogboard.server.service.BoardService;
+import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
+import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -133,7 +135,7 @@ public class ServicesController {
     @RequestMapping(value = "/{username}/boards", method = RequestMethod.POST)
     public
     @ResponseBody
-    BoardServiceResponse createBoard(
+    CreateBoardResponse createBoard(
             @PathVariable String username,
             @RequestParam(value = "boardName", required = true) String boardName,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
@@ -169,23 +171,20 @@ public class ServicesController {
     /*
     *========== Get Board Page ==========
     */
-    @RequestMapping(value = "/boards/{boardName}", method = RequestMethod.GET)
-    public ModelAndView getBoardPage(@PathVariable String boardName,
+    @RequestMapping(value = "/boards/{boardId}", method = RequestMethod.GET)
+    public ModelAndView getBoardPage(@PathVariable Long boardId,
                                      @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
                                      @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
                                      HttpServletResponse httpResponse) throws IOException {
         ModelAndView mav = new ModelAndView();
 
-        //add info from repo
-        //1. check sessionId for validity (do later)
-        BoardServiceResponse getBoardResponse = boardService.getBoard(boardRepo, boardName, sessionUsername,
-                httpResponse);
+        Board targetBoard = boardService.getBoard(boardRepo, boardId, sessionUsername, httpResponse);
 
         //create object to add to pebble board template
-        mav.addObject("boardName", getBoardResponse.getBoard().getName());
-        mav.addObject("boardOwner", getBoardResponse.getBoard().getOwnerUsername());
-        mav.addObject("dateCreated", getBoardResponse.getBoard().getDateCreated());
-        mav.addObject("boardMembers", getBoardResponse.getBoard().getMembers());
+        mav.addObject("boardName", targetBoard.getName());
+        mav.addObject("boardOwner", targetBoard.getOwnerUsername());
+        mav.addObject("dateCreated", targetBoard.getDateCreated());
+        mav.addObject("boardMembers", targetBoard.getMembers());
         mav.setViewName("board");
         return mav;
     }
@@ -194,17 +193,17 @@ public class ServicesController {
     /*
     *========== Add Member ==========
     */
-    @RequestMapping(value = "/boards/{boardName}/members", method = RequestMethod.POST)
+    @RequestMapping(value = "/boards/{boardId}/members", method = RequestMethod.POST)
     public
     @ResponseBody
-    JSONObject addMember(
-            @PathVariable String boardName,
+    AddMemberResponse addMember(
+            @PathVariable Long boardId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @RequestParam(value = "memberUsername", required = true) String memberUsername,
-            HttpServletResponse httpresponse) throws IOException {
+            HttpServletResponse httpResponse) throws IOException {
 
-        return boardService.addMember(accountRepo, boardRepo, memberUsername, boardName, httpresponse);
+        return boardService.addMember(accountRepo, boardRepo, memberUsername, boardId, httpResponse);
     }
 
 
