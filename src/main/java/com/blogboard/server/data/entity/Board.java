@@ -39,16 +39,11 @@ public class Board {
         super();
     }
 
-    public Board(String name, String owner, String dateCreated, String baseUrl) {
-        String urlEncodedName = name;
-        name = AppServiceHelper.decodeString(name);
-
+    public Board(String name, String owner, String dateCreated) {
         this.name = name;
         this.ownerUsername = owner;
         this.dateCreated = dateCreated;
-        this.url = baseUrl + File.separator + "boards" + File.separator +  urlEncodedName;
         members.add(owner);
-
     }
 
     public Long getId() {
@@ -83,7 +78,9 @@ public class Board {
     public void setDateCreated(String dateCreated) { this.dateCreated = dateCreated; }
 
 
-    private void setUrl(String url) { this.url = url; }
+    public void setUrl(String baseUrl) {
+        this.url = baseUrl + File.separator +  id;
+    }
 
     public String getUrl() { return url; }
 

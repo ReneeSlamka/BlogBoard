@@ -86,20 +86,18 @@ public class BoardService {
     * Method Name: Get Board
     * Inputs: Board Repository, name (of board), ownerUsername
     * Return: ArrayList<Board>
-    * Purpose:
+    * Purpose: return a board so that its information can be rendered in its page
     */
-    public BoardServiceResponse getBoard(BoardRepository boardRepo, String name, String username,
+    public Board getBoard(BoardRepository boardRepo, Long boardId, String username,
                                          HttpServletResponse httpResponse) throws IOException {
 
-        BoardServiceResponse getBoardResponse = new BoardServiceResponse();
-        Board targetBoard = boardRepo.findByName(name);
+        Board targetBoard = boardRepo.findOne(boardId);
 
         //check that board exists and is accessible by user
         //Todo: check if username is in list of members
-        if (targetBoard != null && (targetBoard.getOwnerUsername().equals(username))) {
-            getBoardResponse.setBoard(targetBoard);
-            getBoardResponse.setMessage(BOARD_FOUND);
-        } else if (!targetBoard.getOwnerUsername().equals(username)) {
+        if (targetBoard != null && (targetBoard.getMembers().contains(username))) {
+           httpResponse.setStatus(HttpServletResponse.SC_OK);
+        } else if (!targetBoard.getMembers().contains(username)) {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, BOARD_ACCESS_DENIED);
         } else if (targetBoard == null) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
@@ -107,7 +105,7 @@ public class BoardService {
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
         }
 
-        return getBoardResponse;
+        return targetBoard;
     }
 
 
@@ -130,22 +128,20 @@ public class BoardService {
     * Return: Object containing the username of the new member, its url (add later), and http response
     * Purpose: To add the username of the new member to a board's members list
     */
-    public JSONObject addMember(AccountRepository accountRepo, BoardRepository boardRepo,
-        String username, String boardName, HttpServletResponse httpResponse) throws IOException {
+    public AddMemberResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
+        String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
 
-        BoardServiceResponse addMemberResponse = new BoardServiceResponse();
-        JSONObject response = new JSONObject();
+        AddMemberResponse response = new AddMemberResponse();
 
-        //1. Check if user exists
         if (accountRepo.findByUsername(username) != null) {
-            Board targetBoard = boardRepo.findByName(boardName);
+            Board targetBoard = boardRepo.findOne(boardId);
             if (targetBoard == null) {
                 httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
             } else if(targetBoard.addMember(username)) {
                 boardRepo.save(targetBoard);
-                response.put("username", username);
-                response.put("url", BASE_URL + File.separator + "board=" + boardName + File.separator + username);
-                response.put("message", MEMBER_ADDED);
+                response.setUsername(username);
+                response.setUrl(BASE_URL + File.separator + username);
+                response.setMessage(MEMBER_ADDED);
                 httpResponse.setStatus(HttpServletResponse.SC_CREATED);
             } else {
                 httpResponse.sendError(HttpServletResponse.SC_CONFLICT, USER_ALREADY_MEMBER);
