@@ -64,6 +64,9 @@ public class ServicesController {
 
 
 
+    /*
+    *========== Create Account ==========
+    */
     @RequestMapping(value ="/accounts", method=RequestMethod.POST)
     public @ResponseBody
     AccountServiceResponse createAccount(
@@ -75,6 +78,10 @@ public class ServicesController {
         return accountService.createAccount(accountRepo, username, password, email, httpResponse);
     }
 
+
+    /*
+    *========== Login ==========
+    */
     @RequestMapping(value ="/accounts", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse login(
@@ -85,6 +92,10 @@ public class ServicesController {
         return accountService.login(accountRepo, sessionRepo, username, password, httpResponse);
     }
 
+
+    /*
+    *========== Logout ==========
+    */
     @RequestMapping(value ="/sessions", method=RequestMethod.POST) //better http call option?
     public @ResponseBody
     AccountServiceResponse logout(
@@ -95,6 +106,10 @@ public class ServicesController {
         return accountService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
     }
 
+
+    /*
+    *========== Validate Session ==========
+    */
     @RequestMapping(value = "/sessions", method=RequestMethod.GET)
     public @ResponseBody
     AccountServiceResponse validateSession(
@@ -104,6 +119,10 @@ public class ServicesController {
         return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
     }
 
+
+    /*
+    *========== Validate Session ==========
+    */
     @RequestMapping(value = "/{username}/boards", method=RequestMethod.POST)
     public @ResponseBody
     BoardServiceResponse createBoard(
@@ -115,6 +134,10 @@ public class ServicesController {
         return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
     }
 
+
+    /*
+    *========== Get Home Page ==========
+    */
     @RequestMapping(value ="/{username}", method=RequestMethod.GET)
     public ModelAndView getHomePage(@PathVariable String username,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
@@ -134,7 +157,11 @@ public class ServicesController {
         return mav;
     }
 
-    @RequestMapping(value ="/boards={boardName}", method=RequestMethod.GET)
+
+    /*
+    *========== Get Board Page ==========
+    */
+    @RequestMapping(value ="/boards/{boardName}", method=RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable String boardName,
         @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
         @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
@@ -154,6 +181,10 @@ public class ServicesController {
         return mav;
     }
 
+
+    /*
+    *========== Add Member ==========
+    */
     @RequestMapping(value = "/boards={boardName}/members", method=RequestMethod.POST)
     public @ResponseBody
     JSONObject addMember(
@@ -167,9 +198,13 @@ public class ServicesController {
     }
 
 
+    /*
+    *========== Exception Handler(s) ==========
+    */
+
     @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason = "An IO exception occurred")
     @ExceptionHandler(IOException.class)
-    public void exceptionHandler(IOException ex)
+    public void exceptionHandlerIO(IOException ex)
     {
         logger.log(Level.SEVERE, "An IO exception has occurred, most likely due to a close internet connection", ex);
     }
