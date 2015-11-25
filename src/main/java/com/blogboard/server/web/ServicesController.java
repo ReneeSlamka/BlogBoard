@@ -187,7 +187,7 @@ public class ServicesController {
     /*
     *========== Add Member ==========
     */
-    @RequestMapping(value = "/boards={boardName}/members", method = RequestMethod.POST)
+    @RequestMapping(value = "/boards/{boardName}/members", method = RequestMethod.POST)
     public
     @ResponseBody
     JSONObject addMember(
