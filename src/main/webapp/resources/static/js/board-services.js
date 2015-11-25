@@ -18,10 +18,8 @@ function createBoard() {
             alert(request.responseText);
             if(textStatus === "success") {
                 $("#create-board-form").modal("hide");
-                //var boardName = getCookie("userBoards");
-                //parseJSONBoardCookies(boardName)
-                var newBoard = request.responseJSON.board;
-                addBoardName(newBoard.name, newBoard.url);
+                var newBoard = request.responseJSON;
+                addBoardName(newBoard.boardName, newBoard.boardUrl);
             }
             document.getElementById("new-board-name").value = "";
         }
@@ -46,7 +44,9 @@ function addMember() {
         complete: function (request, textStatus) {
             alert(request.responseText);
             var newMember = request.responseJSON;
-            if(textStatus === "success") {
+            var error = newMember.error;
+            //Todo: temporary solution for user friendly error
+            if(error === undefined) {
                 addMemberName(newMember.username, newMember.url);
             }
         }
