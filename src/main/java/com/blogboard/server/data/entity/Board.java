@@ -48,7 +48,7 @@ public class Board {
         this.name = name;
         this.ownerUsername = owner;
         this.dateCreated = dateCreated;
-        this.url = baseUrl + File.separator + "boards=" +  urlEncodedName;
+        this.url = baseUrl + File.separator + "boards" + File.separator +  urlEncodedName;
         members.add(owner);
 
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout">
+<html lang="en">
     <head>
         <meta charset="UTF-8"/>
         <title>{% block title %}{% endblock title %}</title>
@@ -11,7 +11,7 @@
                 integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
                 crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-        <link rel="stylesheet" type="text/css" href="resources/static/css/top-navbar.css" />
+        <link rel="stylesheet" type="text/css" href="/resources/static/css/top-navbar.css" />
 
         {% block css %}
         {% endblock css %}
@@ -26,6 +26,6 @@
         {% endblock content %}
         {% block js %}
         {% endblock js %}
-        <script src="resources/static/js/account-services.js"></script>
+        <script src="/resources/static/js/account-services.js"></script>
     </body>
 </html>
