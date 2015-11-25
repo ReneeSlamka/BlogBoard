@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public interface BoardRepository extends CrudRepository<Board, Long> {
 
-    Board findByName(String name);
+    ArrayList<Board> findByName(String name);
 
     ArrayList<Board> findByOwnerUsername (String ownerUsername);
 
