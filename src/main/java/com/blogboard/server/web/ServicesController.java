@@ -5,6 +5,7 @@ import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
+import com.blogboard.server.service.AuthenticationService;
 import com.blogboard.server.service.BoardService;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ public class ServicesController {
 
     private AccountService accountService;
     private BoardService boardService;
+    private AuthenticationService authenticationService;
 
     //TODO: in future will have to ensure repositories are only accessed by one call at a time
     //will need resource locking
@@ -44,6 +46,11 @@ public class ServicesController {
     @Autowired(required = true)
     public void setAccountService(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    @Autowired(required = true)
+    public void setAuthenticationService(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @Autowired(required = true)
@@ -87,7 +94,7 @@ public class ServicesController {
             @RequestParam(value = "password", required = true) String password,
             HttpServletResponse httpResponse) throws IOException {
 
-        return accountService.login(accountRepo, sessionRepo, username, password, httpResponse);
+        return authenticationService.login(accountRepo, sessionRepo, username, password, httpResponse);
     }
 
 
@@ -102,7 +109,7 @@ public class ServicesController {
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
 
-        return accountService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
+        return authenticationService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
     }
 
 
@@ -116,7 +123,7 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
-        return accountService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
+        return authenticationService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
     }
 
 
