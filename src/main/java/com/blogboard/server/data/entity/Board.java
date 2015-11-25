@@ -1,5 +1,7 @@
 package com.blogboard.server.data.entity;
 
+import com.blogboard.server.service.AppServiceHelper;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,7 +32,7 @@ public class Board {
     @Column(name="members")
     private ArrayList<String> members = new ArrayList<String>();;
 
-    //keep like this for now, in future might have different types if posts and want loose coupling
+    //keep like this for now, in future might have different types of posts and want loose coupling
     private ArrayList<String> posts;
 
     public Board() {
@@ -39,11 +41,7 @@ public class Board {
 
     public Board(String name, String owner, String dateCreated, String baseUrl) {
         String urlEncodedName = name;
-        try {
-            name = URLDecoder.decode(name, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new AssertionError("UTF-8 is unknown");
-        }
+        name = AppServiceHelper.decodeString(name);
 
         this.name = name;
         this.ownerUsername = owner;
@@ -61,6 +59,7 @@ public class Board {
         this.id = id;
     }
 
+
     public String getName() {
         return name;
     }
@@ -68,6 +67,7 @@ public class Board {
     public void setName(String newName) {
         this.name = newName;
     }
+
 
     public String getOwnerUsername() {
         return ownerUsername;
@@ -77,17 +77,21 @@ public class Board {
         this.ownerUsername = newOwner;
     }
 
+
+    public String getDateCreated() { return dateCreated; }
+
     public void setDateCreated(String dateCreated) { this.dateCreated = dateCreated; }
+
 
     private void setUrl(String url) { this.url = url; }
 
     public String getUrl() { return url; }
 
-    public String getDateCreated() { return dateCreated; }
 
     public ArrayList<String> getMembers() {
         return members;
     }
+
 
     public boolean addMember(String newMember) {
         if (!members.contains(newMember)) {
@@ -97,8 +101,12 @@ public class Board {
         return false;
     }
 
-    public void removeMember(Account memberToDelete) {
-        members.remove(memberToDelete);
+    public boolean removeMember(Account memberToDelete) {
+        if (members.contains(memberToDelete)) {
+            members.remove(memberToDelete);
+            return true;
+        }
+        return false;
     }
 
 }

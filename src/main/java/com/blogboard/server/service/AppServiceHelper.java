@@ -1,6 +1,8 @@
 package com.blogboard.server.service;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -61,6 +63,15 @@ public class AppServiceHelper {
         if (timeValues[5] != null) {
             numMinutes = Integer.parseInt(timeValues[5]);
         }
+    }
 
+    public static String decodeString(String encodedString) {
+        String decodedString;
+        try {
+            decodedString = URLDecoder.decode(encodedString, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new AssertionError("UTF-8 is unknown");
+        }
+        return decodedString;
     }
 }
