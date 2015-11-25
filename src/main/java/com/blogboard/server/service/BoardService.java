@@ -1,35 +1,24 @@
 package com.blogboard.server.service;
 
 
-import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
-import com.blogboard.server.web.BoardServiceResponse;
+import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
+import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class BoardService {
 
     private static final String BASE_URL = "http://localhost:8080";
-
-    public enum Service {
-        BOARD_CREATION, GET_BOARD, ADD_MEMBER, REMOVE_MEMBER, ADD_POST, DELETE_POST
-    }
+    private static final String BASE_BOARD_URL = BASE_URL + File.separator + "boards";
 
     //Custom Success/Error Messages
     private static final String BOARD_CREATED = "Your board has been successfully created!";
@@ -52,33 +41,35 @@ public class BoardService {
     /*
     * Method Name: Create Board
     * Inputs: Board Repository, name (of board), ownerUsername
-    * Return Value: BoardServiceResponse containing newly created board object and httpResponse
+    * Return Value: CreateBoardResponse containing newly created board object and httpResponse
     * Purpose: create new board, store in database and return the necessary info to add it to
     * the DOM on the client side
     */
-    public BoardServiceResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
+    public CreateBoardResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
                                             HttpServletResponse httpResponse) throws IOException {
 
-        BoardServiceResponse createBoardResponse = new BoardServiceResponse();
+        CreateBoardResponse response = new CreateBoardResponse();
         String decodedName = AppServiceHelper.decodeString(name);
 
         //SUCCESS CASE: board with that name does not already exist (for this user)
         if (boardRepo.findByNameAndOwnerUsername(decodedName, ownerUsername) == null) {
             //create board and save in board repo
-            Board newBoard = new Board(name, ownerUsername, AppServiceHelper.createTimeStamp(), BASE_URL);
-            createBoardResponse.setBoard(newBoard);
+            Board newBoard = new Board(decodedName, ownerUsername, AppServiceHelper.createTimeStamp());
             Board savedBoard = boardRepo.save(newBoard);
+            savedBoard.setUrl(BASE_BOARD_URL);
+            savedBoard = boardRepo.save(savedBoard);
+            response.setBoardName(savedBoard.getName());
+            response.setBoardUrl(savedBoard.getUrl());
 
-            //TODO: will have to also get boards that are a member but not owner of (later)
             httpResponse.setStatus(HttpServletResponse.SC_CREATED);
-            createBoardResponse.setMessage(BOARD_CREATED);
+            response.setMessage(BOARD_CREATED);
         } else {
             //FAILURE CASE: board with given name already exists (for this user)
             httpResponse.sendError(HttpServletResponse.SC_OK, NAME_IN_USE);
         }
 
         httpResponse.setHeader("Location", BASE_URL + File.separator + ownerUsername);
-        return createBoardResponse;
+        return response;
     }
 
 
