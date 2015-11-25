@@ -73,7 +73,7 @@ public class ServicesController {
     @RequestMapping(value = "/accounts", method = RequestMethod.POST)
     public
     @ResponseBody
-    AccountServiceResponse createAccount(
+    BasicResponse createAccount(
             @RequestParam(value = "username", required = true) String username,
             @RequestParam(value = "password", required = true) String password,
             @RequestParam(value = "email", required = false, defaultValue = "") String email,
@@ -89,7 +89,7 @@ public class ServicesController {
     @RequestMapping(value = "/accounts", method = RequestMethod.GET)
     public
     @ResponseBody
-    AccountServiceResponse login(
+    BasicResponse login(
             @RequestParam(value = "username", required = true) String username,
             @RequestParam(value = "password", required = true) String password,
             HttpServletResponse httpResponse) throws IOException {
@@ -104,7 +104,7 @@ public class ServicesController {
     @RequestMapping(value = "/sessions", method = RequestMethod.POST) //better http call option?
     public
     @ResponseBody
-    AccountServiceResponse logout(
+    BasicResponse logout(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
@@ -119,7 +119,7 @@ public class ServicesController {
     @RequestMapping(value = "/sessions", method = RequestMethod.GET)
     public
     @ResponseBody
-    AccountServiceResponse validateSession(
+    BasicResponse validateSession(
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
@@ -128,7 +128,7 @@ public class ServicesController {
 
 
     /*
-    *========== Validate Session ==========
+    *========== Create Board ==========
     */
     @RequestMapping(value = "/{username}/boards", method = RequestMethod.POST)
     public

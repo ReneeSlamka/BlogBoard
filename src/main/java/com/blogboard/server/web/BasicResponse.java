@@ -1,10 +1,10 @@
 package com.blogboard.server.web;
 
-public abstract class BasicAPIResponse {
+public class BasicResponse {
 
     private String message;
 
-    public BasicAPIResponse() {
+    public BasicResponse() {
         this.message = "";
     }
 
@@ -12,8 +12,8 @@ public abstract class BasicAPIResponse {
         return this.message;
     }
 
-    public void setMessage(String newResponseText) {
-        this.message = newResponseText;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

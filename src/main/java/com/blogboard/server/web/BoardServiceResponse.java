@@ -4,7 +4,7 @@ import com.blogboard.server.data.entity.Board;
 import org.json.simple.JSONObject;
 
 
-public class BoardServiceResponse extends BasicAPIResponse {
+public class BoardServiceResponse extends BasicResponse {
 
     private Board board;
 

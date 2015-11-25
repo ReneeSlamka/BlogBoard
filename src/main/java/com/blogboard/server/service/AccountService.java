@@ -1,19 +1,12 @@
 package com.blogboard.server.service;
 
 import com.blogboard.server.web.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.blogboard.server.data.entity.*;
 import com.blogboard.server.data.repository.*;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import org.springframework.http.HttpStatus;
 
 @Service
 public class AccountService {
@@ -32,13 +25,13 @@ public class AccountService {
     /*
     * Method Name: Create Account
     * Inputs: Account Repository, username, password, email, httpResponse
-    * Return Value: Account Services BasicAPIResponse w/ HTTP Servlet BasicAPIResponse
+    * Return Value: Account Services BasicResponse w/ HTTP Servlet BasicResponse
     * Purpose: create new account, store in database and return the a success or failure message
      */
 
-    public AccountServiceResponse createAccount(AccountRepository accountRepo, String username, String password,
+    public BasicResponse createAccount(AccountRepository accountRepo, String username, String password,
         String email, HttpServletResponse httpResponse) throws IOException{
-        AccountServiceResponse response = new AccountServiceResponse();
+        BasicResponse response = new BasicResponse();
 
         //SUCCESS CASE: account with provided credentials doesn't already exist
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
@@ -71,22 +64,22 @@ public class AccountService {
     /*
     * Method Name: Update Email
     * Inputs: Account Repository, username, password, email, httpResponse
-    * Return Value: Account Services BasicAPIResponse w/ HTTP Servlet BasicAPIResponse
+    * Return Value: Account Services BasicResponse w/ HTTP Servlet BasicResponse
     * Purpose: create new account, store in database and return the a success or failure message
      */
 
-    public AccountServiceResponse updateEmail() {
+    public BasicResponse updateEmail() {
         return new AccountServiceResponse();
     }
 
     /*
     * Method Name: Update Password
     * Inputs: Account Repository, username, password, email, httpResponse
-    * Return Value: Account Services BasicAPIResponse w/ HTTP Servlet BasicAPIResponse
+    * Return Value: Account Services BasicResponse w/ HTTP Servlet BasicResponse
     * Purpose: create new account, store in database and return the a success or failure message
      */
 
-    public AccountServiceResponse updatePassword() {
+    public BasicResponse updatePassword() {
         return new AccountServiceResponse();
     }
 }

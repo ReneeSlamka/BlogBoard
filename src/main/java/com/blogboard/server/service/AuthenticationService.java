@@ -5,6 +5,7 @@ import com.blogboard.server.data.entity.Session;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.web.AccountServiceResponse;
+import com.blogboard.server.web.BasicResponse;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -31,15 +32,17 @@ public class AuthenticationService {
 
     /*
    * Method Name: Login
-   * Inputs: Account Repository, Session Repository, username, password, HTTP Servlet BasicAPIResponse
-   * Return Value: Account Services BasicAPIResponse
+   * Inputs: Account Repository, Session Repository, username, password, HTTP Servlet BasicResponse
+   * Return Value: Account Services BasicResponse
    * Purpose: logs user in by creating a session object, storing it the database and returning its values
    * in a cookie to be stored on the client side for persistent authentication
     */
-    public AccountServiceResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
+
+    //Todo: break down this method into into smaller submethods
+    public BasicResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
                                         String password, HttpServletResponse httpResponse) throws IOException {
 
-        AccountServiceResponse response = new AccountServiceResponse();
+        BasicResponse response = new BasicResponse();
         Account targetAccount = accountRepo.findByUsername(username);
 
 
@@ -98,14 +101,14 @@ public class AuthenticationService {
 
     /*
     * Method Name: Logout
-    * Inputs: Session Repository, username, sessionId, HTTP Servlet BasicAPIResponse
-    * Return Value: Account Services BasicAPIResponse
+    * Inputs: Session Repository, username, sessionId, HTTP Servlet BasicResponse
+    * Return Value: Account Services BasicResponse
     * Purpose: logs user out of their current session, deletes their session from the database and returns
     * the url to the login page to redirect the client
      */
-    public AccountServiceResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
+    public BasicResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
                                          HttpServletResponse httpResponse) throws IOException {
-        AccountServiceResponse response = new AccountServiceResponse();
+        BasicResponse response = new BasicResponse();
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
             httpResponse.setHeader("Location", LOGIN_PAGE);
@@ -134,15 +137,15 @@ public class AuthenticationService {
 
     /*
     * Method Name: Validate User Session
-    * Inputs: Session Repository, HTTP Servlet BasicAPIResponse, sessionId
-    * Return Value: Account Services BasicAPIResponse
+    * Inputs: Session Repository, HTTP Servlet BasicResponse, sessionId
+    * Return Value: Account Services BasicResponse
     * Purpose: checks if sessionId provided by client's cookie matches with one stored in database and returns
      * success message with user home page url to redirect client to if it does
      */
-    public AccountServiceResponse validateUserSession(SessionRepository sessionRepo,
+    public BasicResponse validateUserSession(SessionRepository sessionRepo,
                                                       HttpServletResponse httpResponse, String sessionId, String sessionUsername) throws IOException{
 
-        AccountServiceResponse response = new AccountServiceResponse();
+        BasicResponse response = new BasicResponse();
         Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
 
         //TODO: improve security here after more research
