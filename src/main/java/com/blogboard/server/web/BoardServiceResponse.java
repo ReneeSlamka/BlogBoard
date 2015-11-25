@@ -1,6 +1,5 @@
 package com.blogboard.server.web;
 
-import com.blogboard.server.service.BoardService;
 import com.blogboard.server.data.entity.Board;
 import org.json.simple.JSONObject;
 
@@ -23,7 +22,11 @@ public class BoardServiceResponse extends BasicAPIResponse {
         return board;
     }
 
-    public void setJsonReponseObject(JSONObject jsonObject) { this.jsonReponseObject = jsonObject; }
+    public void setJsonReponseObject(JSONObject jsonObject) {
+        this.jsonReponseObject = jsonObject;
+    }
 
-    public JSONObject getJsonReponseObject() { return jsonReponseObject; }
+    public JSONObject getJsonReponseObject() {
+        return jsonReponseObject;
+    }
 }

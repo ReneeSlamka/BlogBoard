@@ -1,6 +1,4 @@
 package com.blogboard.server.web;
-import com.blogboard.server.service.AccountService;
-
 
 public abstract class BasicAPIResponse {
 

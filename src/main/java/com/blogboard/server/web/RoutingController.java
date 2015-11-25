@@ -9,21 +9,19 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class RoutingController {
 
-    @RequestMapping(value ="/", method= RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView getIndexPage() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("index");
         return mav;
     }
 
-    @RequestMapping(value ="/login", method= RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView getLoginPage() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("login");
         return mav;
     }
-
-
 
 
 }
