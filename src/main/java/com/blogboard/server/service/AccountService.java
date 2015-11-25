@@ -19,9 +19,7 @@ import org.springframework.http.HttpStatus;
 public class AccountService {
 
     private static final String BASE_URL = "http://localhost:8080";
-    private static final String LOGIN_SUCCESS_URL = "http://localhost:8080/home";
     private static final String LOGIN_PAGE = "http://localhost:8080/login";
-
 
     //Custom Success/Error Messages
     private static final String ACCOUNT_CREATED = "Congrats, your account has successfully been " +
