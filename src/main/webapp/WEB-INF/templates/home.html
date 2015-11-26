@@ -25,16 +25,30 @@
                 <i class="fa fa-pencil-square fa-2x"></i>
                 <h3 class="header-text">Your Boards</h3>
             </div>
-            <ul id="user-boards-list">
-                <li>Uni Pals</li>
-                <li>The Girl Gang</li>
-                <li>The Fam Jam</li>
-                {% for board in userBoards %}
-                    <a href="{{ board.url }}">
-                        <li>{{ board.name }}</li>
-                    </a>
-                {% endfor %}
-            </ul>
+            <section id="owner-boards-list" class="boards-section">
+                <h4>Boards You Created</h4>
+                {% if createdBoards is empty %}
+                    <h6 class="default-filler-text">You haven't created any boards yet</h6>
+                {% else %}
+                    {% for board in createdBoards %}
+                        <a href="{{ board.url }}">
+                            <h6>{{ board.name }}</h6>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </section>
+            <section id="member-boards" class="boards-section">
+                <h4>Boards You've Been Added To</h4>
+                {% if memberBoards is empty %}
+                    <h6 class="default-filler-text">You haven't been added to any boards yet</h6>
+                {% else %}
+                    {% for board in memberBoards %}
+                        <a href="{{ board.url }}">
+                            <h6>{{ board.name }}</h6>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </section>
             <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
                 data-target="#create-board-form" onclick="displayModal()">
                 Create Board

@@ -54,8 +54,8 @@ function addMember() {
 }
 
 function addBoardName(newBoardName, url) {
-    var $listBoards = $("#user-boards-list");
-    $listBoards.append("<a href=" + url + "><li>" + newBoardName+ "</li></a>");
+    var $listBoards = $("#owner-boards-list");
+    $listBoards.append("<a href=" + url + "><h6>" + newBoardName+ "</h6></a>");
 }
 
 
@@ -75,7 +75,5 @@ function parseJSONBoardCookies(jsonArray) {
 
     for (var i = 0; i < arrayCookieJson.length; i=i+2) {
         arrayCookieJson[i/2] = arrayCookieJson[i] + "," + arrayCookieJson[i+1];
-        //var cookieJSON = JSON.parse(arrayCookieJson[i/2]);
-        //addBoardName(cookieJSON.name, cookieJSON.url);
     }
 }
