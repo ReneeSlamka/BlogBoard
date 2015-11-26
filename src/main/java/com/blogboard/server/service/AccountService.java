@@ -69,7 +69,7 @@ public class AccountService {
      */
 
     public BasicResponse updateEmail() {
-        return new AccountServiceResponse();
+        return new BasicResponse();
     }
 
     /*
@@ -80,6 +80,6 @@ public class AccountService {
      */
 
     public BasicResponse updatePassword() {
-        return new AccountServiceResponse();
+        return new BasicResponse();
     }
 }
