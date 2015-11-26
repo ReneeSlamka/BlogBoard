@@ -4,7 +4,6 @@ import com.blogboard.server.data.entity.Account;
 import com.blogboard.server.data.entity.Session;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.SessionRepository;
-import com.blogboard.server.web.AccountServiceResponse;
 import com.blogboard.server.web.BasicResponse;
 import org.springframework.stereotype.Service;
 
