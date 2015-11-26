@@ -7,10 +7,13 @@ import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.ModelAndView;
+import com.blogboard.server.data.entity.Account;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,16 +48,22 @@ public class BoardService {
     * Purpose: create new board, store in database and return the necessary info to add it to
     * the DOM on the client side
     */
-    public CreateBoardResponse createBoard(BoardRepository boardRepo, String name, String ownerUsername,
-                                            HttpServletResponse httpResponse) throws IOException {
+    public CreateBoardResponse createBoard(BoardRepository boardRepo, AccountRepository accountRepo, String boardName,
+                                           String ownerUsername, HttpServletResponse httpResponse) throws IOException {
 
         CreateBoardResponse response = new CreateBoardResponse();
-        String decodedName = AppServiceHelper.decodeString(name);
+        String decodedName = AppServiceHelper.decodeString(boardName);
+        Account boardOwner = accountRepo.findByUsername(ownerUsername);
+
+        if (boardOwner == null) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
+            return response;
+        }
 
         //SUCCESS CASE: board with that name does not already exist (for this user)
-        if (boardRepo.findByNameAndOwnerUsername(decodedName, ownerUsername) == null) {
+        if (boardRepo.findByNameAndOwner(decodedName, boardOwner) == null) {
             //create board and save in board repo
-            Board newBoard = new Board(decodedName, ownerUsername, AppServiceHelper.createTimeStamp());
+            Board newBoard = new Board(decodedName, boardOwner, AppServiceHelper.createTimeStamp());
             Board savedBoard = boardRepo.save(newBoard);
             savedBoard.setUrl(BASE_BOARD_URL);
             savedBoard = boardRepo.save(savedBoard);
@@ -79,19 +88,25 @@ public class BoardService {
     * Return: ArrayList<Board>
     * Purpose: return a board so that its information can be rendered in its page
     */
-    public Board getBoard(BoardRepository boardRepo, Long boardId, String username,
+    public Board getBoard(BoardRepository boardRepo, AccountRepository accountRepo, Long boardId, String username,
                                          HttpServletResponse httpResponse) throws IOException {
 
         Board targetBoard = boardRepo.findOne(boardId);
+        Account targetMember = accountRepo.findByUsername(username);
+
+        if (targetMember == null) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
+            return null;
+        }
 
         //check that board exists and is accessible by user
         //Todo: check if username is in list of members
-        if (targetBoard != null && (targetBoard.getMembers().contains(username))) {
+        if (targetBoard != null && (targetBoard.getMembers().contains(targetMember))) {
            httpResponse.setStatus(HttpServletResponse.SC_OK);
-        } else if (!targetBoard.getMembers().contains(username)) {
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, BOARD_ACCESS_DENIED);
         } else if (targetBoard == null) {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
+        } else if (!targetBoard.getMembers().contains(targetMember)) {
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, BOARD_ACCESS_DENIED);
         } else {
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
         }
@@ -104,11 +119,36 @@ public class BoardService {
    * Method Name: Get List Boards
    * Inputs: Board Repository, username(board ownerUsername)
    * Return: ArrayList<Board>
-   * Purpose: to retrieve all boards that belong to that user
+   * Purpose: to retrieve all boards that either belong to that user or that user is a member of
    */
-    public ArrayList<Board> getListBoards(BoardRepository boardRepo, String username) {
-        ArrayList<Board> userBoards =  boardRepo.findByOwnerUsername(username);
-        return userBoards;
+    public ModelAndView getHomePageBoardsList(BoardRepository boardRepo, AccountRepository accountRepo,
+                                              String username, HttpServletResponse httpResponse) throws IOException {
+
+        ModelAndView mav = new ModelAndView();
+
+        Account user = accountRepo.findByUsername(username);
+        if (user == null) {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
+            return mav;
+        }
+
+        ArrayList<Account> memberSearchList = new ArrayList<Account>();
+        memberSearchList.add(user);
+        ArrayList<Board> createdBoards = boardRepo.findByOwner(user);
+        ArrayList<Board> memberBoards = boardRepo.findByMembersIn(memberSearchList);
+
+        for (Board board : memberBoards) {
+            if (board.getOwner().equals(user)) {
+                memberBoards.remove(board);
+            }
+        }
+
+        mav.addObject("createdBoards", createdBoards);
+        mav.addObject("memberBoards", memberBoards);
+        mav.setViewName("home");
+        httpResponse.setStatus(HttpServletResponse.SC_OK);
+
+        return mav;
     }
 
 
@@ -123,12 +163,13 @@ public class BoardService {
         String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
 
         AddMemberResponse response = new AddMemberResponse();
+        Account targetAccount = accountRepo.findByUsername(username);
 
-        if (accountRepo.findByUsername(username) != null) {
+        if (targetAccount != null) {
             Board targetBoard = boardRepo.findOne(boardId);
             if (targetBoard == null) {
                 httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
-            } else if(targetBoard.addMember(username)) {
+            } else if(targetBoard.addMember(targetAccount)) {
                 boardRepo.save(targetBoard);
                 response.setUsername(username);
                 response.setUrl(BASE_URL + File.separator + username);

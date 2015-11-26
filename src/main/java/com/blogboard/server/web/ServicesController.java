@@ -141,7 +141,7 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
-        return boardService.createBoard(boardRepo, boardName, sessionUsername, httpResponse);
+        return boardService.createBoard(boardRepo,accountRepo, boardName, sessionUsername, httpResponse);
     }
 
 
@@ -150,21 +150,13 @@ public class ServicesController {
     */
     @RequestMapping(value = "/{username}", method = RequestMethod.GET)
     public ModelAndView getHomePage(@PathVariable String username,
-                                    @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-                                    @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+                                    @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
+                                    String sessionUsername,
+                                    @CookieValue(value = "sessionID", defaultValue = "", required = false)
+                                    String sessionId,
                                     HttpServletResponse httpResponse) throws IOException {
-        ModelAndView mav = new ModelAndView();
 
-        if (accountRepo.findByUsername(username) == null) {
-            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Account not found");
-        } else {
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
-        }
-
-        ArrayList<Board> userBoards = boardService.getListBoards(boardRepo, sessionUsername);
-        mav.addObject("userBoards", userBoards);
-        mav.setViewName("home");
-        return mav;
+        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionUsername, httpResponse);
     }
 
 
@@ -173,16 +165,18 @@ public class ServicesController {
     */
     @RequestMapping(value = "/boards/{boardId}", method = RequestMethod.GET)
     public ModelAndView getBoardPage(@PathVariable Long boardId,
-                                     @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
-                                     @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+                                     @CookieValue(value = "sessionID", defaultValue = "", required = false)
+                                     String sessionId,
+                                     @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
+                                     String sessionUsername,
                                      HttpServletResponse httpResponse) throws IOException {
         ModelAndView mav = new ModelAndView();
 
-        Board targetBoard = boardService.getBoard(boardRepo, boardId, sessionUsername, httpResponse);
+        Board targetBoard = boardService.getBoard(boardRepo, accountRepo, boardId, sessionUsername, httpResponse);
 
         //create object to add to pebble board template
         mav.addObject("boardName", targetBoard.getName());
-        mav.addObject("boardOwner", targetBoard.getOwnerUsername());
+        mav.addObject("boardOwner", targetBoard.getOwner().getUsername());
         mav.addObject("dateCreated", targetBoard.getDateCreated());
         mav.addObject("boardMembers", targetBoard.getMembers());
         mav.setViewName("board");

@@ -2,6 +2,7 @@ package com.blogboard.server.data.entity;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Account {
@@ -12,6 +13,9 @@ public class Account {
     private String username;
     private String password;
     private String email;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    private List<Board> boards;
 
     public Account() {
         super();

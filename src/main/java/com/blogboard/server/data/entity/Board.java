@@ -2,15 +2,12 @@ package com.blogboard.server.data.entity;
 
 import com.blogboard.server.service.AppServiceHelper;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import javax.persistence.Column;
 import java.io.File;
+import java.util.List;
 
 @Entity
 public class Board {
@@ -19,29 +16,26 @@ public class Board {
     @Column(name="id")
     private Long id;
 
-    @Column(name="name")
     private String name;
-
-    @Column(name="owner")
-    private String ownerUsername;
-
     private String dateCreated;
-
     private String url;
 
-    @Column(name="members")
-    private ArrayList<String> members = new ArrayList<String>();;
+    @OneToOne(targetEntity=Account.class, mappedBy="board", fetch=FetchType.EAGER)
+    private Account owner;
+
+    @OneToMany(targetEntity=Account.class, mappedBy="board", fetch=FetchType.LAZY)
+    private List<Account> members = new ArrayList<Account>();
 
     //keep like this for now, in future might have different types of posts and want loose coupling
-    private ArrayList<String> posts;
+    //private ArrayList<String> posts;
 
     public Board() {
         super();
     }
 
-    public Board(String name, String owner, String dateCreated) {
+    public Board(String name, Account owner, String dateCreated) {
         this.name = name;
-        this.ownerUsername = owner;
+        this.owner = owner;
         this.dateCreated = dateCreated;
         members.add(owner);
     }
@@ -64,12 +58,10 @@ public class Board {
     }
 
 
-    public String getOwnerUsername() {
-        return ownerUsername;
-    }
+    public Account getOwner() { return owner; }
 
-    public void setownerUsername(String newOwner) {
-        this.ownerUsername = newOwner;
+    public void setOwner(Account newOwner) {
+        this.owner = newOwner;
     }
 
 
@@ -84,13 +76,9 @@ public class Board {
 
     public String getUrl() { return url; }
 
+    public  List<Account> getMembers() { return members; }
 
-    public ArrayList<String> getMembers() {
-        return members;
-    }
-
-
-    public boolean addMember(String newMember) {
+    public boolean addMember(Account newMember) {
         if (!members.contains(newMember)) {
             members.add(newMember);
             return true;
