@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Random;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class AppServiceHelper {
 
@@ -57,12 +58,20 @@ public class AppServiceHelper {
         return timeStamp;
     }
 
-    public static void parseTimeStamp(String timeStamp) {
-        String[] timeValues = timeStamp.split("/");
-        int numMinutes;
-        if (timeValues[5] != null) {
-            numMinutes = Integer.parseInt(timeValues[5]);
-        }
+    public static HashMap<String, Integer> parseTimeStamp(String timeStamp) {
+        String[] values = timeStamp.split(" ");
+        String[] dateValues = values[0].split("/");
+        String[] timeValues = values[1].split(":");
+
+        HashMap<String, Integer> numericDateValues = new HashMap<String, Integer>();
+        numericDateValues.put("years", new Integer(dateValues[0]));
+        numericDateValues.put("months", new Integer(dateValues[1]));
+        numericDateValues.put("days", new Integer(dateValues[2]));
+        numericDateValues.put("hours", new Integer(timeValues[0]));
+        numericDateValues.put("minutes", new Integer(timeValues[1]));
+        numericDateValues.put("seconds", new Integer(timeValues[2]));
+
+        return numericDateValues;
     }
 
     public static String decodeString(String encodedString) {
@@ -73,5 +82,28 @@ public class AppServiceHelper {
             throw new AssertionError("UTF-8 is unknown");
         }
         return decodedString;
+    }
+
+
+    //checks time stamp against current time, if diff >= 30 returns true
+    //currently only works for timestamps in same month
+    public static boolean validateExpirationTime(String timeStamp, String currentTime) {
+
+        HashMap<String,Integer> timeStampValues = AppServiceHelper.parseTimeStamp(timeStamp);
+        HashMap<String,Integer> currentTimeValues = AppServiceHelper.parseTimeStamp(currentTime);
+
+        Integer timeStampMinutes = (timeStampValues.get("hours")*60) + timeStampValues.get("minutes");
+        Integer currentTimeMinutes = (currentTimeValues.get("hours")*60) + currentTimeValues.get("minutes");
+
+        if (currentTimeMinutes - timeStampMinutes >= 30) {
+            return true;
+        } else if ((currentTimeValues.get("days") - timeStampValues.get("days") > 0)) {
+            if ((currentTimeValues.get("days") - timeStampValues.get("days") == 1)) {
+                if (!(timeStampValues.get("hours") == 23 && currentTimeValues.get("hours") == 0)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
