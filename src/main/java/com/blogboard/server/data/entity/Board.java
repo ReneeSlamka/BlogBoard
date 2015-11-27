@@ -10,20 +10,27 @@ import java.io.File;
 import java.util.List;
 
 @Entity
+@Table(name="BOARD")
 public class Board {
     @Id
+    @Column(name="BOARD_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="id")
     private Long id;
 
+    @Column(name="NAME")
     private String name;
+
+    @Column(name="DATE_CREATED")
     private String dateCreated;
+
+    @Column(name="URL")
     private String url;
 
-    @OneToOne(targetEntity=Account.class, mappedBy="board", fetch=FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ACCOUNT_ID")
     private Account owner;
 
-    @OneToMany(targetEntity=Account.class, mappedBy="board", fetch=FetchType.LAZY)
+    @ManyToMany(mappedBy = "accessibleBoards", cascade = CascadeType.PERSIST)
     private List<Account> members = new ArrayList<Account>();
 
     //keep like this for now, in future might have different types of posts and want loose coupling
@@ -37,7 +44,7 @@ public class Board {
         this.name = name;
         this.owner = owner;
         this.dateCreated = dateCreated;
-        members.add(owner);
+        //this.addMember(owner);
     }
 
     public Long getId() {
