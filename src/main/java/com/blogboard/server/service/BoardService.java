@@ -58,11 +58,6 @@ public class BoardService {
         String decodedName = AppServiceHelper.decodeString(boardName);
         Account boardOwner = accountRepo.findByUsername(ownerUsername);
 
-        if (boardOwner == null) {
-            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
-            return response;
-        }
-
         //SUCCESS CASE: board with that name does not already exist (for this user)
         if (boardRepo.findByNameAndOwner(decodedName, boardOwner) == null) {
             //create board and save in board repo
@@ -100,11 +95,6 @@ public class BoardService {
         Board targetBoard = boardRepo.findOne(boardId);
         Account targetMember = accountRepo.findByUsername(username);
 
-        if (targetMember == null) {
-            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
-            return null;
-        }
-
         //check that board exists and is accessible by user
         //Todo: check if username is in list of members
         if (targetBoard != null && (targetBoard.getMembers().contains(targetMember))) {
@@ -131,12 +121,7 @@ public class BoardService {
                                               String username, HttpServletResponse httpResponse) throws IOException {
 
         ModelAndView mav = new ModelAndView();
-
         Account user = accountRepo.findByUsername(username);
-        if (user == null) {
-            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
-            return mav;
-        }
 
         List<Account> memberSearchList = new ArrayList<Account>();
         memberSearchList.add(user);

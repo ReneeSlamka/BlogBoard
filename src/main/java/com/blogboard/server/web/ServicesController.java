@@ -147,6 +147,13 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
+
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
+        if (!sessionValid) {
+            CreateBoardResponse response = new CreateBoardResponse();
+            return response;
+        }
         return boardService.createBoard(boardRepo,accountRepo, boardName, sessionUsername, httpResponse);
     }
 
@@ -155,13 +162,20 @@ public class ServicesController {
     *========== Get Home Page ==========
     */
     @RequestMapping(value = "/{username}", method = RequestMethod.GET)
-    public ModelAndView getHomePage(@PathVariable String username,
-                                    @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
-                                    String sessionUsername,
-                                    @CookieValue(value = "sessionID", defaultValue = "", required = false)
-                                    String sessionId,
-                                    HttpServletResponse httpResponse) throws IOException {
+    public ModelAndView getHomePage(
+            @PathVariable String username,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
+            String sessionUsername,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false)
+            String sessionId,
+            HttpServletResponse httpResponse) throws IOException {
 
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
+        if (!sessionValid) {
+            ModelAndView mav = new ModelAndView();
+            return mav;
+        }
         return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionUsername, httpResponse);
     }
 
@@ -170,14 +184,20 @@ public class ServicesController {
     *========== Get Board Page ==========
     */
     @RequestMapping(value = "/boards/{boardId}", method = RequestMethod.GET)
-    public ModelAndView getBoardPage(@PathVariable Long boardId,
-                                     @CookieValue(value = "sessionID", defaultValue = "", required = false)
-                                     String sessionId,
-                                     @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
-                                     String sessionUsername,
-                                     HttpServletResponse httpResponse) throws IOException {
-        ModelAndView mav = new ModelAndView();
+    public ModelAndView getBoardPage(
+            @PathVariable Long boardId,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false)
+            String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
+            String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
 
+        ModelAndView mav = new ModelAndView();
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
+        if (!sessionValid) {
+            return mav;
+        }
         Board targetBoard = boardService.getBoard(boardRepo, accountRepo, boardId, sessionUsername, httpResponse);
 
         //create object to add to pebble board template
@@ -203,6 +223,12 @@ public class ServicesController {
             @RequestParam(value = "memberUsername", required = true) String memberUsername,
             HttpServletResponse httpResponse) throws IOException {
 
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
+        if (!sessionValid) {
+            AddMemberResponse response = new AddMemberResponse();
+            return response;
+        }
         return boardService.addMember(accountRepo, boardRepo, memberUsername, boardId, httpResponse);
     }
 
