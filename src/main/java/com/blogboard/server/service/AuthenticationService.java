@@ -27,6 +27,7 @@ public class AuthenticationService {
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
     private static final String INVALID_SESSION = "Not a valid session";
     private static final String NO_SESSION_FOUND = "No session has been initialized";
+    private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
 
 
     /*
@@ -133,6 +134,38 @@ public class AuthenticationService {
         return response;
     }
 
+    /*
+    * Method Name: Validate Session
+    * Inputs: sessionId, sessionUsername
+    * Return Value: boolean
+    * Purpose: Checks if current session is valid before every service call and that user tied
+    * to it exists in DB. Also sets appropriate error status and message if an error is found.
+     */
+
+    public boolean validateSession(AccountRepository accountRepo, SessionRepository sessionRepo, String sessionId,
+                                   String sessionUsername, HttpServletResponse httpResponse) throws IOException {
+
+        Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
+        httpResponse.setHeader("Location", LOGIN_PAGE);
+
+        if(sessionId.isEmpty() || targetSession != null) {
+            if(targetSession.getAccountUsername().equals(sessionUsername)) {
+                if (accountRepo.findByUsername(sessionUsername) != null) {
+                    httpResponse.setHeader("Location", BASE_URL + File.separator + sessionUsername);
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    return true;
+                } else {
+                    httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
+                }
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_SESSION);
+            }
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, NO_SESSION_FOUND);
+        }
+
+        return false;
+    }
 
     /*
     * Method Name: Validate User Session
