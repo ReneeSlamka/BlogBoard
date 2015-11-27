@@ -4,48 +4,59 @@ package com.blogboard.server.data.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name="POST")
 public class Post {
 
     @Id
+    @Column(name="POST_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String name;
-    private String author; //TODO: maybe change this to Account object
-    private String datePosted;
+
+    @Column(name="TITLE")
+    private String title;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ACCOUNT_ID")
+    private Account author; //TODO: maybe change this to Account object
+
+    @Column(name = "TIME_STAMP")
+    private String timeStamp;
+
+    @Column(name = "TEXT_CONTENT")
     private String textContent;
 
     public Post() {
         super();
     }
 
-    public Post(String name, String author, String datePosted) {
-        this.name = name;
+    public Post(String title, Account author, String timeStamp) {
+        this.title = title;
         this.author = author;
-        this.datePosted = datePosted;
+        this.timeStamp = timeStamp;
     }
 
-    private void setName(String name) {
-        this.name = name;
+    private void setTitle(String name) {
+        this.title = name;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    private void setAuthor(String author) {
+    private void setAuthor(Account author) {
         this.author = author;
     }
 
-    public String getAuthor() {
+    public Account getAuthor() {
         return author;
     }
 
     private void setDateCreated(String dateCreated) {
-        this.datePosted = dateCreated;
+        this.timeStamp = dateCreated;
     }
 
     public String getDateCreated() {
-        return datePosted;
+        return timeStamp;
     }
 
     public void setTextContent(String textContent) {
