@@ -35,7 +35,7 @@ public class Board {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "POST_ID")
-    private ArrayList<Post> posts;
+    private List<Post> posts;
 
     public Board() {
         super();
