@@ -3,13 +3,14 @@ package com.blogboard.server.web;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
+import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
 import com.blogboard.server.service.AuthenticationService;
 import com.blogboard.server.service.BoardService;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
-import org.json.simple.JSONObject;
+import com.blogboard.server.web.ServiceResponses.AddPostResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +34,7 @@ public class ServicesController {
     private AccountRepository accountRepo;
     private SessionRepository sessionRepo;
     private BoardRepository boardRepo;
+    private PostRepository postRepo;
 
     @Autowired(required = true)
     public void setSessionRepository(BoardRepository boardRepository) {
@@ -63,6 +64,11 @@ public class ServicesController {
     @Autowired(required = true)
     public void setSessionRepository(SessionRepository sessionRepository) {
         this.sessionRepo = sessionRepository;
+    }
+
+    @Autowired(required = true)
+    public void setPostRepository(PostRepository postRepository) {
+        this.postRepo = postRepository;
     }
 
 
@@ -198,6 +204,24 @@ public class ServicesController {
             HttpServletResponse httpResponse) throws IOException {
 
         return boardService.addMember(accountRepo, boardRepo, memberUsername, boardId, httpResponse);
+    }
+
+
+    /*
+    *========== Add Post ==========
+    */
+    @RequestMapping(value = "/boards/{boardId}/posts", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    AddPostResponse addPost(
+            @PathVariable Long boardId,
+            @RequestParam(value = "authorUsername",defaultValue = "", required = false) String authorUsername,
+            @RequestParam(value = "title",defaultValue = "", required = false) String title,
+            @RequestParam(value = "textBody",defaultValue = "", required = false) String textBody,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId) {
+
+        return boardService.addPost(accountRepo, boardRepo, postRepo, boardId, authorUsername, title, textBody);
     }
 
 

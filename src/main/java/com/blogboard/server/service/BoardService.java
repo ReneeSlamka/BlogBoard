@@ -4,11 +4,14 @@ package com.blogboard.server.service;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
+import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
+import com.blogboard.server.web.ServiceResponses.AddPostResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import com.blogboard.server.data.entity.Account;
+import com.blogboard.server.data.entity.Post;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,6 +190,25 @@ public class BoardService {
         } else {
             httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, USER_NOT_FOUND);
         }
+
+        return response;
+    }
+
+    /*
+    * Method Name: Create Post
+    * Inputs:
+    * Return:
+    * Purpose:
+     */
+    public AddPostResponse addPost(AccountRepository accountRepo, BoardRepository boardRepo, PostRepository postRepo,
+                                  Long boardId, String authorUsername, String title, String textContent) {
+
+        AddPostResponse response = new AddPostResponse();
+        Account targetAccount = accountRepo.findByUsername(authorUsername);
+        Board targetBoard = boardRepo.findOne(boardId);
+        String timeStamp = AppServiceHelper.createTimeStamp();
+        Post newPost = new Post(title, targetAccount, timeStamp);
+        newPost.setTextContent(textContent);
 
         return response;
     }
