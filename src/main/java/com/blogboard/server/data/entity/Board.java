@@ -33,8 +33,9 @@ public class Board {
     @ManyToMany(mappedBy = "accessibleBoards", cascade = CascadeType.PERSIST)
     private List<Account> members = new ArrayList<Account>();
 
-    //keep like this for now, in future might have different types of posts and want loose coupling
-    //private ArrayList<String> posts;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "POST_ID")
+    private ArrayList<Post> posts;
 
     public Board() {
         super();
