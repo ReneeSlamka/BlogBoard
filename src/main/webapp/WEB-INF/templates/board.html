@@ -18,23 +18,30 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4">
-            <h3>{{boardName}}</h3>
-            <h6>Created {{dateCreated}}</h6>
-            <section id="list-board-members">
-            {% for member in boardMembers %}
-                <h5>member</h5>
-            {% endfor %}
-                <h5>Tester Jenny</h5>
+            <section id="board-info-section">
+                <h3>{{boardName}}</h3>
+                <h6>Created {{dateCreated}}</h6>
+                <section id="list-board-members">
+                {% for member in boardMembers %}
+                    <h5>member</h5>
+                {% endfor %}
+                    <h5>Tester Jenny</h5>
+                </section>
+                <input type="text" class="form-control" id="member-username" size="40" />
+                <button onclick="addMember()" id="add-member-button" type="submit" class="btn btn-default">
+                    Add New Member
+                </button>
             </section>
-            <input type="text" class="form-control" id="member-username" size="40" />
-            <button onclick="addMember()" id="add-member-button" type="submit" class="btn btn-default">
-                Add New Member
-            </button>
-
         </div>
         <div class="col-md-8">
-            <section>
-                <h3>This is a post</h3>
+            <section id="post-section">
+                <label>
+                    New Post:
+                </label>
+                <input type="text" class="form-control" id="new-username" size="40" />
+                <button onclick="" id="new-post-button" type="submit" class="btn btn-default">
+                    Login
+                </button>
             </section>
         </div>
     </div>
