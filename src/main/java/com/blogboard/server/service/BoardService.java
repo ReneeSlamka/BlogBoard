@@ -64,9 +64,12 @@ public class BoardService {
         if (boardRepo.findByNameAndOwner(decodedName, boardOwner) == null) {
             //create board and save in board repo
             Board newBoard = new Board(decodedName, boardOwner, AppServiceHelper.createTimeStamp());
+            newBoard.addMember(boardOwner);
             Board savedBoard = boardRepo.save(newBoard);
             savedBoard.setUrl(BASE_BOARD_URL);
             savedBoard = boardRepo.save(savedBoard);
+            boardOwner.addAccessibleBoard(savedBoard);
+            Account savedAccount = accountRepo.save(boardOwner);
             response.setBoardName(savedBoard.getName());
             response.setBoardUrl(savedBoard.getUrl());
 
@@ -132,14 +135,15 @@ public class BoardService {
             return mav;
         }
 
-        ArrayList<Account> memberSearchList = new ArrayList<Account>();
+        List<Account> memberSearchList = new ArrayList<Account>();
         memberSearchList.add(user);
-        ArrayList<Board> createdBoards = boardRepo.findByOwner(user);
-        ArrayList<Board> memberBoards = boardRepo.findByMembersIn(memberSearchList);
+        List<Board> createdBoards = user.getAdminLevelBoards();
+        List<Board> accessibleBoards = user.getAccessibleBoards();
+        List<Board> memberBoards = new ArrayList<Board>();
 
-        for (Board board : memberBoards) {
-            if (board.getOwner().equals(user)) {
-                memberBoards.remove(board);
+        for (Board board : accessibleBoards) {
+            if (!board.getOwner().equals(user)) {
+                memberBoards.add(board);
             }
         }
 
@@ -170,7 +174,9 @@ public class BoardService {
             if (targetBoard == null) {
                 httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
             } else if(targetBoard.addMember(targetAccount)) {
-                boardRepo.save(targetBoard);
+                targetAccount.addAccessibleBoard(targetBoard);
+                Account savedAccount = accountRepo.save(targetAccount);
+                Board savedBoard = boardRepo.save(targetBoard);
                 response.setUsername(username);
                 response.setUrl(BASE_URL + File.separator + username);
                 response.setMessage(MEMBER_ADDED);
