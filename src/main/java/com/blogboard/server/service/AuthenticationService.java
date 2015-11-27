@@ -11,6 +11,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 @Service
 public class AuthenticationService {
@@ -37,55 +38,36 @@ public class AuthenticationService {
    * Purpose: logs user in by creating a session object, storing it the database and returning its values
    * in a cookie to be stored on the client side for persistent authentication
     */
-
-    //Todo: break down this method into into smaller submethods
     public BasicResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
-                                        String password, HttpServletResponse httpResponse) throws IOException {
+                               String password, HttpServletResponse httpResponse) throws IOException {
 
         BasicResponse response = new BasicResponse();
         Account targetAccount = accountRepo.findByUsername(username);
-
+        Boolean loginPermitted = false;
 
         //Check if account exists and whether password is correct
         if (targetAccount != null && targetAccount.getPassword().equals(AppServiceHelper.hashString(password))){
-
             Session previousSession = sessionRepo.findByAccountUsername(username);
-            //SUCCESS CASE: no previous session exists in database
+            //SUCCESS CASE: credentials correct and no previous session exists in database
             if (previousSession == null) {
-                String newSessionId = AppServiceHelper.generateSessionID();
-                String hashedSessionId = AppServiceHelper.hashString(newSessionId);
-                String timeStamp = AppServiceHelper.createTimeStamp();
-                Session newSession = new Session(username, hashedSessionId, timeStamp);
-                Session savedSession = sessionRepo.save(newSession);
-
-                httpResponse.setStatus(HttpServletResponse.SC_OK);
-                //return getHomePage url --> /{username}
-                httpResponse.setHeader("Location", BASE_URL + File.separator + username);
-
-                Cookie sessionId = new Cookie("sessionID", newSessionId);
-                AppServiceHelper.configureCookie(sessionId, (60 * 15), "/", false, false);
-                httpResponse.addCookie(sessionId);
-                Cookie sesssionUsername = new Cookie("sessionUsername", username);
-                AppServiceHelper.configureCookie(sesssionUsername, (60 * 15), "/", false, false);
-                httpResponse.addCookie(sesssionUsername);
-                response.setMessage(LOGIN_SUCCESSFUL);
-
-                //session cookie expired before user logged out
+                loginPermitted = true;
+            //CASE: user trying to login without session credentials while previous session still stored in DB
             } else {
-                String timeStamp = AppServiceHelper.createTimeStamp();
-                //substract current time against time is previous session
-                //if is greater than 30 minutes can still allow user to login again
-
-                httpResponse.setHeader("Location", LOGIN_PAGE);
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_LOGIN_ATTEMPT);
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_LOGIN_ATTEMPT);
+                String currentTime = AppServiceHelper.createTimeStamp();
+                boolean validExpirationTime =
+                        AppServiceHelper.validateExpirationTime(previousSession.getTimeStamp(), currentTime);
+                //SUCCESS CASE: session cookie expired on client before user manually logged out
+                if (validExpirationTime) {
+                    loginPermitted = true;
+                //FAILURE CASE: someone trying to login to same account while session still in place
+                } else {
+                    httpResponse.setHeader("Location", LOGIN_PAGE);
+                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_LOGIN_ATTEMPT);
+                }
             }
-
-            Account updatedAccount = accountRepo.save(targetAccount);//Todo: remove this?
         } else {
             //FAILURE CASE(S): either credentials were wrong or unknown error occurred
             httpResponse.setHeader("Location", LOGIN_PAGE);
-
             if (accountRepo.findByUsername(username) == null) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INCORRECT_USERNAME);
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
@@ -95,7 +77,36 @@ public class AuthenticationService {
             }
         }
 
+        if (loginPermitted) {
+            activateSession(sessionRepo, username, response, httpResponse);
+        }
         return response;
+    }
+
+    /*
+    * Method Name: Activate Session
+    * Inputs: Session Repository, username, Basic Response, HTTP Servlet Response
+    * Return Value: none
+    * Purpose: Helper function generate and save a new session, and configure session cookies
+     */
+    public void activateSession(SessionRepository sessionRepo, String username, BasicResponse response,
+                                 HttpServletResponse httpResponse) {
+        String newSessionId = AppServiceHelper.generateSessionID();
+        String hashedSessionId = AppServiceHelper.hashString(newSessionId);
+        String timeStamp = AppServiceHelper.createTimeStamp();
+        Session newSession = new Session(username, hashedSessionId, timeStamp);
+        Session savedSession = sessionRepo.save(newSession);
+
+        httpResponse.setStatus(HttpServletResponse.SC_OK);
+        httpResponse.setHeader("Location", BASE_URL + File.separator + username);
+
+        Cookie sessionId = new Cookie("sessionID", newSessionId);
+        AppServiceHelper.configureCookie(sessionId, (60 * 30), "/", false, false);
+        httpResponse.addCookie(sessionId);
+        Cookie sesssionUsername = new Cookie("sessionUsername", username);
+        AppServiceHelper.configureCookie(sesssionUsername, (60 * 30), "/", false, false);
+        httpResponse.addCookie(sesssionUsername);
+        response.setMessage(LOGIN_SUCCESSFUL);
     }
 
 
