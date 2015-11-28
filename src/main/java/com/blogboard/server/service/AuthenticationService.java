@@ -17,7 +17,6 @@ import java.util.HashMap;
 public class AuthenticationService {
 
     private static final String BASE_URL = "http://localhost:8080";
-    private static final String LOGIN_PAGE = BASE_URL + File.separator + "login";
 
     private static final String LOGIN_SUCCESSFUL = "Login successful!";
     private static final String LOGOUT_SUCCESSFUL = "Logout successful";
@@ -38,6 +37,7 @@ public class AuthenticationService {
    * Purpose: logs user in by creating a session object, storing it the database and returning its values
    * in a cookie to be stored on the client side for persistent authentication
     */
+
     public BasicResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
                                String password, HttpServletResponse httpResponse) throws IOException {
 
@@ -61,13 +61,13 @@ public class AuthenticationService {
                     loginPermitted = true;
                 //FAILURE CASE: someone trying to login to same account while session still in place
                 } else {
-                    httpResponse.setHeader("Location", LOGIN_PAGE);
+                    httpResponse.setHeader("Location", BASE_URL);
                     httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_LOGIN_ATTEMPT);
                 }
             }
         } else {
             //FAILURE CASE(S): either credentials were wrong or unknown error occurred
-            httpResponse.setHeader("Location", LOGIN_PAGE);
+            httpResponse.setHeader("Location", BASE_URL);
             if (accountRepo.findByUsername(username) == null) {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INCORRECT_USERNAME);
             } else if (!accountRepo.findByUsername(username).getPassword().equals(password)) {
@@ -83,12 +83,14 @@ public class AuthenticationService {
         return response;
     }
 
+
     /*
     * Method Name: Activate Session
     * Inputs: Session Repository, username, Basic Response, HTTP Servlet Response
     * Return Value: none
     * Purpose: Helper function generate and save a new session, and configure session cookies
      */
+
     public void activateSession(SessionRepository sessionRepo, String username, BasicResponse response,
                                  HttpServletResponse httpResponse) {
         String newSessionId = AppServiceHelper.generateSessionID();
@@ -117,12 +119,13 @@ public class AuthenticationService {
     * Purpose: logs user out of their current session, deletes their session from the database and returns
     * the url to the login page to redirect the client
      */
+
     public BasicResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
                                          HttpServletResponse httpResponse) throws IOException {
         BasicResponse response = new BasicResponse();
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
-            httpResponse.setHeader("Location", LOGIN_PAGE);
+            httpResponse.setHeader("Location", BASE_URL);
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, NO_SESSION_FOUND);
             return response;
         }
@@ -132,7 +135,7 @@ public class AuthenticationService {
         //if sessionID exists and is valid remove session from DB
         if (targetSesssion != null && targetSesssion.getAccountUsername().equals(sessionUsername)) {
             sessionRepo.delete(targetSesssion.getId());
-            httpResponse.setHeader("Location", LOGIN_PAGE);
+            httpResponse.setHeader("Location", BASE_URL);
             response.setMessage(LOGOUT_SUCCESSFUL);
         } else if (targetSesssion == null) {
             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, NO_SESSION_FOUND);
@@ -144,6 +147,7 @@ public class AuthenticationService {
 
         return response;
     }
+
 
     /*
     * Method Name: Validate Session
@@ -157,7 +161,7 @@ public class AuthenticationService {
                                    String sessionUsername, HttpServletResponse httpResponse) throws IOException {
 
         Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
-        httpResponse.setHeader("Location", LOGIN_PAGE);
+        httpResponse.setHeader("Location", BASE_URL);
 
         if(!sessionId.isEmpty() && !sessionUsername.isEmpty() && targetSession != null) {
             if(targetSession.getAccountUsername().equals(sessionUsername)) {
