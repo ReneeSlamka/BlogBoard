@@ -91,21 +91,15 @@ public class ServicesController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("login");
+        httpResponse.setStatus(HttpServletResponse.SC_OK);
 
-        if (sessionId.isEmpty() || sessionUsername.isEmpty()) {
-            httpResponse.setStatus(HttpServletResponse.SC_OK);
-        } else {
+        if (!sessionId.isEmpty() && !sessionUsername.isEmpty()){
             Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
             if (targetSession != null) {
-                if(targetSession.getAccountUsername().equals(sessionUsername) &
-                    accountRepo.findByUsername(sessionUsername) != null) {
-                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                if (targetSession.getAccountUsername().equals(sessionUsername) &&
+                        accountRepo.findByUsername(sessionUsername) != null) {
                     httpResponse.sendRedirect(BASE_URL + File.separator + sessionUsername);
-                } else {
-                    httpResponse.setStatus(HttpServletResponse.SC_OK);
                 }
-            } else {
-                httpResponse.setStatus(HttpServletResponse.SC_OK);
             }
         }
 
