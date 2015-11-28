@@ -159,7 +159,7 @@ public class AuthenticationService {
         Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
         httpResponse.setHeader("Location", LOGIN_PAGE);
 
-        if(sessionId.isEmpty() || targetSession != null) {
+        if(!sessionId.isEmpty() && !sessionUsername.isEmpty() && targetSession != null) {
             if(targetSession.getAccountUsername().equals(sessionUsername)) {
                 if (accountRepo.findByUsername(sessionUsername) != null) {
                     httpResponse.setHeader("Location", BASE_URL + File.separator + sessionUsername);
@@ -176,36 +176,5 @@ public class AuthenticationService {
         }
 
         return false;
-    }
-
-    /*
-    * Method Name: Validate User Session
-    * Inputs: Session Repository, HTTP Servlet BasicResponse, sessionId
-    * Return Value: Account Services BasicResponse
-    * Purpose: checks if sessionId provided by client's cookie matches with one stored in database and returns
-     * success message with user home page url to redirect client to if it does
-     */
-    public BasicResponse validateUserSession(SessionRepository sessionRepo,
-                                                      HttpServletResponse httpResponse, String sessionId, String sessionUsername) throws IOException{
-
-        BasicResponse response = new BasicResponse();
-        Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
-
-        //TODO: improve security here after more research
-        if ((!sessionId.isEmpty()) && (targetSession != null)) {
-            if (targetSession.getAccountUsername().equals(sessionUsername)) {
-                httpResponse.setHeader("Location", BASE_URL + File.separator + sessionUsername);
-                httpResponse.setStatus(HttpServletResponse.SC_OK);
-                response.setMessage(SESSION_VALID);
-            } else {
-                httpResponse.setHeader("Location", LOGIN_PAGE);
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, INVALID_SESSION);
-            }
-        } else {
-            httpResponse.setHeader("Location", LOGIN_PAGE);
-            httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, NO_SESSION_FOUND);
-        }
-
-        return response;
     }
 }

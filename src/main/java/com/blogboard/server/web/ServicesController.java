@@ -1,11 +1,13 @@
 package com.blogboard.server.web;
 
 import com.blogboard.server.data.entity.Board;
+import com.blogboard.server.data.entity.Session;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.service.AccountService;
+import com.blogboard.server.service.AppServiceHelper;
 import com.blogboard.server.service.AuthenticationService;
 import com.blogboard.server.service.BoardService;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +31,7 @@ public class ServicesController {
     private AccountService accountService;
     private BoardService boardService;
     private AuthenticationService authenticationService;
+    private static final String BASE_URL = "http://localhost:8080";
 
     //TODO: in future will have to ensure repositories are only accessed by one call at a time
     //will need resource locking
@@ -76,6 +80,39 @@ public class ServicesController {
 
 
     /*
+    *========== Get Index Page ==========
+    */
+
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView getIndexPage(
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("login");
+
+        if (sessionId.isEmpty() || sessionUsername.isEmpty()) {
+            httpResponse.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
+            if (targetSession != null) {
+                if(targetSession.getAccountUsername().equals(sessionUsername) &
+                    accountRepo.findByUsername(sessionUsername) != null) {
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    httpResponse.sendRedirect(BASE_URL + File.separator + sessionUsername);
+                } else {
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                }
+            } else {
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+            }
+        }
+
+        return mav;
+    }
+
+    /*
     *========== Create Account ==========
     */
     @RequestMapping(value = "/accounts", method = RequestMethod.POST)
@@ -122,16 +159,24 @@ public class ServicesController {
 
 
     /*
-    *========== Validate Session ==========
+    *========== Get Home Page ==========
     */
-    @RequestMapping(value = "/sessions", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    BasicResponse validateSession(
-            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
-            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+    @RequestMapping(value = "/{username}", method = RequestMethod.GET)
+    public ModelAndView getHomePage(
+            @PathVariable String username,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
+            String sessionUsername,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false)
+            String sessionId,
             HttpServletResponse httpResponse) throws IOException {
-        return authenticationService.validateUserSession(sessionRepo, httpResponse, sessionId, sessionUsername);
+
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
+        if (!sessionValid) {
+            ModelAndView mav = new ModelAndView();
+            return mav;
+        }
+        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionUsername, httpResponse);
     }
 
 
@@ -155,28 +200,6 @@ public class ServicesController {
             return response;
         }
         return boardService.createBoard(boardRepo,accountRepo, boardName, sessionUsername, httpResponse);
-    }
-
-
-    /*
-    *========== Get Home Page ==========
-    */
-    @RequestMapping(value = "/{username}", method = RequestMethod.GET)
-    public ModelAndView getHomePage(
-            @PathVariable String username,
-            @CookieValue(value = "sessionUsername", defaultValue = "", required = false)
-            String sessionUsername,
-            @CookieValue(value = "sessionID", defaultValue = "", required = false)
-            String sessionId,
-            HttpServletResponse httpResponse) throws IOException {
-
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-        if (!sessionValid) {
-            ModelAndView mav = new ModelAndView();
-            return mav;
-        }
-        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionUsername, httpResponse);
     }
 
 
