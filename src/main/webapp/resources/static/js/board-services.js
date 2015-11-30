@@ -16,9 +16,11 @@ function createBoard() {
         },
         complete: function (request, textStatus) {
             alert(request.responseText);
-            if(textStatus === "success") {
+            var newBoard = request.responseJSON;
+            var error = newBoard.error;
+            if(error === undefined) {
                 $("#create-board-form").modal("hide");
-                var newBoard = request.responseJSON;
+
                 addBoardName(newBoard.boardName, newBoard.boardUrl);
             }
             document.getElementById("new-board-name").value = "";
