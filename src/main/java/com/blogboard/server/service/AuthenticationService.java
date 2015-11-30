@@ -105,9 +105,9 @@ public class AuthenticationService {
         Cookie sessionId = new Cookie("sessionID", newSessionId);
         AppServiceHelper.configureCookie(sessionId, (60 * 30), "/", false, false);
         httpResponse.addCookie(sessionId);
-        Cookie sesssionUsername = new Cookie("sessionUsername", username);
-        AppServiceHelper.configureCookie(sesssionUsername, (60 * 30), "/", false, false);
-        httpResponse.addCookie(sesssionUsername);
+        Cookie sessionUsername = new Cookie("sessionUsername", username);
+        AppServiceHelper.configureCookie(sessionUsername, (60 * 30), "/", false, false);
+        httpResponse.addCookie(sessionUsername);
         response.setMessage(LOGIN_SUCCESSFUL);
     }
 
