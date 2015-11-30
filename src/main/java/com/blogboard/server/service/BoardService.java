@@ -35,7 +35,7 @@ public class BoardService {
     private static final String POST_DELETED = "Post successfully deleted";
 
     private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
-    private static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
+    public static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
     private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
     private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
     private static final String USER_ALREADY_MEMBER = "This user is already a member of this board";
@@ -51,10 +51,14 @@ public class BoardService {
     * Purpose: create new board, store in database and return the necessary info to add it to
     * the DOM on the client side
     */
-    public CreateBoardResponse createBoard(BoardRepository boardRepo, AccountRepository accountRepo, String boardName,
-                                           String ownerUsername, HttpServletResponse httpResponse) throws IOException {
+
+    public CreateBoardResponse createBoard(BoardRepository boardRepo, AccountRepository accountRepo, boolean sessionValid,
+                                           String boardName, String ownerUsername,
+                                           HttpServletResponse httpResponse) throws IOException {
 
         CreateBoardResponse response = new CreateBoardResponse();
+        if (!sessionValid) { return response; }
+
         String decodedName = AppServiceHelper.decodeString(boardName);
         Account boardOwner = accountRepo.findByUsername(ownerUsername);
 
@@ -89,6 +93,7 @@ public class BoardService {
     * Return: ArrayList<Board>
     * Purpose: return a board so that its information can be rendered in its page
     */
+
     public Board getBoard(BoardRepository boardRepo, AccountRepository accountRepo, Long boardId, String username,
                                          HttpServletResponse httpResponse) throws IOException {
 
@@ -117,10 +122,13 @@ public class BoardService {
    * Return: ArrayList<Board>
    * Purpose: to retrieve all boards that either belong to that user or that user is a member of
    */
+
     public ModelAndView getHomePageBoardsList(BoardRepository boardRepo, AccountRepository accountRepo,
-                                              String username, HttpServletResponse httpResponse) throws IOException {
+                                              boolean sessionValid, String username,
+                                              HttpServletResponse httpResponse) throws IOException {
 
         ModelAndView mav = new ModelAndView();
+        if (!sessionValid) { return mav; }
         Account user = accountRepo.findByUsername(username);
 
         List<Account> memberSearchList = new ArrayList<Account>();
@@ -151,10 +159,13 @@ public class BoardService {
     * Return: Object containing the username of the new member, its url (add later), and http response
     * Purpose: To add the username of the new member to a board's members list
     */
+
     public AddMemberResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
-        String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
+        boolean sessionValid, String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
 
         AddMemberResponse response = new AddMemberResponse();
+        if (!sessionValid) { return response; }
+
         Account targetAccount = accountRepo.findByUsername(username);
 
         if (targetAccount != null) {

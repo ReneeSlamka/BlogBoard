@@ -6,10 +6,7 @@ import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.data.repository.SessionRepository;
-import com.blogboard.server.service.AccountService;
-import com.blogboard.server.service.AppServiceHelper;
-import com.blogboard.server.service.AuthenticationService;
-import com.blogboard.server.service.BoardService;
+import com.blogboard.server.service.*;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import com.blogboard.server.web.ServiceResponses.AddPostResponse;
@@ -31,6 +28,7 @@ public class ServicesController {
     private AccountService accountService;
     private BoardService boardService;
     private AuthenticationService authenticationService;
+    private PostService postService;
     private static final String BASE_URL = "http://localhost:8080";
 
     //TODO: in future will have to ensure repositories are only accessed by one call at a time
@@ -58,6 +56,11 @@ public class ServicesController {
     @Autowired(required = true)
     public void setAuthenticationService(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
+    }
+
+    @Autowired(required = true)
+    public void setPostService(PostService postService) {
+        this.postService = postService;
     }
 
     @Autowired(required = true)
@@ -166,11 +169,7 @@ public class ServicesController {
 
         boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
                 sessionUsername, httpResponse);
-        if (!sessionValid) {
-            ModelAndView mav = new ModelAndView();
-            return mav;
-        }
-        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionUsername, httpResponse);
+        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionValid, sessionUsername, httpResponse);
     }
 
 
@@ -189,14 +188,11 @@ public class ServicesController {
 
         boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
                 sessionUsername, httpResponse);
-        if (!sessionValid) {
-            CreateBoardResponse response = new CreateBoardResponse();
-            return response;
-        }
-        return boardService.createBoard(boardRepo,accountRepo, boardName, sessionUsername, httpResponse);
+        return boardService.createBoard(boardRepo,accountRepo, sessionValid, boardName, sessionUsername, httpResponse);
     }
 
 
+    //Todo: need to refactor, move code body to a function in services
     /*
     *========== Get Board Page ==========
     */
@@ -242,11 +238,7 @@ public class ServicesController {
 
         boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
                 sessionUsername, httpResponse);
-        if (!sessionValid) {
-            AddMemberResponse response = new AddMemberResponse();
-            return response;
-        }
-        return boardService.addMember(accountRepo, boardRepo, memberUsername, boardId, httpResponse);
+        return boardService.addMember(accountRepo, boardRepo, sessionValid, memberUsername, boardId, httpResponse);
     }
 
 
