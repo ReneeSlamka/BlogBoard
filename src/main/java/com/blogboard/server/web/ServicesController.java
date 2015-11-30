@@ -262,9 +262,11 @@ public class ServicesController {
             @RequestParam(value = "title",defaultValue = "", required = false) String title,
             @RequestParam(value = "textBody",defaultValue = "", required = false) String textBody,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
-            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId) {
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            HttpServletResponse httpResponse) throws IOException {
 
-        return boardService.addPost(accountRepo, boardRepo, postRepo, boardId, authorUsername, title, textBody);
+        return postService.addPost(accountRepo, boardRepo, postRepo, boardId, authorUsername, title, textBody,
+                httpResponse);
     }
 
 

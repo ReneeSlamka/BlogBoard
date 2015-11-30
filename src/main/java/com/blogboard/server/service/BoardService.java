@@ -178,23 +178,4 @@ public class BoardService {
 
         return response;
     }
-
-    /*
-    * Method Name: Create Post
-    * Inputs:
-    * Return:
-    * Purpose:
-     */
-    public AddPostResponse addPost(AccountRepository accountRepo, BoardRepository boardRepo, PostRepository postRepo,
-                                  Long boardId, String authorUsername, String title, String textContent) {
-
-        AddPostResponse response = new AddPostResponse();
-        Account targetAccount = accountRepo.findByUsername(authorUsername);
-        Board targetBoard = boardRepo.findOne(boardId);
-        String timeStamp = AppServiceHelper.createTimeStamp();
-        Post newPost = new Post(title, targetAccount, timeStamp);
-        newPost.setTextContent(textContent);
-
-        return response;
-    }
 }
