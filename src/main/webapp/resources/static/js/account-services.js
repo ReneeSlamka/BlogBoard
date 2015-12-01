@@ -13,7 +13,7 @@ function createAccount() {
         dataType: 'json',
         crossDomain: true,
         complete: function (request, textStatus) { //for additional info
-            showResponseMessage("create-account-response-text", request.responseJSON.message);
+            showResponseMessage("create-account-response-text", request.responseJSON.message, textStatus);
             document.getElementById("new-username").value = "";
             document.getElementById("new-password").value = "";
             document.getElementById("new-email").value = "";
@@ -21,10 +21,17 @@ function createAccount() {
     });
 }
 
-function showResponseMessage(elementId, text) {
-    var display = document.getElementById(elementId);
-    display.innerHTML = text;
-    display.style.display="block";
+function showResponseMessage(elementId, text, textStatus) {
+    var textDisplay = document.getElementById(elementId);
+    textDisplay.innerHTML = text;
+    textDisplay.style.background = "#77F45A";
+    var fadeOutTime = 3000;
+    if (textStatus ==="error") {
+        textDisplay.style.background = "#ffc1c1";
+        fadeOutTime = 5000;
+    }
+    textDisplay.style.display="block";
+    $("#" + elementId).fadeOut(fadeOutTime);
 }
 
 function login(event) {
@@ -47,6 +54,8 @@ function login(event) {
         }
     });
 }
+
+///boards/{boardId}/posts
 
 function logout(event) {
     $.ajax({
