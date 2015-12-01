@@ -11,7 +11,10 @@
                 integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ=="
                 crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" type="text/css" href="/resources/static/css/top-navbar.css" />
+        <link rel="stylesheet" type="text/css" href="/resources/static/css/bottom-navbar.css" />
+        <link rel="stylesheet" type="text/css" href="/resources/static/css/layout.css" />
 
         {% block css %}
         {% endblock css %}
@@ -26,6 +29,8 @@
         {% endblock content %}
         {% block js %}
         {% endblock js %}
+
         <script src="/resources/static/js/account-services.js"></script>
+        {% include '/fragments/bottom-navbar' %}
     </body>
 </html>
