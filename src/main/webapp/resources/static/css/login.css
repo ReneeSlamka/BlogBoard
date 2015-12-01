@@ -1,3 +1,10 @@
+#login-greeting {
+    margin-top: 50px;
+}
+
+#app-description {
+    margin-top: 30px;
+}
 
 .login-page-button {
     margin-top: 15px;
@@ -13,9 +20,30 @@
 
 #create-account-response-text {
     display: none;
-    margin-top: 15px;
+    margin-top: 20px;
+    height: 75px;
     opacity: 0.7;
+    padding-left: 10px;
+    padding-top: 8px;
     background-color: rgba(119,244,90, 0.8);
     border-color: rgba(28,159,16, 0.8);
+    border-radius: 8px;
     color: rgba(0,0,0,0.7);
+}
+
+.account-services {
+    margin-top: 25px;
+}
+
+.account-services h3 {
+    margin-top: 0px;
+}
+
+.account-service-form label {
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.account-service-button {
+    margin-top: 20px;
 }

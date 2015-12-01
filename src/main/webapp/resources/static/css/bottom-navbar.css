@@ -1,0 +1,36 @@
+.bottom-navbar {
+    background-image: url("https://static.pexels.com/photos/2752/city-sunny-people-street.jpg");
+    background-position: 24% 70%;
+    height: 80px;
+}
+
+.bottom-navbar .overlay-layer {
+    background-color: rgba(0,0,0,0.7);
+    padding-top: 20px;
+    height: 100%;
+}
+
+#bottom-navbar-text-content {
+    margin-top: 20px;
+}
+
+.bottom-navbar-text {
+    color: rgba(255,255,255,1);
+    display: inline-block;
+    font-size: 14px;
+    font-family: 'Open Sans', sans-serif;
+}
+
+#copyright-section {
+    float: left;
+    margin-left: 20px;
+}
+
+#project-info-section {
+    float: right;
+    margin-right: 20px;
+}
+
+.bottom-navbar a:link {
+    color: rgba(255,255,255,1);
+}
