@@ -1,0 +1,131 @@
+#board-info-section {
+
+    background-color: rgba(0,0,0,0.7);
+    padding-left: 20px;
+    padding-right: 15px;
+    border-radius: 6px;
+    padding-top: 10px;
+    padding-bottom: 15px;
+    min-height: 600px;
+}
+
+.board-info {
+    color: rgba(255,255,255,1);
+    margin-top: 15px;
+}
+
+.board-member * {
+    display: inline-block;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+}
+
+.board-member h5 {
+    margin-left: 8px;
+}
+
+.board-member {
+    margin-bottom: 10px;
+}
+
+#board-entry-months * {
+    color: rgba(255,255,255,1);
+}
+
+.list-months  h6 {
+    margin-left: 15px;
+}
+
+#add-member-button {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    background-color: rgba(0,0,0,0.0);
+    width: 80%;
+    color: rgba(255,255,255,1);
+    border-width: 1px;
+}
+
+.list-months {
+    margin-bottom: 20px;
+}
+
+.board-section {
+    margin-top: 20px;
+}
+
+#posts-section {
+    border-radius: 6px;
+    overflow: hidden;
+    padding-bottom: 100px;
+}
+
+#board-header-img {
+    display: flex;
+    flex-direction: column-reverse;
+    opacity: 0.8;
+    background-image: url("https://cucustom.s3.amazonaws.com/admissions/images/college-university-students.png");
+    width: 100%;
+    height: 300px;
+    background-position: 36% 0%;
+}
+
+.post {
+    padding: 15px 25px;
+}
+
+.post-title {
+    margin-bottom: 25px;
+}
+
+#board-title {
+    width: 100%;
+    height: 55px;
+    font-size: 36px;
+    padding-left: 60px;
+    color: rgba(255,255,255,1);
+    background-color: rgba(10,210,220,0.65);
+}
+
+.post-button {
+    float: right;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#new-post-section {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 25px;
+}
+
+#new-post-title {
+    width: 70%;
+    border-radius: 2px;
+    border-width: 1px;
+    border-color: rgba(0,0,0,0.7);
+}
+
+#new-post-text {
+    width: 95%;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: rgba(0,0,0,0.7);
+}
+
+#new-post-button {
+    width: 10%;
+    margin-top: 15px;
+    background-color: rgba(255,255,255,1);
+    border-color: rgba(160,112,180,0.7);
+    border-width: 2px;
+}
+
+
+/*=====Modal Popup Styling=====*/
+
+#add-member-board-form {
+}

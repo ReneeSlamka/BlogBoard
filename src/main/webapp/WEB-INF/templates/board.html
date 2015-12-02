@@ -17,33 +17,95 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-4">
-            <section id="board-info-section">
-                <h3>{{boardName}}</h3>
-                <h6>Created {{dateCreated}}</h6>
+        <div class="col-md-3 ">
+            <div class="board-section" id="board-info-section">
+                <h6 class="board-info" id="date-created">Created {{dateCreated}} by {{boardOwner}}</h6>
                 <section id="list-board-members">
-                {% for member in boardMembers %}
-                    <h5>member</h5>
-                {% endfor %}
-                    <h5>Tester Jenny</h5>
+                    {% for member in boardMembers %}
+                        <div class="board-member">
+                            <img class="user-avatar" src="https://www.tubestart.com/upload/thumb/user_4823_square.jpeg" />
+                            <h5 class="board-info">{{member.username}}</h5>
+                        </div>
+                    {% endfor %}
+                    <div class="board-member">
+                        <img class="user-avatar" src="https://www.tubestart.com/upload/thumb/user_4823_square.jpeg" />
+                        <h5 class="board-info">JennaOlaff</h5>
+                    </div>
+                    <div class="board-member">
+                        <img class="user-avatar" src="https://s-media-cache-ak0.pinimg.com/avatars/terenewen_1379143112_140.jpg" />
+                        <h5 class="board-info">FionaMary</h5>
+                    </div>
+                    <div class="board-member">
+                        <img class="user-avatar" src="https://relayfm.s3.amazonaws.com/uploads/user/avatar/61/user_avatar_simonederochefort_artwork.png" />
+                        <h5 class="board-info">CaraWatson</h5>
+                    </div>
                 </section>
-                <input type="text" class="form-control" id="member-username" size="40" />
-                <button onclick="addMember()" id="add-member-button" type="submit" class="btn btn-default">
-                    Add New Member
+                <button onclick="displayAddMemberModal()" id="add-member-button" type="button"
+                        data-toggle="modal" data-target="#add-member-board-form" class="btn btn-default">
+                    Invite
                 </button>
-            </section>
+                <section id="board-entry-months">
+                    <h5>2015</h5>
+                    <div class="list-months">
+                        <h6>March</h6>
+                        <h6>April</h6>
+                        <h6>May</h6>
+                        <h6>June</h6>
+                        <h6>July</h6>
+                        <h6>August</h6>
+                        <h6>Septemeber</h6>
+                        <h6>October</h6>
+                        <h6>November</h6>
+                        <h6>Decemeber</h6>
+                    </div>
+                    <h5>2014</h5>
+                    <div class="list-months">
+                        <h6>November</h6>
+                        <h6>Decemeber</h6>
+                    </div>
+                </section>
+            </div>
         </div>
-        <div class="col-md-8">
-            <section id="post-section">
-                <label>
-                    New Post:
-                </label>
-                <input type="text" class="form-control" id="new-username" size="40" />
-                <button onclick="" id="new-post-button" type="submit" class="btn btn-default">
-                    Login
-                </button>
+        <div class="col-md-9">
+            <section class="board-section" id="posts-section" >
+                <section id="board-header-img">
+                    <div class="" id="board-title">{{boardName}}</div>
+                </section>
+                <div id="new-post-section">
+                    <label>Title</label>
+                    <input type="text" id="new-post-title" size="20" />
+                    <label>Content</label>
+                    <textarea id="new-post-text" rows="5" cols="80"></textarea>
+                    <button onclick="addPost()" id="new-post-button" type="button" class="btn btn-default">
+                        Post
+                    </button>
+                </div>
+                <div id="posts-container">
+                    <div class="post">
+                        <header class="post-title">
+                            <h3>London Baby!</h3>
+                            <h6>November 23rd, 2015</h6>
+                            <section class="post-button-panel">
+                                <button onclick="" class="post-button"><i class="fa fa-1x fa-pencil-square-o"></i></button>
+                                <button onclick="" class="post-button"><i class="fa fa-trash-o"></i></button>
+                            </section>
+                        </header>
+                        <p>
+                            I never knew there was so much to do in Normandy. Despite it being so close to England, I haven’t explored the
+                            northern coast of France since I moved to London. But now that I’m here, I’m finding enough to fill four days
+                            and plenty more to bring me back again. From what I’ve seen, these are the five best places to travel in Normandy…
+
+                            I’ve never driven a car onto a train before. It feels odd, and yet strangely exciting. As the wheels roll up the
+                            ramp and down the long, narrow corridor, I feel like I’m about to traverse into another world. And in a sense, I am.
+                            I’m traveling from England to France, leaving the cliffs of Dover for the ports of Seine-Maritime as I embark on a
+                            trip to discover the best seafood festivals in Normandy.
+                        </p>
+                        <div></div>
+                    </div>
+                </div>
             </section>
         </div>
     </div>
 </div>
+{% include '/fragments/add-board-member-form' %}
 {% endblock content %}
