@@ -34,7 +34,6 @@ public class Board {
     private List<Account> members = new ArrayList<Account>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "POST_ID")
     private List<Post> posts;
 
     public Board() {
@@ -97,6 +96,22 @@ public class Board {
     public boolean removeMember(Account memberToDelete) {
         if (members.contains(memberToDelete)) {
             members.remove(memberToDelete);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addPost(Post newPost) {
+        if(!posts.contains(newPost)) {
+            posts.add(newPost);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deletePost(Post postToDelete) {
+        if (posts.contains(postToDelete)) {
+            posts.remove(postToDelete);
             return true;
         }
         return false;
