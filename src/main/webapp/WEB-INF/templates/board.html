@@ -81,6 +81,20 @@
                     </button>
                 </div>
                 <div id="posts-container">
+                    {% for post in boardPosts %}
+                        <div class="post">
+                            <header class="post-title">
+                                <h3>{{post.title}}</h3>
+                                <section class="post-button-panel">
+                                    <button onclick="" class="post-button"><i class="fa fa-1x fa-pencil-square-o"></i></button>
+                                    <button onclick="" class="post-button"><i class="fa fa-trash-o"></i></button>
+                                </section>
+                            </header>
+                            <p>{{post.textContent}}</p>
+                            <p>Post {{post.timeStamp}} by {{post.author.username}}</p>
+                            <div class="post-divider"></div>
+                        </div>
+                    {% endfor %}
                     <div class="post">
                         <header class="post-title">
                             <h3>London Baby!</h3>
@@ -100,7 +114,8 @@
                             I’m traveling from England to France, leaving the cliffs of Dover for the ports of Seine-Maritime as I embark on a
                             trip to discover the best seafood festivals in Normandy.
                         </p>
-                        <div></div>
+                        <p>Posted Nov.23rd 2015 by Cara</p>
+                        <div class="post-divider"></div>
                     </div>
                 </div>
             </section>
