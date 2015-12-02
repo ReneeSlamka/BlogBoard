@@ -1,8 +1,8 @@
 
 function createAccount() {
-    var $newUsername = $("#new-username").val();
-    var $newPassword = $("#new-password").val();
-    var $newEmail = $("#new-email").val();
+    var $newUsername = $("#new-username").val().trim();
+    var $newPassword = $("#new-password").val().trim();
+    var $newEmail = $("#new-email").val().trim();
 
     $.ajax({
         type: 'POST',

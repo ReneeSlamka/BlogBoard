@@ -1,6 +1,6 @@
 
 function createBoard() {
-    var $newBoardname = encodeURI($("#new-board-name").val());
+    var $newBoardname = encodeURI($("#new-board-name").val().trim());
     var apiUrl = window.location.href + "/boards";
 
     $.ajax({
@@ -29,7 +29,7 @@ function createBoard() {
 }
 
 function addMember() {
-    var $memberUsername = $("#new-member-name").val();
+    var $memberUsername = $("#new-member-name").val().trim();
     var apiUrl = window.location.href + '/members';
 
     $.ajax({
@@ -62,8 +62,8 @@ function addMember() {
 
 function addPost() {
     var apiUrl = window.location.href + '/posts';
-    var $title = $("#new-post-title").val();
-    var $textBody = $("#new-post-text").val();
+    var $title = $("#new-post-title").val().trim();
+    var $textBody = $("#new-post-text").val().trim();
 
     $.ajax({
         type: 'POST',
