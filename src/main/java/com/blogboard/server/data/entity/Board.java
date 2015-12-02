@@ -34,7 +34,7 @@ public class Board {
     private List<Account> members = new ArrayList<Account>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<Post>();
 
     public Board() {
         super();
@@ -83,7 +83,11 @@ public class Board {
 
     public String getUrl() { return url; }
 
-    public  List<Account> getMembers() { return members; }
+    public List<Account> getMembers() { return members; }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
 
     public boolean addMember(Account newMember) {
         if (!members.contains(newMember)) {
