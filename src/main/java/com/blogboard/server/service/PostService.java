@@ -34,9 +34,11 @@ public class PostService {
         String timeStamp = AppServiceHelper.createTimeStamp();
         Post newPost = new Post(title, targetAccount, timeStamp);
         newPost.setTextContent(textContent);
+        Post savedPost = postRepo.save(newPost);
 
         if (targetBoard != null) {
-            if (targetBoard.addPost(newPost)) {
+            if (targetBoard.addPost(savedPost)) {
+                Board savedBoard = boardRepo.save(targetBoard);
                 httpResponse.setStatus(HttpServletResponse.SC_CREATED);
                 response.setMessage(POST_CREATED);
             } else {
