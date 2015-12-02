@@ -18,10 +18,10 @@ function createBoard() {
             alert(request.responseText);
             var newBoard = request.responseJSON;
             var error = newBoard.error;
+            //Todo: temporary solution for user friendly error
             if(error === undefined) {
-                $("#create-board-form").modal("hide");
-
                 addBoardName(newBoard.boardName, newBoard.boardUrl);
+                $("#create-board-form").modal("toggle");
             }
             document.getElementById("new-board-name").value = "";
         }
@@ -29,7 +29,7 @@ function createBoard() {
 }
 
 function addMember() {
-    var $memberUsername = $("#member-username").val();
+    var $memberUsername = $("#new-member-name").val();
     var apiUrl = window.location.href + '/members';
 
     $.ajax({
@@ -50,20 +50,78 @@ function addMember() {
             //Todo: temporary solution for user friendly error
             if(error === undefined) {
                 addMemberName(newMember.username, newMember.url);
+                $("#add-member-board-form").modal("toggle");
+            } else {
+                $document.getElementById("new-member-name").value = "";
             }
         }
     });
 }
+
+///boards/{boardId}/posts
+
+function addPost() {
+    var apiUrl = window.location.href + '/posts';
+    var $title = $("#new-post-title").val();
+    var $textBody = $("#new-post-text").val();
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        data: {"title": $title, "textBody": $textBody},
+        dataType: 'json',
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            //Todo: temporary solution for user friendly error
+            if(request.responseJSON.error === undefined) {
+                addPostElement($title, $textBody);
+                document.getElementById("#new-post-title").value = "";
+                document.getElementById("#new-post-text").value = "";
+            }
+        }
+    });
+}
+
+function displayAddMemberModal() {
+    var modal = document.getElementById("add-member-board-form");
+    modal.style.display = "block";
+}
+
+function test() {
+    alert("Button works");
+}
+
 
 function addBoardName(newBoardName, url) {
     var $listBoards = $("#owner-boards-list");
     $listBoards.append("<a href=" + url + "><h6>" + newBoardName+ "</h6></a>");
 }
 
+function addPostElement(title, textBody) {
+    var newPost = "<div class=post> <header class= post-title> <h3>" + title + "</h3>" +
+    "<h6>November 23rd, 2015</h6> <section class=post-button-panel>" +
+        "<button class=post-button><i class=fa fa-1x fa-pencil-square-o></i></button>" +
+    "<button class=post-button><i class=fa fa-trash-o></i></button> </section> </header> <p>"
+    + textBody + "</p> <div></div> </div>";
+
+    $("#posts-container").prepend(newPost);
+}
+
 
 function addMemberName(newMemberName, url) {
     var $listMembers = $("#list-board-members");
-    $listMembers.append("<a href=" + url + "><h5>" + newMemberName + "</h5></a>");
+    //$listMembers.append("<a href=" + url + "><h5>" + newMemberName + "</h5></a>");
+    var newMemberElement = "<div class=board-member>" +
+            "<img class=user-avatar src=" + "https://www.tubestart.com/upload/thumb/user_4823_square.jpeg/>" +
+            "<h5 class=board-info>" + newMemberName + "</h5>" +
+    "</div>";
+    $listMembers.append(newMemberElement);
 
 }
 //function to parse board cookie from server to list names on home page
