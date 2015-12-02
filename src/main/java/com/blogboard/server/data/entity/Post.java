@@ -53,11 +53,11 @@ public class Post {
         return author;
     }
 
-    private void setDateCreated(String dateCreated) {
+    private void setTimeStamp(String dateCreated) {
         this.timeStamp = dateCreated;
     }
 
-    public String getDateCreated() {
+    public String getTimeStamp() {
         return timeStamp;
     }
 
