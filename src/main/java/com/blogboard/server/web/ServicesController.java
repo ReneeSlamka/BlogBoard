@@ -218,6 +218,7 @@ public class ServicesController {
         mav.addObject("boardOwner", targetBoard.getOwner().getUsername());
         mav.addObject("dateCreated", targetBoard.getDateCreated());
         mav.addObject("boardMembers", targetBoard.getMembers());
+        mav.addObject("boardPosts", targetBoard.getPosts());
         mav.setViewName("board");
         return mav;
     }
