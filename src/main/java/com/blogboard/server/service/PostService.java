@@ -29,17 +29,20 @@ public class PostService {
                                    HttpServletResponse httpResponse) throws IOException {
 
         AddPostResponse response = new AddPostResponse();
-        Account targetAccount = accountRepo.findByUsername(authorUsername);
         Board targetBoard = boardRepo.findOne(boardId);
-        String timeStamp = AppServiceHelper.createTimeStamp();
-        Post newPost = new Post(title, targetAccount, timeStamp);
-        newPost.setTextContent(textContent);
-        Post savedPost = postRepo.save(newPost);
 
         if (targetBoard != null) {
+            Account targetAccount = accountRepo.findByUsername(authorUsername);
+            String timeStamp = AppServiceHelper.createTimeStamp();
+            Post newPost = new Post(title, targetAccount, timeStamp);
+            newPost.setTextContent(textContent);
+            Post savedPost = postRepo.save(newPost);
+
             if (targetBoard.addPost(savedPost)) {
                 Board savedBoard = boardRepo.save(targetBoard);
                 httpResponse.setStatus(HttpServletResponse.SC_CREATED);
+                response.setAuthorUsername(authorUsername);
+                response.setTimeStamp(timeStamp);
                 response.setMessage(POST_CREATED);
             } else {
                 //would this ever happen though?
