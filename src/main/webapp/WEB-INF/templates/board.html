@@ -75,48 +75,35 @@
                     </button>
                 </div>
                 <div id="posts-container">
-                    {% for post in boardPosts %}
-                        <div class="post" id="{{boardName}}-post-{{post.id}}">
-                            <header class="post-title">
-                                <h3 id="post-{{post.id}}-title">{{post.title}}</h3>
-                                <input type="text" class="editing-input" id="edit-post-{{post.id}}-title" size="20" />
-                                <section class="post-button-panel">
-                                    <button onclick="showEditingFields('edit-post-{{post.id}}-title',
-                                        'edit-post-{{post.id}}-text')" class="post-button">
-                                        <i class="fa fa-1x fa-pencil-square-o"></i>
-                                    </button>
-                                    <button onclick="savePostChanges('{{post.id}}','post-{{post.id}}-title',
-                                        'post-{{post.id}}-text')" class="post-button">
-                                        Save Changes
-                                    </button>
-                                    <button onclick="deletePost('{{post.id}}', '{{boardName}}-post-{{post.id}}')" class="post-button">
-                                        <i class="fa fa-trash-o"></i>
-                                    </button>
-                                </section>
-                            </header>
-                            <p id="post-{{post.id}}-text">{{post.textContent}}</p>
-                            <textarea class="editing-input" id="edit-post-{{post.id}}-text" rows="5" cols="80"></textarea>
-                            <p>Post {{post.timeStamp}} by {{post.author.username}}</p>
-                            <div class="post-divider"></div>
-                        </div>
-                    {% endfor %}
-                    <div class="post">
-                        <header class="post-title">
-                            <h3>London Baby!</h3>
-                            <h6>November 23rd, 2015</h6>
-                            <section class="post-button-panel">
-                                <button onclick="" class="post-button"><i class="fa fa-1x fa-pencil-square-o"></i></button>
-                                <button onclick="" class="post-button"><i class="fa fa-trash-o"></i></button>
-                            </section>
-                        </header>
-                        <p>
-                            I never knew there was so much to do in Normandy. Despite it being so close to England, I haven’t explored the
-                            northern coast of France since I moved to London. But now that I’m here, I’m finding enough to fill four days
-                            and plenty more to bring me back again. From what I’ve seen, these are the five best places to travel in Normandy…
-                        </p>
-                        <p>Posted Nov.23rd 2015 by Cara</p>
-                        <div class="post-divider"></div>
-                    </div>
+                    {% if boardPosts is empty %}
+                        <h5>No posts have been added to this board yet.</h5>
+                    {% else %}
+                        {% for post in boardPosts %}
+                            <div class="post" id="board-{{boardId}}-post-{{post.id}}">
+                                <header class="post-title">
+                                    <h3 id="post-{{post.id}}-title">{{post.title}}</h3>
+                                    <input type="text" class="editing-input" id="edit-post-{{post.id}}-title" size="20" />
+                                    <section class="post-button-panel">
+                                        <button onclick="showEditingFields('post-{{post.id}}-title',
+                                            'post-{{post.id}}-text')" class="post-button">
+                                            <i class="fa fa-1x fa-pencil-square-o"></i>
+                                        </button>
+                                        <button onclick="savePostChanges('{{post.id}}','post-{{post.id}}-title',
+                                            'post-{{post.id}}-text')" class="post-button">
+                                            Save Changes
+                                        </button>
+                                        <button onclick="deletePost('{{post.id}}', 'board-{{boardId}}-post-{{post.id}}')" class="post-button">
+                                            <i class="fa fa-trash-o"></i>
+                                        </button>
+                                    </section>
+                                </header>
+                                <p id="post-{{post.id}}-text">{{post.textContent}}</p>
+                                <textarea class="editing-input" id="edit-post-{{post.id}}-text" rows="5" cols="80"></textarea>
+                                <p>Post {{post.timeStamp}} by {{post.author.username}}</p>
+                                <div class="post-divider"></div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </section>
         </div>
