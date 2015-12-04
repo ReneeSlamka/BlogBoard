@@ -124,6 +124,10 @@
 }
 
 
+.editing-input {
+    display: none;
+}
+
 /*=====Modal Popup Styling=====*/
 
 #add-member-board-form {

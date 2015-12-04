@@ -12,6 +12,7 @@
 
 {% block js %}
 <script src="/resources/static/js/board-services.js"></script>
+<script src="/resources/static/js/post-services.js"></script>
 {% endblock js %}
 
 {% block content %}
@@ -47,13 +48,6 @@
                 <section id="board-entry-months">
                     <h5>2015</h5>
                     <div class="list-months">
-                        <h6>March</h6>
-                        <h6>April</h6>
-                        <h6>May</h6>
-                        <h6>June</h6>
-                        <h6>July</h6>
-                        <h6>August</h6>
-                        <h6>Septemeber</h6>
                         <h6>October</h6>
                         <h6>November</h6>
                         <h6>Decemeber</h6>
@@ -82,15 +76,26 @@
                 </div>
                 <div id="posts-container">
                     {% for post in boardPosts %}
-                        <div class="post">
+                        <div class="post" id="{{boardName}}-post-{{post.id}}">
                             <header class="post-title">
-                                <h3>{{post.title}}</h3>
+                                <h3 id="post-{{post.id}}-title">{{post.title}}</h3>
+                                <input type="text" class="editing-input" id="edit-post-{{post.id}}-title" size="20" />
                                 <section class="post-button-panel">
-                                    <button onclick="" class="post-button"><i class="fa fa-1x fa-pencil-square-o"></i></button>
-                                    <button onclick="" class="post-button"><i class="fa fa-trash-o"></i></button>
+                                    <button onclick="showEditingFields('edit-post-{{post.id}}-title',
+                                        'edit-post-{{post.id}}-text')" class="post-button">
+                                        <i class="fa fa-1x fa-pencil-square-o"></i>
+                                    </button>
+                                    <button onclick="savePostChanges('{{post.id}}','post-{{post.id}}-title',
+                                        'post-{{post.id}}-text')" class="post-button">
+                                        Save Changes
+                                    </button>
+                                    <button onclick="deletePost('{{post.id}}', '{{boardName}}-post-{{post.id}}')" class="post-button">
+                                        <i class="fa fa-trash-o"></i>
+                                    </button>
                                 </section>
                             </header>
-                            <p>{{post.textContent}}</p>
+                            <p id="post-{{post.id}}-text">{{post.textContent}}</p>
+                            <textarea class="editing-input" id="edit-post-{{post.id}}-text" rows="5" cols="80"></textarea>
                             <p>Post {{post.timeStamp}} by {{post.author.username}}</p>
                             <div class="post-divider"></div>
                         </div>
@@ -108,11 +113,6 @@
                             I never knew there was so much to do in Normandy. Despite it being so close to England, I haven’t explored the
                             northern coast of France since I moved to London. But now that I’m here, I’m finding enough to fill four days
                             and plenty more to bring me back again. From what I’ve seen, these are the five best places to travel in Normandy…
-
-                            I’ve never driven a car onto a train before. It feels odd, and yet strangely exciting. As the wheels roll up the
-                            ramp and down the long, narrow corridor, I feel like I’m about to traverse into another world. And in a sense, I am.
-                            I’m traveling from England to France, leaving the cliffs of Dover for the ports of Seine-Maritime as I embark on a
-                            trip to discover the best seafood festivals in Normandy.
                         </p>
                         <p>Posted Nov.23rd 2015 by Cara</p>
                         <div class="post-divider"></div>
