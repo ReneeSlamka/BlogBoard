@@ -77,6 +77,11 @@
     padding: 15px 25px;
 }
 
+.posts-container {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .post-title {
     margin-bottom: 25px;
 }
