@@ -14,59 +14,78 @@
 
 {% block content %}
 <div class="container">
-    <div class="row" id="home-greeting">
-        <div class="col-md-8 col-md-offset-2">
-            <h1 class="red">Welcome to your home page <span id="home-username"></span></h1>
-        </div>
-    </div>
-    <div class="row" id="home-page-boards-container">
-        <div class="col-md-5" id="user-boards-section">
-            <div class="row section-header">
-                <i class="fa fa-pencil-square fa-2x"></i>
-                <h3 class="header-text">Your Boards</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="homepage-section" id="user-info-section">
+                <div id=image-container>
+                    <img id="profile-img" src="http://cdn.cutestpaw.com/wp-content/uploads/2013/11/s-Golden-Retriever-Puppy.jpg" />
+                    <button id="change-profile-img-button" class="btn btn-default" >Change Profile Picture</button>
+                </div>
+                <div id="account-management-section">
+                    <h5>Joined June 7th, 2015</h5>
+                    <h5>Lives in Vancouver, BC Canada</h5>
+                    <h5>Registered email: renee@slamka.com</h5>
+                    <h5 id="manage-account-title">Manage Account</h5>
+                    <button class="btn account-management-button">Change Email Address</button>
+                    <button class="btn account-management-button">Reset Password</button>
+                    <button class="btn account-management-button">Delete Account</button>
+                </div>
             </div>
-            <section id="owner-boards-list" class="boards-section">
-                <h4>Boards You Created</h4>
-                {% if createdBoards is empty %}
-                    <h6 class="default-filler-text">You haven't created any boards yet</h6>
-                {% else %}
-                    {% for board in createdBoards %}
-                        <a href="{{ board.url }}">
-                            <h6>{{ board.name }}</h6>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-            </section>
-            <section id="member-boards" class="boards-section">
-                <h4>Boards You've Been Added To</h4>
-                {% if memberBoards is empty %}
-                    <h6 class="default-filler-text">You haven't been added to any boards yet</h6>
-                {% else %}
-                    {% for board in memberBoards %}
-                        <a href="{{ board.url }}">
-                            <h6>{{ board.name }}</h6>
-                        </a>
-                    {% endfor %}
-                {% endif %}
-            </section>
-            <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
-                data-target="#create-board-form" onclick="displayModal()">
-                Create Board
-            </button>
         </div>
-        <div class="col-md-6 col-md-offset-1" id="board-notifications">
-            <div class="row section-header">
-                <i class="fa fa-flag fa-2x"></i>
-                <h3 class="header-text">Notifications</h3>
+        <div class="col-md-8" >
+            <div id="board-info-section" class="homepage-section">
+                <h2 id="home-page-greeting">Welcome <span id="home-username">Renee</span>!</h2>
+                <div id="board-notifications">
+                    <div class="board-section-header">
+                        <div class="board-header-overlay" id="notification-header-overlay">
+                            <i class="fa fa-flag fa-2x"></i>
+                            <h3 class="board-header-text">Notifications</h3>
+                        </div>
+                    </div>
+                    <section class="boards-section" >
+                        <h5>Cara posted to The Fishtank</h5>
+                        <h5>Fiona posted to The Fishtank</h5>
+                    </section>
+                </div>
+                <div id="user-boards-section">
+                    <div class="board-section-header">
+                        <div class="board-header-overlay" id="user-boards-header-overlay">
+                            <i class="fa fa-pencil-square fa-2x"></i>
+                            <h3 class="board-header-text">Your Boards</h3>
+                        </div>
+                    </div>
+                    <section id="owner-boards-list" class="boards-section">
+                        <h4>Boards You Created</h4>
+                        {% if createdBoards is empty %}
+                            <h6 class="default-filler-text">You haven't created any boards yet</h6>
+                        {% else %}
+                            {% for board in createdBoards %}
+                            <a href="{{ board.url }}">
+                                <h6>{{ board.name }}</h6>
+                            </a>
+                            {% endfor %}
+                        {% endif %}
+                    </section>
+                    <section id="member-boards" class="boards-section">
+                        <h4>Boards You've Been Added To</h4>
+                        {% if memberBoards is empty %}
+                            <h6 class="default-filler-text">You haven't been added to any boards yet</h6>
+                        {% else %}
+                            {% for board in memberBoards %}
+                                <a href="{{ board.url }}">
+                                    <h6>{{ board.name }}</h6>
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                    </section>
+                    <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
+                            data-target="#create-board-form" onclick="displayModal()">
+                        Create Board
+                    </button>
+                </div>
             </div>
-            <ul>
-                <li>Jeff posted in Uni Pals</li>
-                <li>Mom added a photo in The Fam Jam</li>
-                <li>Suzie added new member Alexa to The Girl Gang</li>
-            </ul>
         </div>
     </div>
 </div>
-
 {% include '/fragments/create-board-form' %}
 {% endblock %}
