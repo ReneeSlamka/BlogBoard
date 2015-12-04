@@ -216,7 +216,7 @@ public class ServicesController {
         //create object to add to pebble board template
         mav.addObject("boardName", targetBoard.getName());
         mav.addObject("boardOwner", targetBoard.getOwner().getUsername());
-        //mav.addObject("boardId", targetBoard.getId());
+        mav.addObject("boardId", targetBoard.getId());
         mav.addObject("dateCreated", targetBoard.getDateCreated());
         mav.addObject("boardMembers", targetBoard.getMembers());
         mav.addObject("boardPosts", targetBoard.getPosts());
@@ -252,8 +252,8 @@ public class ServicesController {
     @ResponseBody
     AddPostResponse addPost(
             @PathVariable Long boardId,
-            @RequestParam(value = "title",defaultValue = "", required = false) String title,
-            @RequestParam(value = "textBody",defaultValue = "", required = false) String textBody,
+            @RequestParam(value = "title", required = true) String title,
+            @RequestParam(value = "textBody", required = true) String textBody,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
@@ -269,14 +269,14 @@ public class ServicesController {
     /*
     *========== Edit Post ==========
     */
-    @RequestMapping(value = "/boards/{boardId}/posts/{postId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/boards/{boardId}/posts/{postId}", method = RequestMethod.POST)
     public
     @ResponseBody
     BasicResponse editPost(
             @PathVariable("boardId") Long boardId,
             @PathVariable("postId") Long postId,
-            @RequestParam(value = "title",defaultValue = "", required = false) String editedTitle,
-            @RequestParam(value = "textBody",defaultValue = "", required = false) String editedTextBody,
+            @RequestParam(value = "title", required = true) String editedTitle,
+            @RequestParam(value = "textBody", required = true) String editedTextBody,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
@@ -292,18 +292,20 @@ public class ServicesController {
     /*
     *========== Delete Post ==========
     */
-    @RequestMapping(value = "/boards/{boardId}/posts/{postId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/boards/{boardId}/posts/{postId}", method = RequestMethod.DELETE)
     public
     @ResponseBody
     BasicResponse deletePost(
-            @PathVariable Long postId,
+            @PathVariable("boardId") Long boardId,
+            @PathVariable("postId") Long postId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
 
-        BasicResponse response = new BasicResponse();
+        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
+                sessionUsername, httpResponse);
 
-        return response;
+        return postService.deletePost(accountRepo, boardRepo, postRepo, sessionValid, boardId, postId, httpResponse);
     }
 
 
