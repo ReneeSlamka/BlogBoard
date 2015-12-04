@@ -37,7 +37,9 @@ public class Post {
         this.timeStamp = timeStamp;
     }
 
-    private void setTitle(String name) {
+    public Long getId() { return id; }
+
+    public void setTitle(String name) {
         this.title = name;
     }
 
