@@ -4,14 +4,13 @@ package com.blogboard.server.service;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
-import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import com.blogboard.server.web.ServiceResponses.AddPostResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import com.blogboard.server.data.entity.Account;
-import com.blogboard.server.data.entity.Post;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,17 +42,21 @@ public class BoardService {
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
+    @Autowired
+    private AccountRepository accountRepo;
+
+    @Autowired
+    private BoardRepository boardRepo;
+
+
 
     /*
     * Method Name: Create Board
-    * Inputs: Board Repository, name (of board), ownerUsername
-    * Return Value: CreateBoardResponse containing newly created board object and httpResponse
     * Purpose: create new board, store in database and return the necessary info to add it to
     * the DOM on the client side
     */
 
-    public CreateBoardResponse createBoard(BoardRepository boardRepo, AccountRepository accountRepo, boolean sessionValid,
-                                           String boardName, String ownerUsername,
+    public CreateBoardResponse createBoard(boolean sessionValid, String boardName, String ownerUsername,
                                            HttpServletResponse httpResponse) throws IOException {
 
         CreateBoardResponse response = new CreateBoardResponse();
@@ -89,13 +92,11 @@ public class BoardService {
 
     /*
     * Method Name: Get Board
-    * Inputs: Board Repository, name (of board), ownerUsername
-    * Return: ArrayList<Board>
     * Purpose: return a board so that its information can be rendered in its page
     */
 
-    public Board getBoard(BoardRepository boardRepo, AccountRepository accountRepo, Long boardId, String username,
-                                         HttpServletResponse httpResponse) throws IOException {
+    public Board getBoard(Long boardId, String username, HttpServletResponse httpResponse)
+            throws IOException {
 
         Board targetBoard = boardRepo.findOne(boardId);
         Account targetMember = accountRepo.findByUsername(username);
@@ -118,13 +119,10 @@ public class BoardService {
 
     /*
    * Method Name: Get List Boards
-   * Inputs: Board Repository, username(board ownerUsername)
-   * Return: ArrayList<Board>
    * Purpose: to retrieve all boards that either belong to that user or that user is a member of
    */
 
-    public ModelAndView getHomePageBoardsList(BoardRepository boardRepo, AccountRepository accountRepo,
-                                              boolean sessionValid, String username,
+    public ModelAndView getHomePageBoardsList(boolean sessionValid, String username,
                                               HttpServletResponse httpResponse) throws IOException {
 
         ModelAndView mav = new ModelAndView();
@@ -154,14 +152,11 @@ public class BoardService {
 
     /*
     * Method Name: Add Member
-    * Inputs: Account Repository, Board Repository, (sessionUsername & sessionID later), memberUsername,
-    * HTTPServlet Response
-    * Return: Object containing the username of the new member, its url (add later), and http response
     * Purpose: To add the username of the new member to a board's members list
     */
 
-    public AddMemberResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
-        boolean sessionValid, String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
+    public AddMemberResponse addMember(boolean sessionValid, String username, Long boardId,
+                                       HttpServletResponse httpResponse) throws IOException {
 
         AddMemberResponse response = new AddMemberResponse();
         if (!sessionValid) { return response; }

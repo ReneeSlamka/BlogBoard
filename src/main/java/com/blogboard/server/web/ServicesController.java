@@ -25,59 +25,28 @@ import java.util.logging.Logger;
 @Controller
 public class ServicesController {
 
+
+    @Autowired
     private AccountService accountService;
+
+    @Autowired
     private BoardService boardService;
+
+    @Autowired
     private AuthenticationService authenticationService;
+
+    @Autowired
     private PostService postService;
-    private static final String BASE_URL = "http://localhost:8080";
 
-    //TODO: in future will have to ensure repositories are only accessed by one call at a time
-    //will need resource locking
+    @Autowired
     private AccountRepository accountRepo;
+
+    @Autowired
     private SessionRepository sessionRepo;
-    private BoardRepository boardRepo;
-    private PostRepository postRepo;
 
-    @Autowired(required = true)
-    public void setSessionRepository(BoardRepository boardRepository) {
-        this.boardRepo = boardRepository;
-    }
 
-    @Autowired(required = true)
-    public void setBoardService(BoardService boardService) {
-        this.boardService = boardService;
-    }
 
-    @Autowired(required = true)
-    public void setAccountService(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
-    @Autowired(required = true)
-    public void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
-
-    @Autowired(required = true)
-    public void setPostService(PostService postService) {
-        this.postService = postService;
-    }
-
-    @Autowired(required = true)
-    public void setAccountRepository(AccountRepository accountRepository) {
-        this.accountRepo = accountRepository;
-    }
-
-    @Autowired(required = true)
-    public void setSessionRepository(SessionRepository sessionRepository) {
-        this.sessionRepo = sessionRepository;
-    }
-
-    @Autowired(required = true)
-    public void setPostRepository(PostRepository postRepository) {
-        this.postRepo = postRepository;
-    }
-
+    private static final String BASE_URL = "http://localhost:8080";
 
     private static final Logger logger = Logger.getLogger(ServicesController.class.getName());
 
@@ -121,7 +90,7 @@ public class ServicesController {
             @RequestParam(value = "email", required = false, defaultValue = "") String email,
             HttpServletResponse httpResponse) throws IOException {
 
-        return accountService.createAccount(accountRepo, username, password, email, httpResponse);
+        return accountService.createAccount(username, password, email, httpResponse);
     }
 
 
@@ -136,7 +105,7 @@ public class ServicesController {
             @RequestParam(value = "password", required = true) String password,
             HttpServletResponse httpResponse) throws IOException {
 
-        return authenticationService.login(accountRepo, sessionRepo, username, password, httpResponse);
+        return authenticationService.login(username, password, httpResponse);
     }
 
 
@@ -151,7 +120,7 @@ public class ServicesController {
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
 
-        return authenticationService.logout(sessionRepo, sessionUsername, sessionId, httpResponse);
+        return authenticationService.logout(sessionUsername, sessionId, httpResponse);
     }
 
 
@@ -167,9 +136,8 @@ public class ServicesController {
             String sessionId,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-        return boardService.getHomePageBoardsList(boardRepo, accountRepo, sessionValid, sessionUsername, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return boardService.getHomePageBoardsList(sessionValid, sessionUsername, httpResponse);
     }
 
 
@@ -186,9 +154,8 @@ public class ServicesController {
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-        return boardService.createBoard(boardRepo,accountRepo, sessionValid, boardName, sessionUsername, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return boardService.createBoard(sessionValid, boardName, sessionUsername, httpResponse);
     }
 
 
@@ -206,12 +173,9 @@ public class ServicesController {
             HttpServletResponse httpResponse) throws IOException {
 
         ModelAndView mav = new ModelAndView();
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-        if (!sessionValid) {
-            return mav;
-        }
-        Board targetBoard = boardService.getBoard(boardRepo, accountRepo, boardId, sessionUsername, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        if (!sessionValid) { return mav; }
+        Board targetBoard = boardService.getBoard(boardId, sessionUsername, httpResponse);
 
         //create object to add to pebble board template
         mav.addObject("boardName", targetBoard.getName());
@@ -238,9 +202,8 @@ public class ServicesController {
             @RequestParam(value = "memberUsername", required = true) String memberUsername,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-        return boardService.addMember(accountRepo, boardRepo, sessionValid, memberUsername, boardId, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return boardService.addMember(sessionValid, memberUsername, boardId, httpResponse);
     }
 
 
@@ -258,11 +221,8 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-
-        return postService.addPost(accountRepo, boardRepo, postRepo,sessionValid, boardId, sessionUsername, title,
-                textBody, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return postService.addPost(sessionValid, boardId, sessionUsername, title, textBody, httpResponse);
     }
 
 
@@ -281,11 +241,8 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-
-        return postService.editPost(accountRepo, boardRepo, postRepo, sessionValid, boardId, postId,
-                editedTitle, editedTextBody, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return postService.editPost(sessionValid, boardId, postId, editedTitle, editedTextBody, httpResponse);
     }
 
 
@@ -302,10 +259,8 @@ public class ServicesController {
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             HttpServletResponse httpResponse) throws IOException {
 
-        boolean sessionValid = authenticationService.validateSession(accountRepo, sessionRepo, sessionId,
-                sessionUsername, httpResponse);
-
-        return postService.deletePost(accountRepo, boardRepo, postRepo, sessionValid, boardId, postId, httpResponse);
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return postService.deletePost(sessionValid, boardId, postId, httpResponse);
     }
 
 

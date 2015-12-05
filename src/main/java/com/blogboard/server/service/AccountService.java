@@ -1,9 +1,10 @@
 package com.blogboard.server.service;
 
 import com.blogboard.server.web.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.blogboard.server.data.entity.*;
-import com.blogboard.server.data.repository.*;
+import com.blogboard.server.data.entity.Account;
+import com.blogboard.server.data.repository.AccountRepository;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,10 @@ public class AccountService {
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
 
+    @Autowired
+    private AccountRepository accountRepo;
+
+
     /*
     * Method Name: Create Account
     * Inputs: Account Repository, username, password, email, httpResponse
@@ -29,8 +34,9 @@ public class AccountService {
     * Purpose: create new account, store in database and return the a success or failure message
      */
 
-    public BasicResponse createAccount(AccountRepository accountRepo, String username, String password,
-        String email, HttpServletResponse httpResponse) throws IOException{
+    public BasicResponse createAccount(String username, String password, String email, HttpServletResponse httpResponse)
+            throws IOException{
+
         BasicResponse response = new BasicResponse();
 
         //SUCCESS CASE: account with provided credentials doesn't already exist

@@ -8,6 +8,7 @@ import com.blogboard.server.data.repository.BoardRepository;
 import com.blogboard.server.data.repository.PostRepository;
 import com.blogboard.server.web.BasicResponse;
 import com.blogboard.server.web.ServiceResponses.AddPostResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,14 +23,21 @@ public class PostService {
     private static final String POST_NOT_DELETED = "Post not found or not part of this board";
     private static final String POST_EDITED = "Changes to post successfully saved";
 
+
+    @Autowired
+    private AccountRepository accountRepo;
+
+    @Autowired
+    private BoardRepository boardRepo;
+
+    @Autowired
+    private PostRepository postRepo;
+
     /*
    * Method Name: Add Post
-   * Inputs: boardId, authorUsername, title, textContent
-   * Return: AddPostResponse
    * Purpose: adds a post object to the specified board
     */
-    public AddPostResponse addPost(AccountRepository accountRepo, BoardRepository boardRepo, PostRepository postRepo,
-                                   boolean sessionValid, Long boardId, String authorUsername, String title,
+    public AddPostResponse addPost(boolean sessionValid, Long boardId, String authorUsername, String title,
                                    String textContent, HttpServletResponse httpResponse) throws IOException {
 
         AddPostResponse response = new AddPostResponse();
@@ -64,13 +72,10 @@ public class PostService {
 
     /*
    * Method Name: Edit Post
-   * Inputs: BoardId, PostId, EditedTitle, EditedText
-   * Return: BasicResponse
    * Purpose:
     */
 
-    public BasicResponse editPost(AccountRepository accountRepo, BoardRepository boardRepo, PostRepository postRepo,
-                                  boolean sessionValid, Long boardId, Long postId, String editedTitle, String editedText,
+    public BasicResponse editPost(boolean sessionValid, Long boardId, Long postId, String editedTitle, String editedText,
                                   HttpServletResponse httpResponse) throws IOException{
 
         BasicResponse response = new BasicResponse();
@@ -105,9 +110,8 @@ public class PostService {
    * Purpose:
     */
 
-    public BasicResponse deletePost(AccountRepository accountRepo, BoardRepository boardRepo, PostRepository postRepo,
-                                  boolean sessionValid,Long boardId, Long postId, HttpServletResponse httpResponse)
-                                  throws IOException {
+    public BasicResponse deletePost(boolean sessionValid,Long boardId, Long postId, HttpServletResponse httpResponse)
+            throws IOException {
 
         BasicResponse response = new BasicResponse();
         if (!sessionValid) { return response; }
