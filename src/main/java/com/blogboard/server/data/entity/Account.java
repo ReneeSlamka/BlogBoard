@@ -22,7 +22,7 @@ public class Account {
     @Column(name="EMAIL")
     private String email;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ACCOUNT_BOARD", joinColumns = {@JoinColumn(name ="ACCOUNT_ID")},
             inverseJoinColumns = {@JoinColumn(name = "BOARD_ID")})
     private List<Board> accessibleBoards = new ArrayList<Board>();
@@ -86,6 +86,14 @@ public class Account {
         return  false;
     }
 
+    public boolean removeAccessibleBoard(Board board) {
+        if (accessibleBoards.contains(board)) {
+            this.accessibleBoards.remove(board);
+            return true;
+        }
+        return false;
+    }
+
     public List<Board> getAccessibleBoards() {
         return accessibleBoards;
     }
@@ -93,6 +101,14 @@ public class Account {
     public boolean addAdminLevelBoard(Board newBoard) {
         if(!adminLevelBoards.contains(newBoard)) {
             this.adminLevelBoards.add(newBoard);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeAdminLevelBoard(Board board) {
+        if (adminLevelBoards.contains(board)) {
+            this.adminLevelBoards.remove(board);
             return true;
         }
         return false;

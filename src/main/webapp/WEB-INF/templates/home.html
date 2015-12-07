@@ -60,9 +60,20 @@
                             <h6 class="default-filler-text">You haven't created any boards yet</h6>
                         {% else %}
                             {% for board in createdBoards %}
-                            <a href="{{ board.url }}">
-                                <h6>{{ board.name }}</h6>
-                            </a>
+                            <div class="board-entry" id="board-{{board.id}}">
+                                <a href="{{ board.url }}">
+                                    <h6>{{ board.name }}</h6>
+                                </a>
+                                <button onclick="" class="board-button">
+                                    <i class="fa fa-1x fa-pencil-square-o"></i>
+                                </button>
+                                <button onclick="" class="board-button">
+                                    Save Changes
+                                </button>
+                                <button onclick="deleteBoard('{{board.id}}', 'board-{{board.id}}')" class="board-button">
+                                    <i class="fa fa-trash-o"></i>
+                                </button>
+                            </div>
                             {% endfor %}
                         {% endif %}
                     </section>

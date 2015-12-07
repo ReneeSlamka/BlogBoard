@@ -26,7 +26,7 @@ public class Board {
     @Column(name="URL")
     private String url;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "ACCOUNT_ID")
     private Account owner;
 

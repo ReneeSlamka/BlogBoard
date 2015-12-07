@@ -4,6 +4,7 @@ package com.blogboard.server.service;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
+import com.blogboard.server.web.BasicResponse;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import com.blogboard.server.web.ServiceResponses.AddPostResponse;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.servlet.http.HttpServletResponse;
 
 @Service
@@ -32,12 +34,14 @@ public class BoardService {
     private static final String MEMBER_REMOVED = "Member successfully removed";
     private static final String POST_ADDED = "Post successfully added";
     private static final String POST_DELETED = "Post successfully deleted";
+    private static final String BOARD_NAME_UPDATED = "Board name successfully updated";
 
     private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
     public static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
     private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
     private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
     private static final String USER_ALREADY_MEMBER = "This user is already a member of this board";
+    private static final String USER_NOT_BOARD_ADMIN = "Action not permitted, you are not the admin of this board";
     private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
@@ -116,6 +120,67 @@ public class BoardService {
         return targetBoard;
     }
 
+
+    /*
+    * Method Name: Edit Board
+    * Purpose: edit the name of a board (only owner will be able to do this via UI)
+    */
+
+    public BasicResponse editBoard(boolean sessionValid, Long boardId, String username, String newBoardName,
+                                   HttpServletResponse httpResponse) throws IOException {
+
+        BasicResponse response = new BasicResponse();
+        if (!sessionValid) { return response; }
+        Board targetBoard = boardRepo.findOne(boardId);
+
+        if (targetBoard != null) {
+            if (targetBoard.getOwner().equals(accountRepo.findByUsername(username))) {
+                targetBoard.setName(newBoardName);
+                Board savedBoard = boardRepo.save(targetBoard);
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                response.setMessage(BOARD_NAME_UPDATED);
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
+            }
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
+        }
+
+        return response;
+    }
+
+
+    /*
+    * Method Name: Delete Board
+    * Purpose: edit the name of a board (only owner will be able to do this via UI)
+    */
+
+    public BasicResponse deleteBoard(boolean sessionValid, Long boardId, String username,
+                                   HttpServletResponse httpResponse) throws IOException {
+
+        BasicResponse response = new BasicResponse();
+        if (!sessionValid) { return response; }
+        Board targetBoard = boardRepo.findOne(boardId);
+        Account targetAccount = accountRepo.findByUsername(username);
+
+        if (targetBoard != null) {
+            if (targetBoard.getOwner().equals(accountRepo.findByUsername(username)) &&
+                    targetAccount.removeAdminLevelBoard(targetBoard)) {
+                        List<Account> listMembers = targetBoard.getMembers();
+                        for (Account member: listMembers) {
+                            member.removeAccessibleBoard(targetBoard);
+                        }
+                        boardRepo.delete(boardId);
+                        //Todo: might need to manually remove from user board lists and save
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
+            }
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
+        }
+
+        return response;
+    }
 
     /*
    * Method Name: Get List Boards

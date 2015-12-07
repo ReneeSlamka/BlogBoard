@@ -28,6 +28,28 @@ function createBoard() {
     });
 }
 
+function deleteBoard(boardId, boardElementId) {
+    var apiUrl = window.location.href + '/boards/' + boardId;
+
+    $.ajax({
+        type: 'DELETE',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            //Todo: temporary solution for user friendly error
+            if(request.responseJSON.error === undefined) {
+                $("#" + boardElementId).remove();
+            }
+        }
+    });
+}
+
 function addMember() {
     var $memberUsername = $("#new-member-name").val().trim();
     var apiUrl = window.location.href + '/members';
@@ -58,7 +80,7 @@ function addMember() {
     });
 }
 
-///boards/{boardId}/posts
+
 
 function addPost() {
     var apiUrl = window.location.href + '/posts';

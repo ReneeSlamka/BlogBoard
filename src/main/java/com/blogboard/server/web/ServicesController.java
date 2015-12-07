@@ -158,6 +158,41 @@ public class ServicesController {
         return boardService.createBoard(sessionValid, boardName, sessionUsername, httpResponse);
     }
 
+    /*
+    *========== Edit Board ==========
+    */
+    @RequestMapping(value = "/{username}/boards/{boardId}", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    BasicResponse editBoard(
+            @PathVariable String username,
+            @PathVariable Long boardId,
+            @RequestParam(value = "boardName", required = true) String editedBoardName,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return boardService.editBoard(sessionValid, boardId, username, editedBoardName, httpResponse);
+    }
+
+    /*
+    *========== Delete Board ==========
+     */
+
+    @RequestMapping(value = "/{username}/boards/{boardId}", method = RequestMethod.DELETE)
+    public
+    @ResponseBody
+    BasicResponse deleteBoard(
+            @PathVariable String username,
+            @PathVariable Long boardId,
+            @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
+            @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return boardService.deleteBoard(sessionValid, boardId, username, httpResponse);
+    }
 
     //Todo: need to refactor, move code body to a function in services
     /*
