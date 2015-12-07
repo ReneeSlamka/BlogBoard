@@ -28,20 +28,8 @@
                             <h5 class="board-info">{{member.username}}</h5>
                         </div>
                     {% endfor %}
-                    <div class="board-member">
-                        <img class="user-avatar" src="https://www.tubestart.com/upload/thumb/user_4823_square.jpeg" />
-                        <h5 class="board-info">JennaOlaff</h5>
-                    </div>
-                    <div class="board-member">
-                        <img class="user-avatar" src="https://s-media-cache-ak0.pinimg.com/avatars/terenewen_1379143112_140.jpg" />
-                        <h5 class="board-info">FionaMary</h5>
-                    </div>
-                    <div class="board-member">
-                        <img class="user-avatar" src="https://relayfm.s3.amazonaws.com/uploads/user/avatar/61/user_avatar_simonederochefort_artwork.png" />
-                        <h5 class="board-info">CaraWatson</h5>
-                    </div>
                 </section>
-                <button onclick="displayAddMemberModal()" id="add-member-button" type="button"
+                <button onclick="displayModal('add-member-board-form')" id="add-member-button" type="button"
                         data-toggle="modal" data-target="#add-member-board-form" class="btn btn-default">
                     Invite
                 </button>
