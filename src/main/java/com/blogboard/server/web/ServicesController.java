@@ -167,7 +167,7 @@ public class ServicesController {
     BasicResponse editBoard(
             @PathVariable String username,
             @PathVariable Long boardId,
-            @RequestParam(value = "boardName", required = true) String editedBoardName,
+            @RequestParam(value = "editedBoardName", required = true) String editedBoardName,
             @CookieValue(value = "sessionID", defaultValue = "", required = false) String sessionId,
             @CookieValue(value = "sessionUsername", defaultValue = "", required = false) String sessionUsername,
             HttpServletResponse httpResponse) throws IOException {
@@ -193,6 +193,7 @@ public class ServicesController {
         boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
         return boardService.deleteBoard(sessionValid, boardId, username, httpResponse);
     }
+
 
     //Todo: need to refactor, move code body to a function in services
     /*

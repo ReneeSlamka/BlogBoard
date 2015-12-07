@@ -62,13 +62,11 @@
                             {% for board in createdBoards %}
                             <div class="board-entry" id="board-{{board.id}}">
                                 <a href="{{ board.url }}">
-                                    <h6>{{ board.name }}</h6>
+                                    <h6 id="board-{{board.id}}-name">{{ board.name }}</h6>
                                 </a>
-                                <button onclick="" class="board-button">
+                                <button onclick="displayEditBoardModal('{{board.id}}', 'board-{{board.id}}-name')"
+                                    class="board-button" type="button" data-toggle="modal" data-target="#edit-board-form">
                                     <i class="fa fa-1x fa-pencil-square-o"></i>
-                                </button>
-                                <button onclick="" class="board-button">
-                                    Save Changes
                                 </button>
                                 <button onclick="deleteBoard('{{board.id}}', 'board-{{board.id}}')" class="board-button">
                                     <i class="fa fa-trash-o"></i>
@@ -99,4 +97,5 @@
     </div>
 </div>
 {% include '/fragments/create-board-form' %}
+{% include '/fragments/edit-board-form' %}
 {% endblock %}

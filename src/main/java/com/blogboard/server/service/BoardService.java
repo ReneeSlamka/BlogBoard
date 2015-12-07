@@ -135,6 +135,13 @@ public class BoardService {
 
         if (targetBoard != null) {
             if (targetBoard.getOwner().equals(accountRepo.findByUsername(username))) {
+                List<Board> adminLevelBoards = accountRepo.findByUsername(username).getAdminLevelBoards();
+                for (Board board : adminLevelBoards) {
+                    if (board.getName().equals(newBoardName)) {
+                        httpResponse.sendError(HttpServletResponse.SC_CONFLICT, NAME_IN_USE);
+                        return response;
+                    }
+                }
                 targetBoard.setName(newBoardName);
                 Board savedBoard = boardRepo.save(targetBoard);
                 httpResponse.setStatus(HttpServletResponse.SC_OK);
@@ -165,13 +172,12 @@ public class BoardService {
 
         if (targetBoard != null) {
             if (targetBoard.getOwner().equals(accountRepo.findByUsername(username)) &&
-                    targetAccount.removeAdminLevelBoard(targetBoard)) {
-                        List<Account> listMembers = targetBoard.getMembers();
-                        for (Account member: listMembers) {
-                            member.removeAccessibleBoard(targetBoard);
-                        }
-                        boardRepo.delete(boardId);
-                        //Todo: might need to manually remove from user board lists and save
+                targetAccount.removeAdminLevelBoard(targetBoard)) {
+                    List<Account> listMembers = targetBoard.getMembers();
+                    for (Account member: listMembers) {
+                        member.removeAccessibleBoard(targetBoard);
+                    }
+                    boardRepo.delete(boardId);
             } else {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
             }

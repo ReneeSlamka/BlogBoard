@@ -28,6 +28,32 @@ function createBoard() {
     });
 }
 
+function saveBoardChanges(boardId, boardNameElementId) {
+    var apiUrl = window.location.href + '/boards/' + boardId;
+    var editedBoardName = document.getElementById("edited-board-name").value;
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        data: {"editedBoardName": editedBoardName},
+        dataType: 'json',
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            //Todo: temporary solution for user friendly error
+            if(request.responseJSON.error === undefined) {
+                document.getElementById(boardNameElementId).innerHTML = editedBoardName;
+                $("#edit-board-form").modal("toggle");
+            }
+        }
+    });
+}
+
 function deleteBoard(boardId, boardElementId) {
     var apiUrl = window.location.href + '/boards/' + boardId;
 
@@ -110,15 +136,14 @@ function addPost() {
     });
 }
 
-function displayAddMemberModal() {
-    var modal = document.getElementById("add-member-board-form");
-    modal.style.display = "block";
-}
 
-function test() {
-    alert("Button works");
+function displayEditBoardModal(boardId, boardNameElementId) {
+    document.getElementById("edit-board-form").style.display = "block";
+    var button = document.getElementById("save-board-changes-button");
+    button.onclick = function() {
+        saveBoardChanges(boardId, boardNameElementId);
+    }
 }
-
 
 function addBoardName(newBoardName, url) {
     var $listBoards = $("#owner-boards-list");
