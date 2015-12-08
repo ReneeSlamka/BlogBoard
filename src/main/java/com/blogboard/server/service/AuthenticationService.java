@@ -5,6 +5,7 @@ import com.blogboard.server.data.entity.Session;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.SessionRepository;
 import com.blogboard.server.web.BasicResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -30,16 +31,20 @@ public class AuthenticationService {
     private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
 
 
+    @Autowired
+    private AccountRepository accountRepo;
+
+    @Autowired
+    private SessionRepository sessionRepo;
+
+
     /*
    * Method Name: Login
-   * Inputs: Account Repository, Session Repository, username, password, HTTP Servlet BasicResponse
-   * Return Value: Account Services BasicResponse
    * Purpose: logs user in by creating a session object, storing it the database and returning its values
    * in a cookie to be stored on the client side for persistent authentication
     */
 
-    public BasicResponse login(AccountRepository accountRepo, SessionRepository sessionRepo, String username,
-                               String password, HttpServletResponse httpResponse) throws IOException {
+    public BasicResponse login(String username, String password, HttpServletResponse httpResponse) throws IOException {
 
         BasicResponse response = new BasicResponse();
         Account targetAccount = accountRepo.findByUsername(username);
@@ -78,7 +83,7 @@ public class AuthenticationService {
         }
 
         if (loginPermitted) {
-            activateSession(sessionRepo, username, response, httpResponse);
+            activateSession(username, response, httpResponse);
         }
         return response;
     }
@@ -86,13 +91,11 @@ public class AuthenticationService {
 
     /*
     * Method Name: Activate Session
-    * Inputs: Session Repository, username, Basic Response, HTTP Servlet Response
-    * Return Value: none
     * Purpose: Helper function generate and save a new session, and configure session cookies
      */
 
-    public void activateSession(SessionRepository sessionRepo, String username, BasicResponse response,
-                                 HttpServletResponse httpResponse) {
+    public void activateSession(String username, BasicResponse response, HttpServletResponse httpResponse) {
+
         String newSessionId = AppServiceHelper.generateSessionID();
         String hashedSessionId = AppServiceHelper.hashString(newSessionId);
         String timeStamp = AppServiceHelper.createTimeStamp();
@@ -114,14 +117,13 @@ public class AuthenticationService {
 
     /*
     * Method Name: Logout
-    * Inputs: Session Repository, username, sessionId, HTTP Servlet BasicResponse
-    * Return Value: Account Services BasicResponse
     * Purpose: logs user out of their current session, deletes their session from the database and returns
     * the url to the login page to redirect the client
      */
 
-    public BasicResponse logout(SessionRepository sessionRepo, String sessionUsername, String sessionID,
-                                         HttpServletResponse httpResponse) throws IOException {
+    public BasicResponse logout(String sessionUsername, String sessionID, HttpServletResponse httpResponse)
+            throws IOException {
+
         BasicResponse response = new BasicResponse();
 
         if (sessionID.equals("undefined") || sessionID.length() == 0){
@@ -151,14 +153,12 @@ public class AuthenticationService {
 
     /*
     * Method Name: Validate Session
-    * Inputs: sessionId, sessionUsername
-    * Return Value: boolean
     * Purpose: Checks if current session is valid before every service call and that user tied
     * to it exists in DB. Also sets appropriate error status and message if an error is found.
      */
 
-    public boolean validateSession(AccountRepository accountRepo, SessionRepository sessionRepo, String sessionId,
-                                   String sessionUsername, HttpServletResponse httpResponse) throws IOException {
+    public boolean validateSession(String sessionId, String sessionUsername, HttpServletResponse httpResponse)
+            throws IOException {
 
         Session targetSession = sessionRepo.findBySessionId(AppServiceHelper.hashString(sessionId));
         httpResponse.setHeader("Location", BASE_URL);

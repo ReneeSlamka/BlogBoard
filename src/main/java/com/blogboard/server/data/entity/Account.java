@@ -22,7 +22,10 @@ public class Account {
     @Column(name="EMAIL")
     private String email;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @Column(name="SIGNUP_DATE")
+    private String signupDate;
+
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ACCOUNT_BOARD", joinColumns = {@JoinColumn(name ="ACCOUNT_ID")},
             inverseJoinColumns = {@JoinColumn(name = "BOARD_ID")})
     private List<Board> accessibleBoards = new ArrayList<Board>();
@@ -36,10 +39,11 @@ public class Account {
         super();
     }
 
-    public Account(String username, String password, String email) {
+    public Account(String username, String password, String email, String signupDate) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.signupDate = signupDate;
     }
 
     public Long getId() {
@@ -58,7 +62,7 @@ public class Account {
         return password;
     }
 
-    private void setPassword(String newPassword){
+    public void setPassword(String password){
         this.password = password;
     }
 
@@ -66,17 +70,13 @@ public class Account {
         this.email = email;
     }
 
-    public java.lang.String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    public void updatePassword(String newPassword) {
-        this.password = newPassword;
-    }
+    public void setSignupDate(String signupDate) { this.signupDate = signupDate; }
 
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
-    }
+    public String getSignupDate() { return signupDate; }
 
     public boolean addAccessibleBoard(Board newBoard) {
         if(!accessibleBoards.contains(newBoard)) {
@@ -86,6 +86,14 @@ public class Account {
         return  false;
     }
 
+    public boolean removeAccessibleBoard(Board board) {
+        if (accessibleBoards.contains(board)) {
+            this.accessibleBoards.remove(board);
+            return true;
+        }
+        return false;
+    }
+
     public List<Board> getAccessibleBoards() {
         return accessibleBoards;
     }
@@ -93,6 +101,14 @@ public class Account {
     public boolean addAdminLevelBoard(Board newBoard) {
         if(!adminLevelBoards.contains(newBoard)) {
             this.adminLevelBoards.add(newBoard);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeAdminLevelBoard(Board board) {
+        if (adminLevelBoards.contains(board)) {
+            this.adminLevelBoards.remove(board);
             return true;
         }
         return false;

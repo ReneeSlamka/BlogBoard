@@ -77,6 +77,11 @@
     padding: 15px 25px;
 }
 
+#posts-container {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
 .post-title {
     margin-bottom: 25px;
 }
@@ -123,6 +128,10 @@
     border: 2px solid rgba(160,112,180,0.7);
 }
 
+
+.editing-input {
+    display: none;
+}
 
 /*=====Modal Popup Styling=====*/
 

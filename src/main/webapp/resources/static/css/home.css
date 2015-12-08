@@ -1,48 +1,123 @@
-#home-greeting {
-    margin-top: 15px;
+/*===== User Info Styling =====*/
+
+#user-info-section {
+    min-height: 600px;
+    border-radius: 6px;
+    background-color: rgba(0,0,0,0.7);
+    color: rgba(255,255,255,1);
+    padding-top: 25px;
+    padding-left: 25px;
+    margin-left: 40px;
+}
+
+#image-container {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    border: 2px solid rgba(255,255,255,1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+#profile-img {
+    display: block;
+}
+
+#change-profile-img-button {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+#account-management-section {
+    margin-top: 30px;
+}
+
+#manage-account-title {
+    margin-top: 30px;
+}
+
+.account-management-button {
+    background-color: rgba(0,0,0,0);
+    color: rgba(255,255,255,1);
+    font-size: 12px;
+    display: block;
+}
+
+/*===== User Board Info Styling =====*/
+
+#board-info-section {
+    margin-right: 40px;
 }
 
 #user-boards-section {
     background-color: rgba(160,112,180,0.1);
     border-radius: 8px;
     color: rgb(62,62,62);
+    margin-top: 30px;
+    position: relative;
 }
 
-.section-header {
-    background-color: rgba(160,112,180, 1);
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+.board-section-header {
+    background-image: url("/resources/static/img/light-stone-texture.jpeg");
+    background-position: 40% 40%;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.board-header-overlay {
     padding-left: 20px;
     padding-top: 15px;
     padding-bottom: 15px;
-    color: #FFFFFF;
+    width: 100%;
+    border-bottom: 8px solid rgba(0,0,0,0.4);
 }
 
-.section-header * {
+.board-section-header * {
     display: inline-block;
 }
 
 #board-notifications {
+    margin-top: 70px;
     background-color: rgba(160,112,180,0.1);
     border-radius: 8px;
     color: rgb(62,62,62);
 }
 
-#home-page-boards-container {
-    margin-top: 60px;
-}
 
 .boards-section {
     display: flex;
     flex-direction: column;
+    padding: 10px 20px;
+    border-left: 1px solid rgba(0,0,0,0.3);
+    border-right: 1px solid rgba(0,0,0,0.3);
+    border-bottom: 1px solid rgba(0,0,0,0.3);
 }
 
-.header-text {
+.board-header-text {
     font-weight: 200;
     margin-left: 15px;
     margin-top: auto;
     margin-bottom: auto;
 }
+
+#user-boards-header-overlay {
+    background-color: rgba(10,210,220,0.65);
+}
+
+#notification-header-overlay {
+    background-color: rgba(237, 173, 5, 0.75);
+}
+
+#create-account-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+/*===== General Page Styling =====*/
 
 .default-filler-text {
     opacity: 0.8;
@@ -51,4 +126,17 @@
 i.fa {
     color: #FFFFFF;
 }
+
+.homepage-section {
+    margin-top: 20px;
+}
+
+
+
+
+
+
+
+
+
 

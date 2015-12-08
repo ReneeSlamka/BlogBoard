@@ -1,14 +1,3 @@
-function setUsername() {
-    var sessionUsername = getCookie("sessionUsername");
-
-    //potentially change second case later
-    if (sessionUsername !== null || sessionUsername.length > 0) {
-        document.getElementById("home-username").innerHTML = sessionUsername;
-    } else {
-        document.getElementById("home-username").innerHTML = "DEFAULT";
-    }
-}
-
 function getCookie(field) {
     var field = field + "=";
     var cookieFields = document.cookie.split(';');
@@ -26,9 +15,7 @@ function getCookie(field) {
     return "";
 }
 
-function displayModal() {
-    var modal = document.getElementById("create-board-form");
+function displayModal(modalElementId) {
+    var modal = document.getElementById(modalElementId);
     modal.style.display = "block";
 }
-
-setUsername();

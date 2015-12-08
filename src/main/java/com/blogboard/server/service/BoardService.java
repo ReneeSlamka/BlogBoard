@@ -4,20 +4,21 @@ package com.blogboard.server.service;
 import com.blogboard.server.data.entity.Board;
 import com.blogboard.server.data.repository.AccountRepository;
 import com.blogboard.server.data.repository.BoardRepository;
-import com.blogboard.server.data.repository.PostRepository;
+import com.blogboard.server.web.BasicResponse;
 import com.blogboard.server.web.ServiceResponses.AddMemberResponse;
 import com.blogboard.server.web.ServiceResponses.CreateBoardResponse;
 import com.blogboard.server.web.ServiceResponses.AddPostResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 import com.blogboard.server.data.entity.Account;
-import com.blogboard.server.data.entity.Post;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.servlet.http.HttpServletResponse;
 
 @Service
@@ -33,27 +34,33 @@ public class BoardService {
     private static final String MEMBER_REMOVED = "Member successfully removed";
     private static final String POST_ADDED = "Post successfully added";
     private static final String POST_DELETED = "Post successfully deleted";
+    private static final String BOARD_NAME_UPDATED = "Board name successfully updated";
 
     private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
     public static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
     private static final String BOARD_ACCESS_DENIED = "Error, you do not have permission to access this board";
     private static final String USER_NOT_FOUND = "Failed to add new member, account with given username doesn't exist";
     private static final String USER_ALREADY_MEMBER = "This user is already a member of this board";
+    private static final String USER_NOT_BOARD_ADMIN = "Action not permitted, you are not the admin of this board";
     private static final String REMOVE_MEMBER_FAILURE = "Failed to remove member, account with given username " +
                                                         "either doesn't exist or isn't a member of this board";
     private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
+    @Autowired
+    private AccountRepository accountRepo;
+
+    @Autowired
+    private BoardRepository boardRepo;
+
+
 
     /*
     * Method Name: Create Board
-    * Inputs: Board Repository, name (of board), ownerUsername
-    * Return Value: CreateBoardResponse containing newly created board object and httpResponse
     * Purpose: create new board, store in database and return the necessary info to add it to
     * the DOM on the client side
     */
 
-    public CreateBoardResponse createBoard(BoardRepository boardRepo, AccountRepository accountRepo, boolean sessionValid,
-                                           String boardName, String ownerUsername,
+    public CreateBoardResponse createBoard(boolean sessionValid, String boardName, String ownerUsername,
                                            HttpServletResponse httpResponse) throws IOException {
 
         CreateBoardResponse response = new CreateBoardResponse();
@@ -89,13 +96,11 @@ public class BoardService {
 
     /*
     * Method Name: Get Board
-    * Inputs: Board Repository, name (of board), ownerUsername
-    * Return: ArrayList<Board>
     * Purpose: return a board so that its information can be rendered in its page
     */
 
-    public Board getBoard(BoardRepository boardRepo, AccountRepository accountRepo, Long boardId, String username,
-                                         HttpServletResponse httpResponse) throws IOException {
+    public Board getBoard(Long boardId, String username, HttpServletResponse httpResponse)
+            throws IOException {
 
         Board targetBoard = boardRepo.findOne(boardId);
         Account targetMember = accountRepo.findByUsername(username);
@@ -117,14 +122,78 @@ public class BoardService {
 
 
     /*
+    * Method Name: Edit Board
+    * Purpose: edit the name of a board (only owner will be able to do this via UI)
+    */
+
+    public BasicResponse editBoard(boolean sessionValid, Long boardId, String username, String newBoardName,
+                                   HttpServletResponse httpResponse) throws IOException {
+
+        BasicResponse response = new BasicResponse();
+        if (!sessionValid) { return response; }
+        Board targetBoard = boardRepo.findOne(boardId);
+
+        if (targetBoard != null) {
+            if (targetBoard.getOwner().equals(accountRepo.findByUsername(username))) {
+                List<Board> adminLevelBoards = accountRepo.findByUsername(username).getAdminLevelBoards();
+                for (Board board : adminLevelBoards) {
+                    if (board.getName().equals(newBoardName)) {
+                        httpResponse.sendError(HttpServletResponse.SC_CONFLICT, NAME_IN_USE);
+                        return response;
+                    }
+                }
+                targetBoard.setName(newBoardName);
+                Board savedBoard = boardRepo.save(targetBoard);
+                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                response.setMessage(BOARD_NAME_UPDATED);
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
+            }
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
+        }
+
+        return response;
+    }
+
+
+    /*
+    * Method Name: Delete Board
+    * Purpose: edit the name of a board (only owner will be able to do this via UI)
+    */
+
+    public BasicResponse deleteBoard(boolean sessionValid, Long boardId, String username,
+                                   HttpServletResponse httpResponse) throws IOException {
+
+        BasicResponse response = new BasicResponse();
+        if (!sessionValid) { return response; }
+        Board targetBoard = boardRepo.findOne(boardId);
+        Account targetAccount = accountRepo.findByUsername(username);
+
+        if (targetBoard != null) {
+            if (targetBoard.getOwner().equals(accountRepo.findByUsername(username)) &&
+                targetAccount.removeAdminLevelBoard(targetBoard)) {
+                    List<Account> listMembers = targetBoard.getMembers();
+                    for (Account member: listMembers) {
+                        member.removeAccessibleBoard(targetBoard);
+                    }
+                    boardRepo.delete(boardId);
+            } else {
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
+            }
+        } else {
+            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, BOARD_NOT_FOUND);
+        }
+
+        return response;
+    }
+
+    /*
    * Method Name: Get List Boards
-   * Inputs: Board Repository, username(board ownerUsername)
-   * Return: ArrayList<Board>
    * Purpose: to retrieve all boards that either belong to that user or that user is a member of
    */
 
-    public ModelAndView getHomePageBoardsList(BoardRepository boardRepo, AccountRepository accountRepo,
-                                              boolean sessionValid, String username,
+    public ModelAndView getHomePageBoardsList(boolean sessionValid, String username,
                                               HttpServletResponse httpResponse) throws IOException {
 
         ModelAndView mav = new ModelAndView();
@@ -143,6 +212,7 @@ public class BoardService {
             }
         }
 
+        mav.addObject("user", user);
         mav.addObject("createdBoards", createdBoards);
         mav.addObject("memberBoards", memberBoards);
         mav.setViewName("home");
@@ -154,14 +224,11 @@ public class BoardService {
 
     /*
     * Method Name: Add Member
-    * Inputs: Account Repository, Board Repository, (sessionUsername & sessionID later), memberUsername,
-    * HTTPServlet Response
-    * Return: Object containing the username of the new member, its url (add later), and http response
     * Purpose: To add the username of the new member to a board's members list
     */
 
-    public AddMemberResponse addMember(AccountRepository accountRepo, BoardRepository boardRepo,
-        boolean sessionValid, String username, Long boardId, HttpServletResponse httpResponse) throws IOException {
+    public AddMemberResponse addMember(boolean sessionValid, String username, Long boardId,
+                                       HttpServletResponse httpResponse) throws IOException {
 
         AddMemberResponse response = new AddMemberResponse();
         if (!sessionValid) { return response; }
