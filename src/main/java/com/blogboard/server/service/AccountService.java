@@ -45,7 +45,8 @@ public class AccountService {
 
         //SUCCESS CASE: account with provided credentials doesn't already exist
         if (accountRepo.findByUsername(username) == null && accountRepo.findByEmail(email) == null) {
-            Account newAccount = new Account(username, AppServiceHelper.hashString(password), email);
+            Account newAccount = new Account(username, AppServiceHelper.hashString(password), email,
+                    AppServiceHelper.createTimeStamp());
             Account savedAccount = accountRepo.save(newAccount);
             response.setMessage(ACCOUNT_CREATED);
 

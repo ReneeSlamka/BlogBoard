@@ -22,6 +22,9 @@ public class Account {
     @Column(name="EMAIL")
     private String email;
 
+    @Column(name="SIGNUP_DATE")
+    private String signupDate;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "ACCOUNT_BOARD", joinColumns = {@JoinColumn(name ="ACCOUNT_ID")},
             inverseJoinColumns = {@JoinColumn(name = "BOARD_ID")})
@@ -36,10 +39,11 @@ public class Account {
         super();
     }
 
-    public Account(String username, String password, String email) {
+    public Account(String username, String password, String email, String signupDate) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.signupDate = signupDate;
     }
 
     public Long getId() {
@@ -70,13 +74,9 @@ public class Account {
         return email;
     }
 
-    public void updatePassword(String newPassword) {
-        this.password = newPassword;
-    }
+    public void setSignupDate(String signupDate) { this.signupDate = signupDate; }
 
-    public void updateEmail(String newEmail) {
-        this.email = newEmail;
-    }
+    public String getSignupDate() { return signupDate; }
 
     public boolean addAccessibleBoard(Board newBoard) {
         if(!accessibleBoards.contains(newBoard)) {
