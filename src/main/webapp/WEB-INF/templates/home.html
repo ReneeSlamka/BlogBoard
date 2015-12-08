@@ -16,13 +16,16 @@
 <div class="container">
     <div class="row">
         <div class="col-md-4">
+            <!--============== User Profile and Settings Section ==============-->
             <div class="homepage-section" id="user-info-section">
+                <!--============== User Profile Picture ==============-->
                 <div id=image-container>
                     <img id="profile-img" src="http://cdn.cutestpaw.com/wp-content/uploads/2013/11/s-Golden-Retriever-Puppy.jpg" />
                     <button id="change-profile-img-button" class="btn btn-default" >Change Profile Picture</button>
                 </div>
+                <!--============== User Info and Account Management Button Panel ==============-->
                 <div id="account-management-section">
-                    <h5>Joined June 7th, 2015</h5>
+                    <h5>Joined {{ user.signupDate }}</h5>
                     <h5>Lives in Vancouver, BC Canada</h5>
                     <h5 id="user-email-address">{{ user.email }}</h5>
                     <h5 id="manage-account-title" >Manage Account</h5>
@@ -39,8 +42,9 @@
             </div>
         </div>
         <div class="col-md-8" >
+            <!--============== User's Board Info Section ==============-->
             <div id="board-info-section" class="homepage-section">
-                <h2 id="home-page-greeting">Welcome <span id="home-username">Renee</span>!</h2>
+                <h2 id="home-page-greeting">Welcome <span id="home-username">{{ user.username }}</span>!</h2>
                 <div id="board-notifications">
                     <div class="board-section-header">
                         <div class="board-header-overlay" id="notification-header-overlay">
@@ -48,18 +52,21 @@
                             <h3 class="board-header-text">Notifications</h3>
                         </div>
                     </div>
+                    <!--============== Board Notification Section ==============-->
                     <section class="boards-section" >
                         <h5>Cara posted to The Fishtank</h5>
                         <h5>Fiona posted to The Fishtank</h5>
                     </section>
                 </div>
                 <div id="user-boards-section">
+                    <!--============== Boards Accessible to User ==============-->
                     <div class="board-section-header">
                         <div class="board-header-overlay" id="user-boards-header-overlay">
                             <i class="fa fa-pencil-square fa-2x"></i>
                             <h3 class="board-header-text">Your Boards</h3>
                         </div>
                     </div>
+                    <!--============== Boards Created by User ==============-->
                     <section id="owner-boards-list" class="boards-section">
                         <h4>Boards You Created</h4>
                         {% if createdBoards is empty %}
@@ -80,7 +87,12 @@
                             </div>
                             {% endfor %}
                         {% endif %}
+                        <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
+                                data-target="#create-board-form" onclick="displayModal('create-board-form')">
+                            Create Board
+                        </button>
                     </section>
+                    <!--============== Boards User was Added to ==============-->
                     <section id="member-boards" class="boards-section">
                         <h4>Boards You've Been Added To</h4>
                         {% if memberBoards is empty %}
@@ -93,10 +105,6 @@
                             {% endfor %}
                         {% endif %}
                     </section>
-                    <button class="btn btn-default" id="create-account-button" type="button" data-toggle="modal"
-                            data-target="#create-board-form" onclick="displayModal('create-board-form')">
-                        Create Board
-                    </button>
                 </div>
             </div>
         </div>
