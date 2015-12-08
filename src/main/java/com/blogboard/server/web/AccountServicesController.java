@@ -72,6 +72,7 @@ public class AccountServicesController {
     /*
     *========== Create Account ==========
     */
+
     @RequestMapping(value = "/accounts", method = RequestMethod.POST)
     public
     @ResponseBody
@@ -84,10 +85,45 @@ public class AccountServicesController {
         return accountService.createAccount(username, password, email, httpResponse);
     }
 
+    /*
+    *========== Change Account Email Address ==========
+    */
 
+    @RequestMapping(value = "/{username}/account/email", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    BasicResponse changeEmail(
+            @RequestParam(value = "newEmailAddress", required = true) String newEmailAddress,
+            @CookieValue(value = "sessionID", required = true) String sessionId,
+            @CookieValue(value = "sessionUsername", required = true) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return accountService.changeEmail(sessionValid, sessionUsername, newEmailAddress, httpResponse);
+    }
+
+
+    /*
+    *========== Change Account Password ==========
+    */
+
+    @RequestMapping(value = "/{username}/account/password", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    BasicResponse changePassword(
+            @RequestParam(value = "oldPassword", required = true) String oldPassword,
+            @RequestParam(value = "newPassword", required = true) String newPassword,
+            @CookieValue(value = "sessionID", required = true) String sessionId,
+            @CookieValue(value = "sessionUsername", required = true) String sessionUsername,
+            HttpServletResponse httpResponse) throws IOException {
+
+        boolean sessionValid = authenticationService.validateSession(sessionId, sessionUsername, httpResponse);
+        return accountService.changePassword(sessionValid, sessionUsername, oldPassword, newPassword, httpResponse);
+    }
     /*
     *========== Login ==========
     */
+
     @RequestMapping(value = "/accounts", method = RequestMethod.GET)
     public
     @ResponseBody
@@ -103,6 +139,7 @@ public class AccountServicesController {
     /*
     *========== Logout ==========
     */
+
     @RequestMapping(value = "/sessions", method = RequestMethod.POST) //better http call option?
     public
     @ResponseBody
@@ -118,6 +155,7 @@ public class AccountServicesController {
     /*
     *========== Get Home Page ==========
     */
+
     @RequestMapping(value = "/{username}", method = RequestMethod.GET)
     public ModelAndView getHomePage(
             @PathVariable String username,

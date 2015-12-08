@@ -24,10 +24,16 @@
                 <div id="account-management-section">
                     <h5>Joined June 7th, 2015</h5>
                     <h5>Lives in Vancouver, BC Canada</h5>
-                    <h5>Registered email: renee@slamka.com</h5>
-                    <h5 id="manage-account-title">Manage Account</h5>
-                    <button class="btn account-management-button">Change Email Address</button>
-                    <button class="btn account-management-button">Reset Password</button>
+                    <h5 id="user-email-address">{{ user.email }}</h5>
+                    <h5 id="manage-account-title" >Manage Account</h5>
+                    <button class="btn account-management-button"  type="button" data-toggle="modal"
+                        data-target="#change-email-form" onclick="displayModal('change-email-form')">
+                        Change Email Address
+                    </button>
+                    <button class="btn account-management-button" type="button" data-toggle="modal"
+                            data-target="#change-password-form" onclick="displayModal('change-password-form')">
+                        Reset Password
+                    </button>
                     <button class="btn account-management-button">Delete Account</button>
                 </div>
             </div>

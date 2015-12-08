@@ -58,7 +58,7 @@ public class Account {
         return password;
     }
 
-    private void setPassword(String newPassword){
+    public void setPassword(String password){
         this.password = password;
     }
 
@@ -66,7 +66,7 @@ public class Account {
         this.email = email;
     }
 
-    public java.lang.String getEmail() {
+    public String getEmail() {
         return email;
     }
 

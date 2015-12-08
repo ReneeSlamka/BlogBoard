@@ -212,6 +212,7 @@ public class BoardService {
             }
         }
 
+        mav.addObject("user", user);
         mav.addObject("createdBoards", createdBoards);
         mav.addObject("memberBoards", memberBoards);
         mav.setViewName("home");

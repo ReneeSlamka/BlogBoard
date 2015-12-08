@@ -55,7 +55,49 @@ function login(event) {
     });
 }
 
-///boards/{boardId}/posts
+function changeEmail() {
+    var $newEmailAddress = $("#new-email-address").val().trim();
+    var apiUrl = window.location.href + "/account/email";
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        data: {"newEmailAddress": $newEmailAddress},
+        dataType: 'json',
+        crossDomain: true,
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            if(request.error === undefined) {
+                document.getElementById("user-email-address").innerHTML = $newEmailAddress;
+               $("#change-email-form").modal("toggle");
+            }
+        }
+    });
+}
+
+function changePassword() {
+    var $oldPassword = $("#old-password").val().trim();
+    var $newPassword = $("#new-password").val().trim();
+    var apiUrl = window.location.href + "/account/password";
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        data: {"oldPassword": $oldPassword, "newPassword" : $newPassword},
+        dataType: 'json',
+        crossDomain: true,
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            if(request.error === undefined) {
+                $("#change-password-form").modal("toggle");
+            }
+        }
+    });
+}
 
 function logout(event) {
     $.ajax({
