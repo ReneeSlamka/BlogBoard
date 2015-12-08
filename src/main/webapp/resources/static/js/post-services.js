@@ -1,4 +1,33 @@
 
+function addPost() {
+    var apiUrl = window.location.href + '/posts';
+    var $title = $("#new-post-title").val().trim();
+    var $textBody = $("#new-post-text").val().trim();
+
+    $.ajax({
+        type: 'POST',
+        cache: false,
+        async: false,
+        url: apiUrl,
+        data: {"title": $title, "textBody": $textBody},
+        dataType: 'json',
+        crossDomain: true,
+        error: function (request, textStatus, errorThrown) {
+            alert(textStatus);
+        },
+        complete: function (request, textStatus) {
+            alert(request.responseText);
+            //Todo: temporary solution for user friendly error
+            if(request.responseJSON.error === undefined) {
+                addPostElement($title, $textBody);
+                document.getElementById("#new-post-title").value = "";
+                document.getElementById("#new-post-text").value = "";
+            }
+        }
+    });
+}
+
+
 function savePostChanges(postId, titleId, textContentId) {
     var apiUrl = window.location.href + '/posts/' + postId;
     var title = document.getElementById("edit-" + titleId).value;
@@ -30,6 +59,7 @@ function savePostChanges(postId, titleId, textContentId) {
     });
 }
 
+
 function showEditingFields(titleId, textContentId) {
     var title = document.getElementById(titleId).innerHTML;
     var textBody =  document.getElementById(textContentId).innerHTML;
@@ -45,6 +75,7 @@ function showEditingFields(titleId, textContentId) {
     document.getElementById(titleId).style.display = "none";
     document.getElementById(textContentId).style.display = "none";
 }
+
 
 function deletePost(postId, postElementId) {
     var apiUrl = window.location.href + '/posts/' + postId;
