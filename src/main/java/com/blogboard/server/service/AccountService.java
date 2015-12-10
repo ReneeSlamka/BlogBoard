@@ -16,15 +16,15 @@ public class AccountService {
     private static final String LOGIN_PAGE = BASE_URL + File.separator + "login";
 
     //Custom Success/Error Messages
-    private static final String ACCOUNT_CREATED = "Congrats, your account has successfully been " +
+    public static final String ACCOUNT_CREATED = "Congrats, your account has successfully been " +
                                                                 "created! You can now login and start blogging.";
-    private static final String EMAIL_CHANGED = "Email successfully changed";
-    private static final String PASSWORD_CHANGED = "Password successfully changed";
-    private static final String USERNAME_IN_USE = "Sorry, it seems there is already an account with that username";
-    private static final String EMAIL_IN_USE = "Sorry, it seems there is already an account with that email";
-    private static final String INCORRECT_PASSWORD = "Password change failed, old password incorrect";
-    private static final String PASSWORD_IN_USE = "New password must be different from old password";
-    private static final String UNKNOWN_ERROR = "An unknown error has occurred.";
+    public static final String EMAIL_CHANGED = "Email successfully changed";
+    public static final String PASSWORD_CHANGED = "Password successfully changed";
+    public static final String USERNAME_IN_USE = "Sorry, it seems there is already an account with that username";
+    public static final String EMAIL_IN_USE = "Sorry, it seems there is already an account with that email";
+    public static final String INCORRECT_PASSWORD = "Password change failed, old password incorrect";
+    public static final String PASSWORD_IN_USE = "New password must be different from old password";
+    public static final String UNKNOWN_ERROR = "An unknown error has occurred.";
 
 
     @Autowired
@@ -54,7 +54,7 @@ public class AccountService {
             if (savedAccount == null) {
                 httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, UNKNOWN_ERROR);
             } else {
-                httpResponse.setStatus(HttpServletResponse.SC_OK);
+                httpResponse.setStatus(HttpServletResponse.SC_CREATED);
                 httpResponse.setHeader("Location", LOGIN_PAGE);
             }
         //FAILURE CASE(S): either account with same credential(s) already exists or unknown error occurred

@@ -1,8 +1,13 @@
-package com.blogboard.server.configuration;
+package com.blogboard.server;
 
+import com.blogboard.server.data.entity.Account;
+import com.blogboard.server.data.repository.AccountRepository;
 import com.mitchellbosecke.pebble.spring.PebbleViewResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -14,15 +19,26 @@ import com.mitchellbosecke.pebble.PebbleEngine;
 import com.mitchellbosecke.pebble.loader.Loader;
 import com.mitchellbosecke.pebble.loader.ServletLoader;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
+import org.springframework.web.context.ServletContextAware;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 
 @Configuration
-@ComponentScan(basePackages = { "com.blogboard.server.web", "com.blogboard.server.service" })
+@ComponentScan(basePackages = { "com.blogboard.server.web", "com.blogboard.server.service"})
+//@EnableJpaRepositories(basePackages = "com.blogboard.server.data.repository")
 @EnableWebMvc
-public class WebConfig extends WebMvcConfigurerAdapter {
+//@EnableTransactionManagement
+
+public class WebConfig extends WebMvcConfigurerAdapter implements ServletContextAware{
+
+    //@Autowired
+    private ServletContext servletContext;
 
     @Autowired
-    private ServletContext servletContext;
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
 
     @Bean
     public Loader templateLoader(){
@@ -48,5 +64,4 @@ public class WebConfig extends WebMvcConfigurerAdapter {
             DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
     }
-
 }
