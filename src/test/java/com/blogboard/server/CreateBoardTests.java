@@ -47,14 +47,12 @@ public class CreateBoardTests extends Mockito {
     String username = "Phoebe";
     String password = "Sm311yCat";
     String email = "chandler@bing.com";
-    BasicResponse response;
     HttpServletResponse httpResponse;
 
     @Before
     public void setUpAccount() throws IOException {
         HttpServletResponse createAccountHttpResponse = mock(HttpServletResponse.class);
-        BasicResponse createAccountResponse = accountService.
-                createAccount(username,password, email,createAccountHttpResponse);
+        accountService.createAccount(username,password, email,createAccountHttpResponse);
     }
 
     @Test
