@@ -26,13 +26,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 @Configuration
 @ComponentScan(basePackages = { "com.blogboard.server.web", "com.blogboard.server.service"})
-//@EnableJpaRepositories(basePackages = "com.blogboard.server.data.repository")
 @EnableWebMvc
-//@EnableTransactionManagement
 
 public class WebConfig extends WebMvcConfigurerAdapter implements ServletContextAware{
 
-    //@Autowired
     private ServletContext servletContext;
 
     @Autowired

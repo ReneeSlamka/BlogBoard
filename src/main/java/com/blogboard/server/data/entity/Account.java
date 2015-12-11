@@ -32,7 +32,6 @@ public class Account {
 
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.PERSIST)
-    //@JoinColumn(name = "BOARD_ID")
     private List<Board> adminLevelBoards = new ArrayList<Board>();
 
     public Account() {
