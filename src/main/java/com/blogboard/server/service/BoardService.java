@@ -71,6 +71,7 @@ public class BoardService {
 
         //SUCCESS CASE: board with that name does not already exist (for this user)
         if (boardRepo.findByNameAndOwner(decodedName, boardOwner) == null) {
+            
             //create board and save in board repo
             Board newBoard = new Board(decodedName, boardOwner, AppServiceHelper.createTimeStamp());
             newBoard.addMember(boardOwner);
@@ -78,7 +79,9 @@ public class BoardService {
             savedBoard.setUrl(BASE_BOARD_URL);
             savedBoard = boardRepo.save(savedBoard);
             boardOwner.addAccessibleBoard(savedBoard);
+            boardOwner.addAdminLevelBoard(savedBoard);
             Account savedAccount = accountRepo.save(boardOwner);
+
             response.setBoardName(savedBoard.getName());
             response.setBoardUrl(savedBoard.getUrl());
 
@@ -199,9 +202,6 @@ public class BoardService {
         ModelAndView mav = new ModelAndView();
         if (!sessionValid) { return mav; }
         Account user = accountRepo.findByUsername(username);
-
-        List<Account> memberSearchList = new ArrayList<Account>();
-        memberSearchList.add(user);
         List<Board> createdBoards = user.getAdminLevelBoards();
         List<Board> accessibleBoards = user.getAccessibleBoards();
         List<Board> memberBoards = new ArrayList<Board>();
