@@ -28,7 +28,7 @@ import java.io.IOException;
 @Transactional
 @ContextConfiguration(classes = {WebConfig.class, PersistenceContext.class})
 @WebAppConfiguration
-public class CreatePostTests extends Mockito{
+public class PostManagementTests extends Mockito{
 
     @Autowired
     private AccountRepository accountRepo;
@@ -93,6 +93,8 @@ public class CreatePostTests extends Mockito{
         postService.addPost(true, targetBoard.getId(), author, title, postBody, addPostResponse);
     }
 
+
+
     @Test
     public void deletePost_happyCase_singlePost() throws IOException {
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
@@ -102,5 +104,86 @@ public class CreatePostTests extends Mockito{
         Post targetPost = targetBoard.getPosts().get(0);
         postService.deletePost(true, targetBoard.getId(), targetPost.getId(), httpResponse);
         MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(0));
+    }
+
+    @Test
+    public void deletePost_postDNE() throws IOException {
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
+        addPostHelper(targetBoard, username, title, postBody);
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+        postService.deletePost(true, targetBoard.getId(), 100L, httpResponse);
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+    }
+
+    @Test
+    public void deletePost_wrongBoardId() throws IOException {
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
+        addPostHelper(targetBoard, username, title, postBody);
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+        Post targetPost = targetBoard.getPosts().get(0);
+        MatcherAssert.assertThat(targetBoard.getId(), Matchers.not(100L));
+        postService.deletePost(true, 100L, targetPost.getId(), httpResponse);
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+    }
+
+
+
+    @Test
+    public void editPost_happyCase() throws IOException {
+        String newTitle = "New Title";
+        String newText = "Changed post body";
+
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
+        addPostHelper(targetBoard, username, title, postBody);
+
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+        Post targetPost = targetBoard.getPosts().get(0);
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(postBody));
+        postService.editPost(true, targetBoard.getId(), targetPost.getId(), newTitle, newText, httpResponse);
+
+        MatcherAssert.assertThat(targetPost.getTitle(), Matchers.equalTo(newTitle));
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(newText));
+    }
+
+    @Test
+    public void editPost_wrongPostId() throws IOException {
+        String newTitle = "New Title";
+        String newText = "Changed post body";
+
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
+        addPostHelper(targetBoard, username, title, postBody);
+
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+        Post targetPost = targetBoard.getPosts().get(0);
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(postBody));
+        MatcherAssert.assertThat(targetPost.getId(), Matchers.not(100L));
+        postService.editPost(true, targetBoard.getId(), 100L, newTitle, newText, httpResponse);
+
+        MatcherAssert.assertThat(targetPost.getTitle(), Matchers.equalTo(title));
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(postBody));
+    }
+
+
+    @Test
+    public void editPost_wrongBoardId() throws IOException {
+        String newTitle = "New Title";
+        String newText = "Changed post body";
+
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
+        Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
+        addPostHelper(targetBoard, username, title, postBody);
+
+        MatcherAssert.assertThat(targetBoard.getPosts().size(), Matchers.equalTo(1));
+        Post targetPost = targetBoard.getPosts().get(0);
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(postBody));
+        MatcherAssert.assertThat(targetBoard.getId(), Matchers.not(100L));
+        postService.editPost(true, 100L, targetPost.getId(), newTitle, newText, httpResponse);
+
+        MatcherAssert.assertThat(targetPost.getTitle(), Matchers.equalTo(title));
+        MatcherAssert.assertThat(targetPost.getTextContent(), Matchers.equalTo(postBody));
     }
 }
