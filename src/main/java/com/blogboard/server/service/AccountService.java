@@ -73,7 +73,7 @@ public class AccountService {
     }
 
     /*
-    * Method Name: Update Email
+    * Method Name: Change Email
     * Inputs: Account Repository, username, password, email, httpResponse
     * Return Value: Account Services BasicResponse w/ HTTP Servlet BasicResponse
     * Purpose: create new account, store in database and return the a success or failure message
@@ -100,7 +100,7 @@ public class AccountService {
     }
 
     /*
-    * Method Name: Update Password
+    * Method Name: Change Password
     * Inputs: Account Repository, username, password, email, httpResponse
     * Return Value: Account Services BasicResponse w/ HTTP Servlet BasicResponse
     * Purpose: create new account, store in database and return the a success or failure message
