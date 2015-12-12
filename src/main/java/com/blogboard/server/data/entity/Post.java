@@ -22,7 +22,6 @@ public class Post {
     @Column(name = "TIME_STAMP")
     private String timeStamp;
 
-    //NOTE: use of columnDefinition = "blob" or "TEXT" is NOT portable, replace with length = #number later
     @Lob
     @Column(name = "TEXT_CONTENT", length = 4096)
     private String textContent;
