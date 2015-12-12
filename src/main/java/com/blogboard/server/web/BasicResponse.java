@@ -5,7 +5,7 @@ public class BasicResponse {
     private String message;
 
     public BasicResponse() {
-        this.message = "";
+        super();
     }
 
     public String getMessage() {
