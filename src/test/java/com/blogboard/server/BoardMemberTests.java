@@ -62,11 +62,14 @@ public class BoardMemberTests extends Mockito {
     @Test
     public void addMember_happyCase_singleAccount() throws IOException {
         createAccountHelper("Regina", "Philange", "p@g.com");
+        Account targetAccount = accountRepo.findByUsername("Regina");
         Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
         MatcherAssert.assertThat(targetBoard.getMembers().size(), Matchers.equalTo(1));
 
         boardService.addMember(true, "Regina", targetBoard.getId(), httpResponse);
         MatcherAssert.assertThat(targetBoard.getMembers().size(), Matchers.equalTo(2));
+        MatcherAssert.assertThat(targetAccount.getAccessibleBoards().size(), Matchers.equalTo(1));
+        MatcherAssert.assertThat(targetAccount.getAdminLevelBoards().size(), Matchers.equalTo(0));
     }
 
     @Test
@@ -76,10 +79,15 @@ public class BoardMemberTests extends Mockito {
         Board targetBoard = boardRepo.findByNameAndOwner(boardName, accountRepo.findByUsername(username));
         MatcherAssert.assertThat(targetBoard.getMembers().size(), Matchers.equalTo(1));
 
+        Account targetAccount1 = accountRepo.findByUsername("Regina");
+        Account targetAccount2 = accountRepo.findByUsername("Richard");
+
         HttpServletResponse secondHttpResponse = mock(HttpServletResponse.class);
         boardService.addMember(true, "Regina", targetBoard.getId(), httpResponse);
         boardService.addMember(true, "Richard", targetBoard.getId(), secondHttpResponse);
         MatcherAssert.assertThat(targetBoard.getMembers().size(), Matchers.equalTo(3));
+        MatcherAssert.assertThat(targetAccount1.getAccessibleBoards().size(), Matchers.equalTo(1));
+        MatcherAssert.assertThat(targetAccount2.getAccessibleBoards().size(), Matchers.equalTo(1));
     }
 
     @Test
