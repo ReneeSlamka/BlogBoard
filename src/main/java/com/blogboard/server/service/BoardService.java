@@ -35,6 +35,7 @@ public class BoardService {
     private static final String POST_ADDED = "Post successfully added";
     private static final String POST_DELETED = "Post successfully deleted";
     private static final String BOARD_NAME_UPDATED = "Board name successfully updated";
+    private static final String BOARD_DELETED = "Board successfully deleted";
 
     private static final String NAME_IN_USE = "Sorry, it seems there is already a board with that name";
     public static final String BOARD_NOT_FOUND = "Error, board with that name doesn't exist";
@@ -181,6 +182,8 @@ public class BoardService {
                         member.removeAccessibleBoard(targetBoard);
                     }
                     boardRepo.delete(boardId);
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    response.setMessage(BOARD_DELETED);
             } else {
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, USER_NOT_BOARD_ADMIN);
             }
